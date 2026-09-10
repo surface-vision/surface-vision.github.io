@@ -1,20 +1,3 @@
----
-title: Surface Inspection Console
-emoji: 🔶
-colorFrom: yellow
-colorTo: gray
-sdk: docker
-app_port: 7860
-pinned: false
-short_description: Steel strip surface defect detection, with the caveats attached
-tags:
-  - computer-vision
-  - object-detection
-  - yolov8
-  - manufacturing
-  - quality-inspection
-  - streamlit
----
 
 # Surface Inspection Console
 
@@ -27,6 +10,37 @@ and says why.
 The model is a 6.22 MB YOLOv8n fine-tuned on NEU-DET. **This is a capability
 demonstration on public research datasets, not a Jindal Stainless production
 system**; no line data was used and nothing here has seen a calibration target.
+
+> ### Try the system without installing anything
+>
+> **<https://surface-vision.github.io>** runs the same detector entirely in your
+> browser -- no upload, no server, no account. It is the fastest way to see the
+> system work, and it is verified detection-for-detection against the PyTorch
+> reference: **40/40 matched across 12 images**, max box delta 0.14 px, max
+> confidence delta 0.0016, median **7.6 ms** per inference.
+>
+> **This repository is the other half**: the full operator console, which does the
+> things a browser cannot -- batch inspection over a coil, the per-coil
+> disposition report, the line simulation, EigenCAM explanations, and a second
+> checkpoint to compare against. It is a Streamlit app.
+>
+> **To deploy it, free, in about two minutes of clicking: [DEPLOY.md](DEPLOY.md).**
+
+### Where this runs, and why it is not a Hugging Face Space
+
+It was built as one. Hugging Face now requires a PRO subscription for Docker and
+Gradio Spaces on free CPU hardware -- only static Spaces remain free, and a static
+Space cannot run a Python process. The `Dockerfile` is kept and still correct, so
+self-hosting is one `docker build` away; the free host is now **Streamlit
+Community Cloud**, which reads `requirements.txt`, `packages.txt` and `app.py`
+straight from this repository and ignores the Dockerfile entirely.
+
+That move cost something worth being explicit about: a free CPU Space had 16 GB of
+RAM and a Streamlit Community Cloud container has of the order of 1 GB. The app
+was measured against the new ceiling rather than assumed to fit, two things were
+cut to make the headroom real, and `tools/measure_memory.py` is the tool that
+proves it -- **peak 585-618 MB against ~1024 MB, about 40% spare.** The working is
+in [DEPLOY.md](DEPLOY.md) section 7 and in the MEMORY BUDGET comment in `app.py`.
 
 ---
 
@@ -180,8 +194,8 @@ conditions for promoting it are written out in `vendor/inference.py` ->
 ### Latency on CPU
 
 Measured by `tools/bench_cpu.py` through the vendored code on the project's
-development host, CPU only, torch pinned to 2 threads to approximate this
-Space's 2 vCPU. Reproduce on the Space's own hardware with
+development host, CPU only, torch pinned to 2 threads to approximate the small
+shared container this deploys into. Reproduce on the deployed hardware with
 `python tools/bench_cpu.py --threads 2 --cam`:
 
 | | mean | p50 | p95 | |
@@ -198,9 +212,10 @@ Two honest notes on those figures. First, the same benchmark at 8 torch threads
 is **slower** than at 2 (7.3 ms vs 6.5 ms single-frame; 244 ms vs 194 ms tiled) --
 for a 3 M-parameter model the thread overhead dominates, which is why the app
 pins torch to the CPUs the container actually has rather than to what
-`os.cpu_count()` reports. Second, a shared Spaces vCPU is slower per core than
+`os.cpu_count()` reports. Second, a shared free-tier vCPU is slower per core than
 that host's, so treat every number above as a floor and read the timings the
-console prints on screen instead: those are measured here, in your request.
+console prints on screen instead: those are measured in the container serving you,
+in your own request.
 
 ### Regression
 
@@ -218,7 +233,7 @@ after everything above.
 and leaves the 180-frame test split fully held out (1,440 / 180 / 180, verified
 free of cross-split duplicates by content hash). *Licence:* the release states
 none. It is distributed for academic research and is treated here as
-research-use-only; the project records no licence grant for it, and this Space
+research-use-only; the project records no licence grant for it, and this repository
 ships 18 frames of the held-out test split for demonstration, with attribution.
 Cite: He, Song, Meng, Yan, *An End-to-End Steel Surface Defect Detection
 Approach via Fusing Multiple Hierarchical Features*, IEEE Trans. Instrum. Meas.
@@ -230,7 +245,7 @@ values 1-4 with **no published defect semantics**, which is why those four
 classes are named after their mask value and carry no root cause. Accessed via
 the public `Voxel51/severstal_steel_defects` mirror of the Kaggle competition
 data. *Licence:* competition terms; no images from it are redistributed in this
-Space.
+repository.
 
 **GC10-DET** -- Lv, X.; Duan, F.; Jiang, J.J.; Fu, X.; Gan, L. *Deep Metallic
 Surface Defect Detection: The New Benchmark and Detection Network.* Sensors 2020,
@@ -238,7 +253,7 @@ Surface Defect Detection: The New Benchmark and Detection Network.* Sensors 2020
 **CC BY 4.0** -- attribution required and given, here and in `assets/README.md`.
 Accessed via the `imaadd05/gc10-det` mirror, which carries the explicit CC BY 4.0
 grant (the original Baidu Pan release states no licence). One unmodified frame is
-redistributed in this Space under that licence. **The model shipped here has
+redistributed here under that licence. **The model shipped here has
 never been trained on GC10**, so the strip demonstration shows the inference path
 on real strip geometry and is not an accuracy claim on that dataset.
 
@@ -281,13 +296,24 @@ than one defect type; the confusion matrix collapses those to a majority class.
 **The economics are placeholders.** 12:1 miss-to-false-alarm and 5% prevalence
 are defensible orders of magnitude, not Jindal Stainless numbers.
 
-**This deployment specifically.** Free CPU tier: 2 shared vCPU, 16 GB RAM, no
-GPU. It carries 18 of the 180 held-out test frames and one strip capture, not
-the datasets. Uploads above 12 MP are downscaled before the network sees them
-(a tiling cost, with the arithmetic in `app.py`). EigenCAM is behind a button
-because the first call in a process costs seconds. Nothing is downloaded at
+**This deployment specifically.** A free shared container: ~1 GB RAM, a small
+number of shared vCPU, no GPU. It carries 18 of the 180 held-out test frames and
+one strip capture, not the datasets. Uploads above 12 MP are downscaled before the
+network sees them (a tiling cost, with the arithmetic in `app.py`). EigenCAM is
+behind a button because the first call in a process costs seconds *and* because
+importing grad-cam costs 85 MB the process would otherwise pay on every cold boot.
+Only one checkpoint is resident at a time and decoded frames are not cached
+through `st.cache_data`; both are memory decisions forced by that ~1 GB, both are
+measured, and both are documented where they are made. Nothing is downloaded at
 runtime; both checkpoints are committed. Everything the console imports lives in
 `vendor/`, which is described in `vendor/README.md`.
+
+**Streamlit serves every session from one process.** The memory figures are one
+session. The model, the calibration map and the sample catalogue are shared across
+all of them, but each concurrent session holds its own decoded frame, and the free
+tier is not the place to send a hundred people at once. It is a demonstration
+host, not a mill deployment -- which is the same point the browser demo makes from
+the other direction.
 
 ---
 
@@ -301,4 +327,7 @@ runtime; both checkpoints are committed. Everything the console imports lives in
     assets/                 one 2048x1000 GC10-DET line-scan frame, CC BY 4.0
     tools/bench_cpu.py      produced every latency figure above
     tools/verify_vendor.py  diffs vendor/ against the repository's src/
-    DEPLOY.md               how this Space was pushed
+    tools/measure_memory.py measures the app against its host's RAM budget
+    DEPLOY.md               click-by-click deployment, free, on Streamlit Cloud
+    Dockerfile              self-hosting; unused by Streamlit Cloud
+    packages.txt            apt packages; names only, no comments -- see DEPLOY.md

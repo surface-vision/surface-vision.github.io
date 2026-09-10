@@ -85,6 +85,7 @@ Run with:
 
 from __future__ import annotations
 
+import hashlib
 import html
 import io
 import json
@@ -93,6 +94,7 @@ import random
 import sys
 import tempfile
 import threading
+from collections import OrderedDict
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
@@ -1718,31 +1720,37 @@ CSS = f"""
 """
 
 
-# MEMORY BUDGET. Streamlit Community Cloud's free tier is the tightest host this
-# console runs on -- of the order of 1 GB for the whole container, against a
-# Hugging Face free CPU Space's 16 GB. Measured on this build (see
-# `tools/measure_memory.py`, which prints every figure quoted here):
+# MEMORY BUDGET. Streamlit Community Cloud is the tightest host this console runs
+# on -- of the order of 1 GB for the whole container, against the 16 GB a free
+# Hugging Face CPU Space gave before Docker Spaces became a paid feature. That is
+# tight enough that "does it fit?" needs a measurement, so there is a tool for it:
+# `tools/measure_memory.py` prints every figure below and exits non-zero if the
+# peak crosses the budget.
 #
-#   cold boot, checkpoint loaded, warmed, one 200x200 frame scored      493.8 MB
-#   after a 2048x1000 strip through the tiled path                      594.8 MB
-#   + the second checkpoint left resident by a sidebar switch          +25.8 MB
-#   + the decode cache filled with 64 wide frames                     +323.5 MB
-#   + the Explain button (pytorch_grad_cam, scikit-learn, scipy)        +85.2 MB
+# Measured on this build (RSS, three runs, macOS/Python 3.11 -- read the tool's
+# docstring on why the platform matters):
 #
-# The floor is torch and ultralytics and is not negotiable: 146 MB and 30 MB of
-# marginal import cost for the engine that does the work. The three additions are
-# negotiable, and the last two would together put the container over its limit, so
-# each is bounded here rather than left to grow:
+#   cold boot: imports, checkpoint, warmup, one frame scored     461 - 494 MB
+#   peak, having also run the tiled path on a 2048x1000 strip,
+#   switched checkpoint, decoded 400 wide frames and hit Explain  588 - 618 MB
+#
+# The floor is torch and ultralytics and is not negotiable -- 146 MB and 30 MB of
+# marginal import cost for the engine that does the work, plus 67 MB of pandas and
+# 53 MB of streamlit for the console around it. What was negotiable was everything
+# that grew *after* boot, which before this build peaked at 923 MB, i.e. inside the
+# noise of the limit:
 #
 #   * ONE detector resident, not one per checkpoint the sidebar has ever shown.
-#   * EIGHT decoded frames cached, not 64.
-#   * grad-cam imported inside the Explain button, never at module scope.
+#   * The decode cache off `st.cache_data`, which was worth 386 MB on its own
+#     (see the long note above `cached_decode`).
+#   * grad-cam imported inside the Explain button, never at module scope: it costs
+#     85 MB the first time and would cost it on every cold boot otherwise.
 #
-# What each bound costs is measured too, and it is nothing: a checkpoint reload is
-# 9.1 ms, a re-decode of the widest frame in the project is 3.1 ms, and of a
-# NEU-DET frame 0.1 ms. Paying single-digit milliseconds to hold ~350 MB in
-# reserve is the right trade on a host whose failure mode is the OOM killer
-# restarting the app under a judge.
+# What the bounds cost is measured too, and it is nothing: a checkpoint reload is
+# 9.1 ms, a re-decode of the widest frame in the project 3.1 ms, of a NEU-DET
+# frame 0.1 ms. Paying single-digit milliseconds to keep ~400 MB in reserve is the
+# right trade on a host whose failure mode is the OOM killer restarting the app
+# under a judge.
 @st.cache_resource(show_spinner=False, max_entries=1)
 def get_detector(weights: str, device: str) -> DefectDetector:
     """The one resident detector, shared across reruns and sessions.
@@ -1795,17 +1803,68 @@ def get_calibration() -> CalibrationInfo:
     return load_calibration()
 
 
-# 8, not 64. Each entry is a decoded HWC RGB uint8 array, so a 2048x1000 strip
-# capture costs 6.1 MB of it and the 64-entry cache measured +323.5 MB once full --
-# more than the model, torch and ultralytics put together, and reachable from the
-# UI by dropping a folder into the batch tab. 8 caps the same worst case at
-# ~49 MB, and the thing being cached takes 3.1 ms to recompute for the widest
-# frame in the project and 0.1 ms for a NEU-DET frame. The cache is here to stop a
-# slider drag re-decoding the frame on screen, and 8 is more than enough for that:
-# one frame being tuned, plus room for the handful behind it in a batch.
-@st.cache_data(show_spinner=False, max_entries=8)
+# THE DECODE CACHE, AND WHY IT IS NOT `st.cache_data`.
+#
+# This was `@st.cache_data(max_entries=64)`, and on a 1 GB host it was the single
+# largest thing in the process after torch. `st.cache_data` guarantees that
+# callers cannot mutate each other's values, and it delivers that by pickling the
+# return value on the way in and unpickling it on the way out. The value here is a
+# `LoadedImage` wrapping an HWC RGB uint8 array -- 6.1 MB for the 2048x1000 strip
+# capture -- so every miss allocated a ~6 MB pickle buffer and every *hit*
+# allocated a fresh ~6 MB array. Measured on this build, pushing wide frames
+# through it drove RSS +386 MB above the boot figure and held it there.
+#
+# That plateau is not a leak and not a retention bug: eviction works, and 400
+# distinct frames cost the same as 100. It is the allocator's arena settling at
+# the high-water mark of that churn, and it counts against the container either
+# way. Lowering `max_entries` to 8 barely moved it (+351 MB) because the cost is
+# the round-trip, not the residency.
+#
+# Measured alternatives, same 400-frame probe, same process:
+#
+#   st.cache_data(max_entries=8)      +351 MB     pickle on every miss and hit
+#   st.cache_resource(max_entries=8)   +85 MB     no pickle, strong references
+#   no cache, decode_image direct      +14 MB     flat from the 8th frame onward
+#
+# So the cache is removed and replaced with two strong references. What that
+# forfeits is measured too and is negligible: a re-decode is 3.1 ms for the widest
+# frame in the project and 0.1 ms for a NEU-DET frame, against an inference in the
+# tens of ms and a websocket round-trip either side of it. `load_sample_image` has
+# always re-decoded on every rerun for exactly this reason; uploads now behave the
+# same way, which is also one less difference between the two paths.
+#
+# Two entries, by strong reference, because that is what makes a slider drag on
+# the frame on screen free without reintroducing the churn -- the frame being
+# tuned, plus the one before it for an A/B. Keyed on the content hash rather than
+# the bytes so the key does not pin a second copy of the file in the dict.
+_DECODE_CACHE: "OrderedDict[tuple[str, int, str], LoadedImage]" = OrderedDict()
+_DECODE_CACHE_MAX = 2
+_DECODE_LOCK = threading.Lock()
+
+
 def cached_decode(data: bytes, name: str) -> LoadedImage:
-    return decode_image(data, name)
+    """`decode_image`, memoised two frames deep by content.
+
+    Process-wide and lock-guarded because Streamlit serves every session from one
+    process, and two sessions uploading at once must not interleave a read and an
+    eviction. `LoadedImage` is treated as immutable by every caller -- nothing in
+    this file writes to `.array` -- which is what makes sharing one instance
+    between sessions safe and is the assumption `st.cache_data` was paying 386 MB
+    to avoid having to make.
+    """
+    key = (hashlib.blake2b(data, digest_size=16).hexdigest(), len(data), name)
+    with _DECODE_LOCK:
+        hit = _DECODE_CACHE.get(key)
+        if hit is not None:
+            _DECODE_CACHE.move_to_end(key)
+            return hit
+    loaded = decode_image(data, name)  # outside the lock: 3 ms is not worth serialising
+    with _DECODE_LOCK:
+        _DECODE_CACHE[key] = loaded
+        _DECODE_CACHE.move_to_end(key)
+        while len(_DECODE_CACHE) > _DECODE_CACHE_MAX:
+            _DECODE_CACHE.popitem(last=False)
+    return loaded
 
 
 @st.cache_data(show_spinner=False)

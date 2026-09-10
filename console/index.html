@@ -51,6 +51,14 @@ docker build -t surface-console . &amp;&amp; docker run -p 7860:7860 surface-con
       <code>pip install -r requirements.txt &amp;&amp; streamlit run app.py</code> on Python 3.11 does the
       same. Both checkpoints are in the clone, so there is nothing to download and no token to obtain.
     </p>
+    <p class="note">
+      To host it rather than run it, the same directory is mirrored at
+      <a href="https://github.com/surface-vision/surface-vision-console">surface-vision/surface-vision-console</a>,
+      laid out at the repository root the way Streamlit Community Cloud expects to find
+      <code>app.py</code>, <code>requirements.txt</code> and <code>packages.txt</code>.
+      <code>DEPLOY.md</code> is the click-by-click. Nothing is deployed there yet -- the repository is
+      the deployable artefact, not a running service.
+    </p>
   </div>
 </div>
 
@@ -70,17 +78,17 @@ docker build -t surface-console . &amp;&amp; docker run -p 7860:7860 surface-con
           <tr>
             <td><a href="app.py" class="mono">app.py</a></td>
             <td class="ds">The Streamlit application: four tabs -- single frame, batch, line simulation, defect atlas.</td>
-            <td class="num">149 KB</td>
+            <td class="num">152 KB</td>
           </tr>
           <tr>
             <td><a href="README.md" class="mono">README.md</a></td>
             <td class="ds">What the console does, in its own words, with the caveats attached.</td>
-            <td class="num">16 KB</td>
+            <td class="num">18 KB</td>
           </tr>
           <tr>
             <td><a href="DEPLOY.md" class="mono">DEPLOY.md</a></td>
-            <td class="ds">How it would be pushed to a Space, including the git-lfs failure mode that would otherwise ship 130-byte pointer files instead of weights.</td>
-            <td class="num">8 KB</td>
+            <td class="ds">The click-by-click for Streamlit Community Cloud, then two self-hosting paths -- including the git-lfs failure mode that would otherwise ship 130-byte pointer files instead of weights.</td>
+            <td class="num">9 KB</td>
           </tr>
           <tr>
             <td><a href="Dockerfile" class="mono">Dockerfile</a></td>
@@ -94,8 +102,8 @@ docker build -t surface-console . &amp;&amp; docker run -p 7860:7860 surface-con
           </tr>
           <tr>
             <td><a href="packages.txt" class="mono">packages.txt</a></td>
-            <td class="ds">The two apt libraries cv2 needs in a container with no X11.</td>
-            <td class="num">1 KB</td>
+            <td class="ds">The two apt libraries cv2 needs in a container with no X11. Names only, nothing else -- the lines go to apt-get verbatim, so the reasoning lives in DEPLOY.md instead.</td>
+            <td class="num">20 bytes</td>
           </tr>
           <tr>
             <td><a href=".streamlit/config.toml" class="mono">.streamlit/config.toml</a></td>

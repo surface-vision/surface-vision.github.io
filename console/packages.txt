@@ -1,21 +1,2 @@
-# Debian/Ubuntu packages apt-installed at Space build time, before requirements.txt.
-#
-# WHY THIS FILE EXISTS. requirements.txt pins opencv-python-headless, but
-# ultralytics declares a hard requirement on `opencv-python` by name. Both wheels
-# install into the same `cv2/` package directory, so whichever pip unpacks last
-# owns the extension module -- verified on a from-scratch install of this exact
-# requirements.txt, where opencv-python was installed after the headless wheel and
-# the resulting cv2 reports a GUI backend. On Linux that build links libGL and
-# libgthread, which a slim container does not carry, and the failure is
-# `ImportError: libGL.so.1: cannot open shared object file` at `import cv2` --
-# i.e. the Space builds successfully and then never starts.
-#
-# Rather than gamble on pip's install order, the two libraries are installed. They
-# are small and they make the outcome the same whichever wheel wins.
-#
-# If a future base image rejects either name, drop the offending line: neither is
-# needed by the headless wheel, and the fallback is to make the headless wheel the
-# one that wins (pip install --force-reinstall opencv-python-headless as the last
-# requirements line).
 libgl1
 libglib2.0-0

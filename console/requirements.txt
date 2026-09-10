@@ -1,7 +1,15 @@
-# Jindal Stainless surface inspection console -- Hugging Face Spaces runtime.
+# Jindal Stainless surface inspection console -- runtime dependencies.
 #
-# Python 3.11 (pinned in README.md front-matter as `python_version: "3.11"`, which
-# is what the +cpu wheel tags below are built for). Free CPU tier: 2 vCPU, 16 GB.
+# PRIMARY HOST: Streamlit Community Cloud (free). Choose **Python 3.11** in the
+# app's Advanced settings when you create it -- that is not the platform default,
+# and it is what the `+cpu` wheel tags below are resolved against. DEPLOY.md says
+# where that dropdown is.
+#
+# Budget on that host is of the order of 1 GB of RAM for the whole container,
+# which is the tightest constraint on this file: see the MEMORY BUDGET comment in
+# app.py and `tools/measure_memory.py`, which measures the app against it. It also
+# still builds as a Docker image (see Dockerfile) for self-hosting, where the
+# budget is whatever the host gives it.
 #
 # Only packages this Space's own code imports are listed, so this file is the
 # dependency surface a reviewer has to trust; everything else arrives
@@ -46,7 +54,7 @@ ultralytics==8.4.144
 
 # --- imaging and numerics ---------------------------------------------------
 numpy==2.3.5
-# headless, not opencv-python: a Spaces container has no X11 and no libGL, and the
+# headless, not opencv-python: these containers have no X11 and no libGL, and the
 # GUI build fails at `import cv2` with an ImportError on libGL.so.1. ultralytics
 # declares `opencv-python`, so pip installs both wheels; they provide the same
 # `cv2` module and the headless one is the one that has to be present. Pinning it
@@ -55,9 +63,10 @@ opencv-python-headless==5.0.0.93
 pillow==12.3.0
 
 # --- console ----------------------------------------------------------------
-# streamlit is pinned here as well as declared as `sdk_version` in the front
-# matter. The front matter selects the Space's prebuilt image; this pin is what
-# the environment actually ends up with, and the two are kept identical.
+# streamlit is pinned rather than left floating. Streamlit Community Cloud
+# installs whatever this file resolves to, so this line is the version the app
+# actually runs, and it is the version every figure in the README was measured
+# against.
 streamlit==1.63.0
 pandas==3.0.5
 plotly==7.0.0

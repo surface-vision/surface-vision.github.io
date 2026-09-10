@@ -1,4 +1,4 @@
-# Streamlit configuration for the Spaces build of the surface inspection console.
+# Streamlit configuration for the surface inspection console.
 #
 # The theme is the repository's, unchanged: a dark industrial palette -- near-black
 # steel greys, safety amber as the accent, and a categorical chart ramp whose six
@@ -6,11 +6,12 @@
 # class-index order. A class then reads the same in a bounding box, a legend chip
 # and a bar chart.
 #
-# The [server] block is NOT the repository's. Spaces starts streamlit itself and
-# passes its own --server.port / --server.address / CORS flags, so anything set
-# here that the platform also sets is either ignored or a conflict warning in the
-# build log. Only the two settings the platform does not manage are set, and both
-# are set for a reason given below.
+# The [server] block is NOT the repository's. Every host this runs on -- Streamlit
+# Community Cloud, and the Dockerfile's CMD -- starts streamlit itself and passes
+# its own --server.port / --server.address / CORS flags, so anything set here that
+# the platform also sets is either ignored or a conflict warning in the build log.
+# Only the two settings no platform manages are set, and both are set for a reason
+# given below.
 
 [theme]
 base = "dark"
@@ -52,15 +53,16 @@ borderColor = "#232A33"
 # long transfer into a resize. 32 MB comfortably holds a 12 MP photograph as JPEG
 # or PNG and a 16-bit line-scan TIFF of the size this console is built for.
 maxUploadSize = 32
-# The container's filesystem does not change under a running Space, and the
-# watchdog thread on a 2 vCPU host is 2 vCPU spent watching files that cannot move.
+# The container's filesystem does not change under a running deployment, and the
+# watchdog thread on a small shared host is CPU spent watching files that cannot
+# move. It also costs memory, which is the scarce resource here.
 fileWatcherType = "none"
 
 [browser]
 gatherUsageStats = false
 
 [client]
-# Hide the developer toolbar: a viewer of a public Space has nothing to rerun.
+# Hide the developer toolbar: a viewer of a public deployment has nothing to rerun.
 toolbarMode = "viewer"
 # Errors stay legible on screen. The console catches its own exceptions and renders
 # them as messages; this covers the ones it does not anticipate, and every path a

@@ -43,7 +43,16 @@ class Meter:
     """RSS sampler that remembers its stages so it can print a summary."""
 
     def __init__(self) -> None:
-        import psutil  # noqa: PLC0415  (optional dependency of this tool only)
+        try:
+            # Deliberately not in requirements.txt: psutil is a dependency of this
+            # measuring tool, not of the app, and the app's dependency list is
+            # meant to be exactly what it imports.
+            import psutil  # noqa: PLC0415
+        except ImportError as exc:  # pragma: no cover - operator-facing
+            raise SystemExit(
+                "tools/measure_memory.py needs psutil, which the app itself does "
+                "not.\n    pip install psutil"
+            ) from exc
 
         self.proc = psutil.Process()
         self.stages: list[tuple[str, float, float]] = []
