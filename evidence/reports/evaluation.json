@@ -1,0 +1,684 @@
+{
+  "run": {
+    "weights": "models/yolov8n_neudet/weights/best.pt",
+    "model_name": "yolov8n_neudet/best.pt",
+    "device": "mps",
+    "imgsz": 256,
+    "train_imgsz": 320,
+    "nms_iou": 0.45,
+    "match_iou": 0.5,
+    "cache_conf": 0.045,
+    "eval_split": "test",
+    "eval_images": 180,
+    "tuning_split": "val",
+    "tuning_images": 180,
+    "generated_at": "2026-09-09T23:50:10+00:00"
+  },
+  "detection_metrics": {
+    "split": "test",
+    "imgsz": 256,
+    "protocol": {
+      "conf": 0.001,
+      "nms_iou": 0.7,
+      "max_det": 300,
+      "source": "ultralytics validator defaults"
+    },
+    "mAP50": 0.7524475543783158,
+    "mAP50_95": 0.3967094751925778,
+    "precision": 0.696003746864622,
+    "recall": 0.6867120962219055,
+    "fitness": 0.3967094751925778,
+    "per_class": {
+      "crazing": {
+        "AP50": 0.44425548715921515,
+        "AP50_95": 0.18695304423944603,
+        "precision": 0.6881123053574577,
+        "recall": 0.22353322544675241,
+        "instances": 79,
+        "images": 30
+      },
+      "inclusion": {
+        "AP50": 0.8271603214836821,
+        "AP50_95": 0.45173540255238187,
+        "precision": 0.7476153382492866,
+        "recall": 0.7865168539325843,
+        "instances": 89,
+        "images": 34
+      },
+      "patches": {
+        "AP50": 0.9486123484770033,
+        "AP50_95": 0.6222517020226163,
+        "precision": 0.8646556043648064,
+        "recall": 0.8888888888888888,
+        "instances": 99,
+        "images": 39
+      },
+      "pitted_surface": {
+        "AP50": 0.7558348365918308,
+        "AP50_95": 0.42727057076656705,
+        "precision": 0.6566296808737371,
+        "recall": 0.717391304347826,
+        "instances": 46,
+        "images": 30
+      },
+      "rolled-in_scale": {
+        "AP50": 0.6295056397451188,
+        "AP50_95": 0.27679071491594043,
+        "precision": 0.5664598667206362,
+        "recall": 0.5942028985507246,
+        "instances": 69,
+        "images": 30
+      },
+      "scratches": {
+        "AP50": 0.9093166928130453,
+        "AP50_95": 0.4152554166585151,
+        "precision": 0.6525496856218077,
+        "recall": 0.9097394061646571,
+        "instances": 64,
+        "images": 30
+      }
+    },
+    "speed_ms": {
+      "preprocess": 0.1722365834413924,
+      "inference": 1.6896291778215933,
+      "loss": 0.00016017745818114941,
+      "postprocess": 2.878970594772707
+    },
+    "save_dir": "reports/ultralytics/val_test"
+  },
+  "image_level": {
+    "threshold": 0.05,
+    "n_images": 180,
+    "background_images": 0,
+    "background_images_flagged": 0,
+    "accuracy": 0.9888888888888889,
+    "macro_f1": 0.9888392857142857,
+    "weighted_f1": 0.9888640873015874,
+    "no_detection_images": 0,
+    "multi_class_images": 12,
+    "labels": [
+      "crazing",
+      "inclusion",
+      "patches",
+      "pitted_surface",
+      "rolled-in_scale",
+      "scratches",
+      "(no detection)"
+    ],
+    "confusion_matrix": [
+      [
+        30,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        30,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        31,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        27,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        30,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        30,
+        0
+      ]
+    ],
+    "per_class": {
+      "crazing": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 30
+      },
+      "inclusion": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 30
+      },
+      "patches": {
+        "precision": 0.9393939393939394,
+        "recall": 1.0,
+        "f1": 0.96875,
+        "support": 31
+      },
+      "pitted_surface": {
+        "precision": 1.0,
+        "recall": 0.9310344827586207,
+        "f1": 0.9642857142857143,
+        "support": 29
+      },
+      "rolled-in_scale": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 30
+      },
+      "scratches": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "support": 30
+      }
+    }
+  },
+  "false_alarm_analysis": {
+    "tuning_split": "val",
+    "match_iou": 0.5,
+    "cost_model": {
+      "miss_cost_ratio": 12.0,
+      "false_alarm_cost": 1.0,
+      "units": "one unnecessary re-inspection / line stop",
+      "detection_floor": 0.9,
+      "detection_floor_met": true,
+      "definition": "expected_cost_per_image = miss_cost_ratio * (1 - image-level defect detection rate) + 1.0 * image-level false alarm rate"
+    },
+    "sweep": [
+      {
+        "threshold": 0.05,
+        "tp": 333,
+        "fp": 372,
+        "fn": 75,
+        "precision": 0.4723,
+        "recall": 0.8162,
+        "f1": 0.5984,
+        "fp_per_image": 2.0667,
+        "false_alarm_rate": 0.8167,
+        "defect_detection_rate": 0.95,
+        "class_accuracy": 0.9889,
+        "images_flagged_rate": 1.0,
+        "expected_cost_per_image": 1.4167
+      },
+      {
+        "threshold": 0.1,
+        "tp": 305,
+        "fp": 222,
+        "fn": 103,
+        "precision": 0.5787,
+        "recall": 0.7475,
+        "f1": 0.6524,
+        "fp_per_image": 1.2333,
+        "false_alarm_rate": 0.6833,
+        "defect_detection_rate": 0.9111,
+        "class_accuracy": 0.9889,
+        "images_flagged_rate": 1.0,
+        "expected_cost_per_image": 1.75
+      },
+      {
+        "threshold": 0.15,
+        "tp": 291,
+        "fp": 151,
+        "fn": 117,
+        "precision": 0.6584,
+        "recall": 0.7132,
+        "f1": 0.6847,
+        "fp_per_image": 0.8389,
+        "false_alarm_rate": 0.5611,
+        "defect_detection_rate": 0.8778,
+        "class_accuracy": 0.9722,
+        "images_flagged_rate": 0.9833,
+        "expected_cost_per_image": 2.0278
+      },
+      {
+        "threshold": 0.2,
+        "tp": 277,
+        "fp": 116,
+        "fn": 131,
+        "precision": 0.7048,
+        "recall": 0.6789,
+        "f1": 0.6916,
+        "fp_per_image": 0.6444,
+        "false_alarm_rate": 0.4833,
+        "defect_detection_rate": 0.8278,
+        "class_accuracy": 0.9333,
+        "images_flagged_rate": 0.9444,
+        "expected_cost_per_image": 2.55
+      },
+      {
+        "threshold": 0.25,
+        "tp": 272,
+        "fp": 94,
+        "fn": 136,
+        "precision": 0.7432,
+        "recall": 0.6667,
+        "f1": 0.7028,
+        "fp_per_image": 0.5222,
+        "false_alarm_rate": 0.4167,
+        "defect_detection_rate": 0.8167,
+        "class_accuracy": 0.9,
+        "images_flagged_rate": 0.9111,
+        "expected_cost_per_image": 2.6167
+      },
+      {
+        "threshold": 0.3,
+        "tp": 261,
+        "fp": 73,
+        "fn": 147,
+        "precision": 0.7814,
+        "recall": 0.6397,
+        "f1": 0.7035,
+        "fp_per_image": 0.4056,
+        "false_alarm_rate": 0.3278,
+        "defect_detection_rate": 0.7778,
+        "class_accuracy": 0.8389,
+        "images_flagged_rate": 0.85,
+        "expected_cost_per_image": 2.9944
+      },
+      {
+        "threshold": 0.35,
+        "tp": 252,
+        "fp": 60,
+        "fn": 156,
+        "precision": 0.8077,
+        "recall": 0.6176,
+        "f1": 0.7,
+        "fp_per_image": 0.3333,
+        "false_alarm_rate": 0.2778,
+        "defect_detection_rate": 0.7611,
+        "class_accuracy": 0.8167,
+        "images_flagged_rate": 0.8278,
+        "expected_cost_per_image": 3.1444
+      },
+      {
+        "threshold": 0.4,
+        "tp": 242,
+        "fp": 42,
+        "fn": 166,
+        "precision": 0.8521,
+        "recall": 0.5931,
+        "f1": 0.6994,
+        "fp_per_image": 0.2333,
+        "false_alarm_rate": 0.2056,
+        "defect_detection_rate": 0.75,
+        "class_accuracy": 0.8,
+        "images_flagged_rate": 0.8111,
+        "expected_cost_per_image": 3.2056
+      },
+      {
+        "threshold": 0.45,
+        "tp": 232,
+        "fp": 34,
+        "fn": 176,
+        "precision": 0.8722,
+        "recall": 0.5686,
+        "f1": 0.6884,
+        "fp_per_image": 0.1889,
+        "false_alarm_rate": 0.1722,
+        "defect_detection_rate": 0.7056,
+        "class_accuracy": 0.7611,
+        "images_flagged_rate": 0.7722,
+        "expected_cost_per_image": 3.7056
+      },
+      {
+        "threshold": 0.5,
+        "tp": 222,
+        "fp": 27,
+        "fn": 186,
+        "precision": 0.8916,
+        "recall": 0.5441,
+        "f1": 0.6758,
+        "fp_per_image": 0.15,
+        "false_alarm_rate": 0.1444,
+        "defect_detection_rate": 0.7,
+        "class_accuracy": 0.7333,
+        "images_flagged_rate": 0.7444,
+        "expected_cost_per_image": 3.7444
+      },
+      {
+        "threshold": 0.55,
+        "tp": 206,
+        "fp": 22,
+        "fn": 202,
+        "precision": 0.9035,
+        "recall": 0.5049,
+        "f1": 0.6478,
+        "fp_per_image": 0.1222,
+        "false_alarm_rate": 0.1167,
+        "defect_detection_rate": 0.6833,
+        "class_accuracy": 0.7111,
+        "images_flagged_rate": 0.7222,
+        "expected_cost_per_image": 3.9167
+      },
+      {
+        "threshold": 0.6,
+        "tp": 190,
+        "fp": 15,
+        "fn": 218,
+        "precision": 0.9268,
+        "recall": 0.4657,
+        "f1": 0.6199,
+        "fp_per_image": 0.0833,
+        "false_alarm_rate": 0.0833,
+        "defect_detection_rate": 0.65,
+        "class_accuracy": 0.6667,
+        "images_flagged_rate": 0.6778,
+        "expected_cost_per_image": 4.2833
+      },
+      {
+        "threshold": 0.65,
+        "tp": 162,
+        "fp": 12,
+        "fn": 246,
+        "precision": 0.931,
+        "recall": 0.3971,
+        "f1": 0.5567,
+        "fp_per_image": 0.0667,
+        "false_alarm_rate": 0.0667,
+        "defect_detection_rate": 0.5722,
+        "class_accuracy": 0.5833,
+        "images_flagged_rate": 0.5944,
+        "expected_cost_per_image": 5.2
+      },
+      {
+        "threshold": 0.7,
+        "tp": 143,
+        "fp": 3,
+        "fn": 265,
+        "precision": 0.9795,
+        "recall": 0.3505,
+        "f1": 0.5162,
+        "fp_per_image": 0.0167,
+        "false_alarm_rate": 0.0167,
+        "defect_detection_rate": 0.5278,
+        "class_accuracy": 0.5278,
+        "images_flagged_rate": 0.5389,
+        "expected_cost_per_image": 5.6833
+      },
+      {
+        "threshold": 0.75,
+        "tp": 115,
+        "fp": 1,
+        "fn": 293,
+        "precision": 0.9914,
+        "recall": 0.2819,
+        "f1": 0.4389,
+        "fp_per_image": 0.0056,
+        "false_alarm_rate": 0.0056,
+        "defect_detection_rate": 0.4389,
+        "class_accuracy": 0.4333,
+        "images_flagged_rate": 0.4444,
+        "expected_cost_per_image": 6.7389
+      },
+      {
+        "threshold": 0.8,
+        "tp": 92,
+        "fp": 0,
+        "fn": 316,
+        "precision": 1.0,
+        "recall": 0.2255,
+        "f1": 0.368,
+        "fp_per_image": 0.0,
+        "false_alarm_rate": 0.0,
+        "defect_detection_rate": 0.3722,
+        "class_accuracy": 0.3611,
+        "images_flagged_rate": 0.3722,
+        "expected_cost_per_image": 7.5333
+      },
+      {
+        "threshold": 0.85,
+        "tp": 55,
+        "fp": 0,
+        "fn": 353,
+        "precision": 1.0,
+        "recall": 0.1348,
+        "f1": 0.2376,
+        "fp_per_image": 0.0,
+        "false_alarm_rate": 0.0,
+        "defect_detection_rate": 0.2444,
+        "class_accuracy": 0.2333,
+        "images_flagged_rate": 0.2444,
+        "expected_cost_per_image": 9.0667
+      },
+      {
+        "threshold": 0.9,
+        "tp": 21,
+        "fp": 0,
+        "fn": 387,
+        "precision": 1.0,
+        "recall": 0.0515,
+        "f1": 0.0979,
+        "fp_per_image": 0.0,
+        "false_alarm_rate": 0.0,
+        "defect_detection_rate": 0.1056,
+        "class_accuracy": 0.1056,
+        "images_flagged_rate": 0.1056,
+        "expected_cost_per_image": 10.7333
+      },
+      {
+        "threshold": 0.95,
+        "tp": 0,
+        "fp": 0,
+        "fn": 408,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "fp_per_image": 0.0,
+        "false_alarm_rate": 0.0,
+        "defect_detection_rate": 0.0,
+        "class_accuracy": 0.0,
+        "images_flagged_rate": 0.0,
+        "expected_cost_per_image": 12.0
+      }
+    ],
+    "cost_sensitivity": [
+      {
+        "miss_cost_ratio": 3.0,
+        "threshold": 0.15,
+        "expected_cost_per_image": 0.9278,
+        "defect_detection_rate": 0.8778,
+        "false_alarm_rate": 0.5611,
+        "meets_detection_floor": false
+      },
+      {
+        "miss_cost_ratio": 6.0,
+        "threshold": 0.05,
+        "expected_cost_per_image": 1.1167,
+        "defect_detection_rate": 0.95,
+        "false_alarm_rate": 0.8167,
+        "meets_detection_floor": true
+      },
+      {
+        "miss_cost_ratio": 12.0,
+        "threshold": 0.05,
+        "expected_cost_per_image": 1.4167,
+        "defect_detection_rate": 0.95,
+        "false_alarm_rate": 0.8167,
+        "meets_detection_floor": true
+      },
+      {
+        "miss_cost_ratio": 25.0,
+        "threshold": 0.05,
+        "expected_cost_per_image": 2.0667,
+        "defect_detection_rate": 0.95,
+        "false_alarm_rate": 0.8167,
+        "meets_detection_floor": true
+      },
+      {
+        "miss_cost_ratio": 50.0,
+        "threshold": 0.05,
+        "expected_cost_per_image": 3.3167,
+        "defect_detection_rate": 0.95,
+        "false_alarm_rate": 0.8167,
+        "meets_detection_floor": true
+      }
+    ],
+    "recommended": {
+      "threshold": 0.05,
+      "f1_optimal_threshold": 0.3,
+      "rationale": "At conf=0.05 the detector finds the real defect on 95.0% of defective images while raising a spurious box on 81.7% of them (2.07 false boxes per image). Pricing one escaped defect at 12 unnecessary re-inspections, that is an expected 1.417 re-inspection-equivalents per inspected coil, the minimum over every threshold meeting the 90% detection floor the line will accept. The F1-optimal threshold 0.30 would lift box precision from 0.47 to 0.78 and cut false alarms from 81.7% to 32.8%, but its detection rate falls from 95.0% to 77.8% -- 4.4x as many coils shipping with an undetected defect. That is the trade F1 hides by weighting a miss and a false alarm equally. The optimum sits at the bottom edge of the swept 0.05-0.95 range, so the true minimum may lie outside it; read this as 'as far as the sweep allows', not as an interior optimum.",
+      "on_tuning_split": {
+        "threshold": 0.05,
+        "tp": 333,
+        "fp": 372,
+        "fn": 75,
+        "precision": 0.4723,
+        "recall": 0.8162,
+        "f1": 0.5984,
+        "fp_per_image": 2.0667,
+        "false_alarm_rate": 0.8167,
+        "defect_detection_rate": 0.95,
+        "class_accuracy": 0.9889,
+        "images_flagged_rate": 1.0,
+        "expected_cost_per_image": 1.4167
+      },
+      "on_held_out_split": {
+        "threshold": 0.05,
+        "tp": 376,
+        "fp": 414,
+        "fn": 70,
+        "precision": 0.4759,
+        "recall": 0.843,
+        "f1": 0.6084,
+        "fp_per_image": 2.3,
+        "false_alarm_rate": 0.8,
+        "defect_detection_rate": 0.9889,
+        "class_accuracy": 0.9889,
+        "images_flagged_rate": 1.0,
+        "expected_cost_per_image": 0.9333
+      }
+    }
+  },
+  "per_class_failures": {
+    "crazing": {
+      "instances": 79,
+      "detected": 59,
+      "missed": 20,
+      "false_positives": 122,
+      "base_severity": "high",
+      "recall": 0.7468354430379747,
+      "fp_landed_on": {
+        "crazing": 122
+      },
+      "misses_shown_in_gallery": 4,
+      "false_positives_shown_in_gallery": 4
+    },
+    "inclusion": {
+      "instances": 89,
+      "detected": 76,
+      "missed": 13,
+      "false_positives": 60,
+      "base_severity": "critical",
+      "recall": 0.8539325842696629,
+      "fp_landed_on": {
+        "inclusion": 57,
+        "patches": 2,
+        "scratches": 1
+      },
+      "misses_shown_in_gallery": 4,
+      "false_positives_shown_in_gallery": 4
+    },
+    "patches": {
+      "instances": 99,
+      "detected": 91,
+      "missed": 8,
+      "false_positives": 42,
+      "base_severity": "medium",
+      "recall": 0.9191919191919192,
+      "fp_landed_on": {
+        "patches": 34,
+        "pitted_surface": 8
+      },
+      "misses_shown_in_gallery": 4,
+      "false_positives_shown_in_gallery": 4
+    },
+    "pitted_surface": {
+      "instances": 46,
+      "detected": 36,
+      "missed": 10,
+      "false_positives": 37,
+      "base_severity": "high",
+      "recall": 0.782608695652174,
+      "fp_landed_on": {
+        "pitted_surface": 36,
+        "patches": 1
+      },
+      "misses_shown_in_gallery": 4,
+      "false_positives_shown_in_gallery": 4
+    },
+    "rolled-in_scale": {
+      "instances": 69,
+      "detected": 56,
+      "missed": 13,
+      "false_positives": 92,
+      "base_severity": "high",
+      "recall": 0.8115942028985508,
+      "fp_landed_on": {
+        "rolled-in_scale": 91,
+        "scratches": 1
+      },
+      "misses_shown_in_gallery": 4,
+      "false_positives_shown_in_gallery": 4
+    },
+    "scratches": {
+      "instances": 64,
+      "detected": 58,
+      "missed": 6,
+      "false_positives": 61,
+      "base_severity": "medium",
+      "recall": 0.90625,
+      "fp_landed_on": {
+        "scratches": 60,
+        "inclusion": 1
+      },
+      "misses_shown_in_gallery": 4,
+      "false_positives_shown_in_gallery": 4
+    }
+  },
+  "artifacts": {
+    "evaluation_json": "reports/evaluation.json",
+    "evaluation_md": "reports/evaluation.md",
+    "operating_point": "reports/operating_point.evaluate.json",
+    "operating_point_demo_update": "not requested (--update-operating-point)",
+    "confusion_matrix": "reports/confusion_matrix.png",
+    "pr_curves": "reports/pr_curves.png",
+    "f1_vs_threshold": "reports/f1_vs_threshold.png",
+    "false_alarms_vs_recall": "reports/false_alarms_vs_recall.png",
+    "error_gallery": [
+      "reports/error_gallery/0_crazing.png",
+      "reports/error_gallery/1_inclusion.png",
+      "reports/error_gallery/2_patches.png",
+      "reports/error_gallery/3_pitted_surface.png",
+      "reports/error_gallery/4_rolled-in_scale.png",
+      "reports/error_gallery/5_scratches.png"
+    ],
+    "validator_run_dir": "reports/ultralytics/val_test"
+  }
+}

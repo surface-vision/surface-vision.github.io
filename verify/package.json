@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Runs the browser's own decode path (site/js/detect.js) under onnxruntime-node, and the published page itself under real Chrome, and compares both detection-for-detection with the Python ultralytics model. Dev-only: nothing here is served to the page.",
+  "description": "Runs the browser's own decode and tiling path (site/js/detect.js, site/js/tiling.js) under onnxruntime-node, and the published page itself under real Chrome, and compares both detection-for-detection with the Python ultralytics model. Also measures the wide strip frames squashed against tiled. Dev-only: nothing here is served to the page.",
   "scripts": {
     "reference": "cd ../.. && .venv/bin/python site/verify/reference_ultralytics.py --dump-pixels /tmp/refpx",
     "parity": "node parity.mjs --pixels /tmp/refpx --out parity_js.json",
@@ -11,7 +11,8 @@
     "compare": "node compare.mjs --json parity_report.json",
     "serve": "cd .. && python3 -m http.server 8777 --bind 127.0.0.1",
     "parity:browser": "node browser_parity.mjs --url http://127.0.0.1:8777/ --json parity_browser.json",
-    "all": "npm run reference && npm run parity && npm run parity:jpegjs && npm run compare"
+    "all": "npm run reference && npm run parity && npm run parity:jpegjs && npm run compare",
+    "strip": "node strip_check.mjs --out strip_check.json"
   },
   "devDependencies": {
     "jpeg-js": "0.4.4",

@@ -1,0 +1,185 @@
+{
+  "checks": [
+    {
+      "name": "class vocabulary",
+      "ok": true,
+      "detail": "nc=10 names=['crazing', 'inclusion', 'patches', 'pitted_surface', 'rolled-in_scale', 'scratches', 'severstal_1', 'severstal_2', 'severstal_3', 'severstal_4']"
+    },
+    {
+      "name": "NEU-DET indices 0-5 unchanged",
+      "ok": true,
+      "detail": "joint[0:6]=['crazing', 'inclusion', 'patches', 'pitted_surface', 'rolled-in_scale', 'scratches'] == neu-det=['crazing', 'inclusion', 'patches', 'pitted_surface', 'rolled-in_scale', 'scratches']"
+    },
+    {
+      "name": "counts recounted, train",
+      "ok": true,
+      "detail": "6234 images (3834 labelled / 2400 background), 7174 instances -- manifest agrees: True"
+    },
+    {
+      "name": "counts recounted, val",
+      "ok": true,
+      "detail": "799 images (499 labelled / 300 background), 914 instances -- manifest agrees: True"
+    },
+    {
+      "name": "counts recounted, test",
+      "ok": true,
+      "detail": "768 images (468 labelled / 300 background), 926 instances -- manifest agrees: True"
+    },
+    {
+      "name": "label geometry in range",
+      "ok": true,
+      "detail": "every box has 0 < w,h <= 1 and lies inside the tile"
+    },
+    {
+      "name": "class ids stay in their own domain",
+      "ok": true,
+      "detail": "NEU-DET images carry only classes 0-5, Severstal crops only 6-9"
+    },
+    {
+      "name": "NEU-DET images/labels byte-identical and in the same split",
+      "ok": true,
+      "detail": "{'train': 1440, 'val': 180, 'test': 180} images compared; 0 mismatches, 0 split differences"
+    },
+    {
+      "name": "splits are content-hash disjoint",
+      "ok": true,
+      "detail": "shared image hashes {'train^val': 0, 'train^test': 0, 'val^test': 0}; intra-split duplicate images {'train': 1, 'val': 0, 'test': 0}"
+    },
+    {
+      "name": "no Severstal source frame straddles a split",
+      "ok": true,
+      "detail": "shared source frames {'train^val': 0, 'train^test': 0, 'val^test': 0}"
+    },
+    {
+      "name": "background crops come only from has_defect=False source frames",
+      "ok": true,
+      "detail": "0 background crops from defective frames, 0 labelled crops from clean frames, 0 frames not in samples.json"
+    },
+    {
+      "name": "crops are the source frame's own pixels",
+      "ok": true,
+      "detail": "120 random crops re-cut from data/.severstal_cache; worst absolute channel delta 6 (JPEG re-encode only, no resampling); 0 sources unavailable"
+    },
+    {
+      "name": "data/joint respects the cross_domain holdout rule",
+      "ok": false,
+      "detail": "2770 train+val crops come from frames cross_domain.py scores (seed 'jsw-ps1-cross-domain-holdout-v1', frac 0.5) -- this is why `build` derives data/joint_xdsafe instead of training on data/joint"
+    }
+  ],
+  "facts": {
+    "per_split": {
+      "train": {
+        "images": 6234,
+        "labelled": 3834,
+        "background": 2400,
+        "instances": {
+          "0": 538,
+          "1": 819,
+          "2": 702,
+          "3": 339,
+          "4": 504,
+          "5": 433,
+          "6": 1055,
+          "7": 321,
+          "8": 1415,
+          "9": 1048
+        },
+        "total_instances": 7174,
+        "neu_images": 1440,
+        "sev_images": 4794,
+        "source_frames": 2182,
+        "bad_geometry": [],
+        "bad_class": [],
+        "class_domain_violations": []
+      },
+      "val": {
+        "images": 799,
+        "labelled": 499,
+        "background": 300,
+        "instances": {
+          "0": 72,
+          "1": 103,
+          "2": 80,
+          "3": 47,
+          "4": 55,
+          "5": 51,
+          "6": 117,
+          "7": 27,
+          "8": 206,
+          "9": 156
+        },
+        "total_instances": 914,
+        "neu_images": 180,
+        "sev_images": 619,
+        "source_frames": 273,
+        "bad_geometry": [],
+        "bad_class": [],
+        "class_domain_violations": []
+      },
+      "test": {
+        "images": 768,
+        "labelled": 468,
+        "background": 300,
+        "instances": {
+          "0": 79,
+          "1": 89,
+          "2": 99,
+          "3": 46,
+          "4": 69,
+          "5": 64,
+          "6": 141,
+          "7": 31,
+          "8": 197,
+          "9": 111
+        },
+        "total_instances": 926,
+        "neu_images": 180,
+        "sev_images": 588,
+        "source_frames": 273,
+        "bad_geometry": [],
+        "bad_class": [],
+        "class_domain_violations": []
+      }
+    },
+    "neu_images_per_split": {
+      "train": 1440,
+      "val": 180,
+      "test": 180
+    },
+    "hash_collisions": {
+      "train^val": 0,
+      "train^test": 0,
+      "val^test": 0
+    },
+    "intra_split_duplicate_images": {
+      "train": 1,
+      "val": 0,
+      "test": 0
+    },
+    "source_frame_collisions": {
+      "train^val": 0,
+      "train^test": 0,
+      "val^test": 0
+    },
+    "has_defect_lookup": 18074,
+    "fidelity_worst_abs_delta": 6,
+    "fidelity_crops_checked": 120,
+    "cross_domain_holdout": {
+      "train": {
+        "source_frames": 2182,
+        "source_frames_on_scored_side": 1133,
+        "crops_on_scored_side": 2465
+      },
+      "val": {
+        "source_frames": 273,
+        "source_frames_on_scored_side": 133,
+        "crops_on_scored_side": 305
+      },
+      "test": {
+        "source_frames": 273,
+        "source_frames_on_scored_side": 130,
+        "crops_on_scored_side": 276
+      }
+    }
+  }
+}

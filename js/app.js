@@ -4,24 +4,32 @@
  * Real inference, in the tab, with no backend: onnxruntime-web on the WASM backend
  * runs the same 12.1 MB yolov8n_neudet_best.onnx the Python console runs. Every
  * numeric step -- resize, normalise, decode, NMS, calibrate -- comes from
- * ./detect.js and ./calibration.js, which site/verify runs under onnxruntime-node
- * against the Python model. See site/verify/parity_report.json for the result.
+ * ./detect.js and ./calibration.js, and the window geometry for non-square frames
+ * comes from ./tiling.js. site/verify runs those same modules under onnxruntime-node
+ * against the Python model. See site/verify/parity_report.json for the result, and
+ * site/verify/strip_check.json for the wide-strip comparison.
  */
 
 import {
   CLASS_NAMES, CLASS_COLORS, IMGSZ, SHIPPED_CONF, NMS_IOU,
-  preprocess, decode,
+  preprocess, decode, nms,
 } from './detect.js';
+import { planTiles, tilingApplies } from './tiling.js';
 import { calibrate, CALIBRATION } from './calibration.js';
 import { DEFECT_INFO, scoreDetection, severityBucket } from './defect-info.js';
 
 /* ==========================================================================
- * FILL THIS IN AFTER THE HUGGING FACE DEPLOYMENT.
+ * OPTIONAL live embed of the hosted Python console.
  *
- * Paste the Space's embed URL, e.g.
- *   'https://prathmesh-28-jindal-surface-console.hf.space'
- * Leave it as the empty string and the console section shows a "coming online"
- * placeholder instead of a broken iframe. Nothing else needs to change.
+ * Empty is the SHIPPED state, and it is not a missing feature: Hugging Face moved
+ * Docker and Gradio Spaces on free CPU behind a PRO subscription, and only static
+ * Spaces remain free, so the Streamlit console in hf_space/ has no free host. The
+ * console section renders its own content -- what that console adds over this page,
+ * and how to run it locally -- straight from index.html, with no placeholder and
+ * nothing deferred.
+ *
+ * Paste a URL here (e.g. 'https://<owner>-<space>.hf.space') and wireConsole()
+ * replaces that content with the live embed. Nothing else needs to change.
  * ========================================================================== */
 const HF_SPACE_URL = '';
 
@@ -52,8 +60,8 @@ const SAMPLES = [
   { file: 'rolled-in_scale_272.jpg', cls: 'rolled-in_scale' },
   { file: 'scratches_271.jpg', cls: 'scratches' },
   { file: 'scratches_272.jpg', cls: 'scratches' },
-  { file: 'strip_rollmark.jpg', cls: null, label: 'strip 2048x1000 roll mark', wide: true },
-  { file: 'strip_weldline.jpg', cls: null, label: 'strip 2048x1000 weld line', wide: true },
+  { file: 'strip_rollmark.jpg', cls: null, label: 'strip 2048x1000 roll mark (tiled)', wide: true },
+  { file: 'strip_weldline.jpg', cls: null, label: 'strip 2048x1000 weld line (tiled)', wide: true },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -64,14 +72,17 @@ const state = {
   ort: null,
   session: null,
   loading: null,
-  /** Last raw output0 tensor, kept so the slider re-filters without a session.run. */
-  raw: null,
-  rawDims: null,
+  /**
+   * One entry per forward pass of the last run -- { tile, data, numAnchors } -- kept
+   * so the confidence slider re-decodes without touching the session. A square frame
+   * has exactly one entry; a 2048x1000 strip has one per window.
+   */
+  passes: [],
   image: null,      // { bitmapOrImg, width, height, name }
   dets: [],
   selected: -1,
   conf: SHIPPED_CONF,
-  timing: { infer: null, pre: null, post: null, first: null },
+  timing: { infer: null, pre: null, post: null, first: null, tiles: null },
 };
 
 /* ---------------------------------------------------------------- status ---- */
@@ -189,42 +200,127 @@ function pixelsOf(src, w, h) {
   return g.getImageData(0, 0, w, h).data;
 }
 
+/** Copy one axis-aligned window out of an RGBA buffer. Same code as the harness. */
+function cropRGBA(rgba, w, x0, y0, cw, ch) {
+  const out = new Uint8ClampedArray(cw * ch * 4);
+  for (let y = 0; y < ch; y++) {
+    const src = ((y0 + y) * w + x0) * 4;
+    out.set(rgba.subarray(src, src + cw * 4), y * cw * 4);
+  }
+  return out;
+}
+
+/**
+ * One run over one frame.
+ *
+ * The network input is a fixed 256x256. A square frame goes straight in. A frame that
+ * is not square is cut into square windows by ./tiling.js and each window goes in on
+ * its own, because squashing a 2048x1000 strip into the square compresses it 8.00x
+ * across the width against 3.91x down the height -- an anisotropy the weights never
+ * saw in training, and one that measurably costs detections. site/verify/strip_check.json
+ * has strip_weldline returning 0 detections squashed against 3 tiled, and strip_rollmark
+ * returning six boxes all labelled inclusion squashed against a rolled-in_scale call on
+ * the mark itself tiled.
+ *
+ * Pixels are read ONCE at natural size and the windows are cut out of that buffer, so
+ * the browser and site/verify/strip_check.mjs crop identically.
+ */
 async function runOn(source, width, height, name) {
   const session = await ensureSession();
   state.image = { source, width, height, name };
 
-  const t0 = performance.now();
+  const tiles = planTiles(width, height, IMGSZ);
+  if (tiles.length > 1) {
+    status(`${name} -- ${width}x${height}, ${tiles.length} tiled passes...`);
+  }
+
+  let pre = 0;
+  let infer = 0;
+  const passes = [];
+
+  const tRead = performance.now();
   const rgba = pixelsOf(source, width, height);
-  const { tensor } = preprocess(rgba, width, height, IMGSZ);
-  state.timing.pre = performance.now() - t0;
+  pre += performance.now() - tRead;
 
-  const feeds = { images: new state.ort.Tensor('float32', tensor, [1, 3, IMGSZ, IMGSZ]) };
-  const t1 = performance.now();
-  const out = await session.run(feeds);
-  state.timing.infer = performance.now() - t1;
+  for (const t of tiles) {
+    const t0 = performance.now();
+    const px = tiles.length === 1 ? rgba : cropRGBA(rgba, width, t.x, t.y, t.w, t.h);
+    const { tensor } = preprocess(px, t.w, t.h, IMGSZ);
+    pre += performance.now() - t0;
 
-  const o = out.output0;
-  state.raw = o.data;
-  state.rawDims = o.dims;
+    const feeds = { images: new state.ort.Tensor('float32', tensor, [1, 3, IMGSZ, IMGSZ]) };
+    const t1 = performance.now();
+    const out = await session.run(feeds);
+    infer += performance.now() - t1;
+
+    passes.push({ tile: t, data: out.output0.data, numAnchors: out.output0.dims[2] });
+  }
+
+  state.passes = passes;
+  state.timing.pre = pre;
+  state.timing.infer = infer;
+  state.timing.tiles = tiles.length;
+
   refilter();
-  status(`${name} -- ${state.dets.length} detection${state.dets.length === 1 ? '' : 's'} at conf ${fmt(state.conf, 2)}`);
+  const n = state.dets.length;
+  status(`${name} -- ${n} detection${n === 1 ? '' : 's'} at conf ${fmt(state.conf, 2)}`
+    + (tiles.length > 1
+      ? `, from ${tiles.length} tiled passes over ${width}x${height} merged by one global NMS`
+      : ''));
 }
 
 /**
- * Re-decode from the cached output tensor. No session.run, so moving the slider is
+ * Re-decode from the cached output tensors. No session.run, so moving the slider is
  * free -- but it is a genuine re-decode, not a filter over an old detection list:
  * the confidence threshold changes which candidates enter NMS, so a post-hoc filter
  * would show boxes the model would not have emitted at that threshold.
+ *
+ * Each window is decoded in its OWN pixel space, so decode()'s internal NMS runs at the
+ * uniform scale ultralytics would have used, and the boxes are then translated into
+ * frame pixels. Only when there is more than one window does a second, global,
+ * class-aware NMS run over the union, to merge the duplicate calls that the deliberate
+ * window overlap produces. With a single window that pass would be a no-op -- nothing
+ * survives decode()'s own NMS still holding IoU > 0.45 against a same-class survivor --
+ * so it is skipped outright and the single-frame path stays identical to the one
+ * site/verify checks against Python.
  */
 function refilter() {
-  if (!state.raw || !state.image) return;
+  if (!state.passes.length || !state.image) return;
   const { width, height } = state.image;
   const t0 = performance.now();
-  state.dets = decode(state.raw, {
-    conf: state.conf, iou: NMS_IOU,
-    origW: width, origH: height, size: IMGSZ,
-    numAnchors: state.rawDims[2],
-  }).map((d) => {
+
+  let merged;
+  if (state.passes.length === 1) {
+    const { data, numAnchors, tile } = state.passes[0];
+    merged = decode(data, {
+      conf: state.conf, iou: NMS_IOU,
+      origW: tile.w, origH: tile.h, size: IMGSZ, numAnchors,
+    });
+  } else {
+    const boxes = [];
+    const scores = [];
+    const classes = [];
+    for (const { data, numAnchors, tile } of state.passes) {
+      for (const d of decode(data, {
+        conf: state.conf, iou: NMS_IOU,
+        origW: tile.w, origH: tile.h, size: IMGSZ, numAnchors,
+      })) {
+        boxes.push([d.x1 + tile.x, d.y1 + tile.y, d.x2 + tile.x, d.y2 + tile.y]);
+        scores.push(d.raw);
+        classes.push(d.classId);
+      }
+    }
+    merged = nms(boxes, scores, classes, NMS_IOU).map((i) => {
+      const [x1, y1, x2, y2] = boxes[i];
+      return {
+        classId: classes[i], className: CLASS_NAMES[classes[i]], raw: scores[i],
+        x1, y1, x2, y2, width: x2 - x1, height: y2 - y1,
+        areaFrac: ((x2 - x1) * (y2 - y1)) / (width * height),
+      };
+    });
+  }
+
+  state.dets = merged.map((d) => {
     const cal = calibrate(d.raw);
     const score = scoreDetection(d.className, d.raw, d.areaFrac);
     return { ...d, calibrated: cal, score, band: severityBucket(score) };
@@ -245,6 +341,9 @@ function refilter() {
       conf: state.conf,
       iou: NMS_IOU,
       imgsz: IMGSZ,
+      // The window plan, so an audit can tell a tiled run from a single-pass one
+      // without inferring it from the frame size.
+      tiles: state.passes.map(({ tile }) => ({ x: tile.x, y: tile.y, w: tile.w, h: tile.h })),
       timing: { ...state.timing },
       detections: state.dets.map((d) => ({
         className: d.className, classId: d.classId,
@@ -412,7 +511,11 @@ function drawGuidance() {
 
 function drawTiming() {
   const t = state.timing;
-  $('tInfer').textContent = t.infer === null ? '--' : `${t.infer.toFixed(1)} ms`;
+  // With tiling the session.run figure is a sum over windows, and saying so is the
+  // difference between an honest number and one that looks like a regression.
+  $('tInfer').textContent = t.infer === null
+    ? '--'
+    : `${t.infer.toFixed(1)} ms${t.tiles > 1 ? ` / ${t.tiles} passes` : ''}`;
   $('tPre').textContent = t.pre === null ? '--' : `${t.pre.toFixed(1)} ms`;
   $('tPost').textContent = t.post === null ? '--' : `${t.post.toFixed(2)} ms`;
   $('tFirst').textContent = t.first === null ? '--' : `${t.first.toFixed(0)} ms`;
@@ -511,16 +614,31 @@ function wireSlider() {
   paint();
 }
 
+/**
+ * Upgrades the console section to a live embed IF a host URL exists.
+ *
+ * The default path returns immediately and leaves index.html's own content standing:
+ * what the Python console adds over this page, and how to run it. That content is the
+ * shipped state and it is complete -- there is no placeholder to fill, and nothing on
+ * the page is waiting on this function. Which is why this reads the static block
+ * rather than writing one: with JavaScript disabled the section still says everything
+ * it needs to.
+ */
 function wireConsole() {
-  const slot = $('console-slot');
   if (!HF_SPACE_URL) return;
-  slot.innerHTML = '';
+
+  const slot = $('console-slot');
+  const stat = $('console-static');
+  if (!slot) return;
+  if (stat) stat.remove();
+
   const frame = document.createElement('iframe');
   frame.src = HF_SPACE_URL;
   frame.title = 'Jindal Stainless surface inspection console';
   frame.loading = 'lazy';
   frame.allow = 'clipboard-write; fullscreen';
   slot.appendChild(frame);
+
   const a = $('console-link');
   if (a) { a.href = HF_SPACE_URL; a.hidden = false; }
 }
@@ -589,6 +707,15 @@ async function loadBrowserParity() {
     ].join('');
     const st = $('parityBrowserStamp');
     if (st) st.textContent = `run ${p.generated_at}`;
+
+    // The hero quotes a latency. Fill it from this artefact rather than from the
+    // HTML, so the headline number cannot drift away from the measurement the
+    // moment the parity run is repeated on different hardware.
+    const hero = $('heroLatency');
+    if (hero) {
+      const r = s.session_run_ms;
+      hero.textContent = `(min ${r.min.toFixed(1)}, median ${r.median.toFixed(1)}, max ${r.max.toFixed(1)} ms)`;
+    }
   } catch (err) {
     host.innerHTML = `<tr><td colspan="3" style="color:var(--muted)">parity_browser.json not reachable (${err.message}). Regenerate it with <code>npm run serve</code> then <code>npm run parity:browser</code> in site/verify.</td></tr>`;
   }

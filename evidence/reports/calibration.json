@@ -1,0 +1,405 @@
+{
+  "run": {
+    "weights": "models/yolov8n_neudet/weights/best.pt",
+    "model_name": "yolov8n_neudet/best.pt",
+    "device": "mps",
+    "imgsz": 256,
+    "nms_iou": 0.45,
+    "cache_conf": 0.05,
+    "match_iou": 0.5,
+    "generated_at": "2026-09-09T23:46:51+00:00"
+  },
+  "fit": {
+    "split": "val",
+    "date": "2026-09-09",
+    "n_images": 180,
+    "n_detections": 705,
+    "positives": 333
+  },
+  "evaluation": {
+    "split": "test",
+    "n_images": 180,
+    "n_detections": 790,
+    "positives": 376
+  },
+  "calibrator": {
+    "method": "isotonic",
+    "n_parameters": 34,
+    "params": {
+      "knots_x": [
+        0.050164446234703064,
+        0.05081210657954216,
+        0.05097289755940437,
+        0.052958663552999496,
+        0.053003329783678055,
+        0.13377390801906586,
+        0.13395541906356812,
+        0.1742050051689148,
+        0.17491646111011505,
+        0.2399325966835022,
+        0.24104474484920502,
+        0.31750497221946716,
+        0.3183032274246216,
+        0.3576990067958832,
+        0.35778093338012695,
+        0.3634984791278839,
+        0.3669489920139313,
+        0.39388763904571533,
+        0.39440345764160156,
+        0.4545809030532837,
+        0.46039879322052,
+        0.4709504544734955,
+        0.47620758414268494,
+        0.5732674598693848,
+        0.5750333070755005,
+        0.594139814376831,
+        0.5976260304450989,
+        0.6975067853927612,
+        0.6998829245567322,
+        0.7374289035797119,
+        0.7380223870277405,
+        0.7797176837921143,
+        0.7800125479698181,
+        0.9425139427185059
+      ],
+      "knots_y": [
+        0.09210526315789473,
+        0.09210526315789473,
+        0.09210526315789473,
+        0.09210526315789473,
+        0.1570796460176991,
+        0.1570796460176991,
+        0.25510204081632654,
+        0.25510204081632654,
+        0.26744186046511625,
+        0.26744186046511625,
+        0.32978723404255317,
+        0.32978723404255317,
+        0.35714285714285715,
+        0.35714285714285715,
+        0.4166666666666667,
+        0.4166666666666667,
+        0.46875,
+        0.46875,
+        0.5,
+        0.5,
+        0.6428571428571429,
+        0.6428571428571429,
+        0.7051282051282052,
+        0.7051282051282052,
+        0.7222222222222222,
+        0.7222222222222222,
+        0.8015873015873016,
+        0.8015873015873016,
+        0.8913043478260869,
+        0.8913043478260869,
+        0.9444444444444444,
+        0.9444444444444444,
+        0.995,
+        0.995
+      ],
+      "eps": 1e-06
+    }
+  },
+  "calibrator_description": "isotonic regression, 34 knots (+1e-06 strict-monotone term)",
+  "top_plateau": {
+    "raw_from": 0.7800125479698181,
+    "n": 99,
+    "positives": 99,
+    "maximum_likelihood_value": 1.0,
+    "jeffreys_value": 0.995
+  },
+  "selection": {
+    "protocol": "5-fold cross-validation on the fitting split, grouped by source image",
+    "seed": 20260909,
+    "folds": 5,
+    "n_images": 180,
+    "n_detections": 705,
+    "candidates": {
+      "temperature": {
+        "oof_ece": 0.09613281276595743,
+        "oof_brier": 0.15427839080947836,
+        "oof_nll": 0.4873771815062474,
+        "eligible": true
+      },
+      "isotonic": {
+        "oof_ece": 0.025005683687943266,
+        "oof_brier": 0.14434253638113514,
+        "oof_nll": 0.44847386397628236,
+        "eligible": true
+      },
+      "isotonic_unsmoothed": {
+        "oof_ece": 0.03633550354609929,
+        "oof_brier": 0.1445137942201542,
+        "oof_nll": 0.4751880235585487,
+        "eligible": false
+      },
+      "platt": {
+        "oof_ece": 0.0613875744680851,
+        "oof_brier": 0.144889828228006,
+        "oof_nll": 0.4536368164452539,
+        "eligible": false
+      },
+      "identity": {
+        "oof_ece": 0.1007977815602837,
+        "oof_brier": 0.15342316257052196,
+        "oof_nll": 0.48749246229740406,
+        "eligible": false
+      }
+    },
+    "eligible": [
+      "temperature",
+      "isotonic"
+    ],
+    "winner": "isotonic"
+  },
+  "metrics": {
+    "ece": {
+      "before": 0.1418430734177215,
+      "after": 0.04608132784810127,
+      "fit_split_before": 0.1007977815602837,
+      "fit_split_after": 0.005958207092198582
+    },
+    "mce": {
+      "before": 0.241708,
+      "after": 0.115942
+    },
+    "brier": {
+      "before": 0.1753679834518315,
+      "after": 0.15761263525448946
+    },
+    "nll": {
+      "before": 0.5402914892937305,
+      "after": 0.4819328814097151
+    },
+    "operating_point": {
+      "conf": 0.15,
+      "n": 481,
+      "ece_before": 0.16541770062370065,
+      "ece_after": 0.055854316008316
+    }
+  },
+  "rank_preservation": {
+    "order_identical": true,
+    "collapsed_pairs": 0,
+    "strictly_increasing_on_data": true,
+    "non_decreasing_on_unit_grid": true,
+    "max_shift": 0.2271626528482139
+  },
+  "map50": {
+    "before": {
+      "crazing": 0.4264801534608473,
+      "inclusion": 0.7232757459833528,
+      "patches": 0.885033005274634,
+      "pitted_surface": 0.7529054502397667,
+      "rolled-in_scale": 0.6273950131348685,
+      "scratches": 0.8328283375814595,
+      "mAP50": 0.7079862842791548
+    },
+    "after": {
+      "crazing": 0.4264801534608473,
+      "inclusion": 0.7232757459833528,
+      "patches": 0.885033005274634,
+      "pitted_surface": 0.7529054502397667,
+      "rolled-in_scale": 0.6273950131348685,
+      "scratches": 0.8328283375814595,
+      "mAP50": 0.7079862842791548
+    },
+    "identical": true,
+    "note": "AP50 here is this module's own 101-point implementation over the evaluator's greedy matcher, so it is not numerically the ultralytics headline (0.7524); it is the same quantity computed twice under two rankings, which is what makes the invariance meaningful."
+  },
+  "examples": {
+    "0.15": 0.2551019357142857,
+    "0.25": 0.32978715425531907,
+    "0.40": 0.4999999,
+    "0.60": 0.8015871,
+    "0.70": 0.891304156521739,
+    "0.80": 0.994999805,
+    "0.90": 0.9949999049999999
+  },
+  "bins": {
+    "before": [
+      {
+        "bin": "[0.00,0.15)",
+        "lo": 0.0,
+        "hi": 0.15,
+        "n": 309,
+        "mean_score": 0.085793,
+        "empirical_precision": 0.190939,
+        "gap": -0.105146
+      },
+      {
+        "bin": "[0.15,0.25)",
+        "lo": 0.15,
+        "hi": 0.25,
+        "n": 116,
+        "mean_score": 0.194708,
+        "empirical_precision": 0.336207,
+        "gap": -0.141498
+      },
+      {
+        "bin": "[0.25,0.35)",
+        "lo": 0.25,
+        "hi": 0.35,
+        "n": 62,
+        "mean_score": 0.30145,
+        "empirical_precision": 0.387097,
+        "gap": -0.085646
+      },
+      {
+        "bin": "[0.35,0.45)",
+        "lo": 0.35,
+        "hi": 0.45,
+        "n": 40,
+        "mean_score": 0.401068,
+        "empirical_precision": 0.575,
+        "gap": -0.173932
+      },
+      {
+        "bin": "[0.45,0.55)",
+        "lo": 0.45,
+        "hi": 0.55,
+        "n": 48,
+        "mean_score": 0.502311,
+        "empirical_precision": 0.666667,
+        "gap": -0.164355
+      },
+      {
+        "bin": "[0.55,0.65)",
+        "lo": 0.55,
+        "hi": 0.65,
+        "n": 69,
+        "mean_score": 0.598872,
+        "empirical_precision": 0.84058,
+        "gap": -0.241708
+      },
+      {
+        "bin": "[0.65,0.75)",
+        "lo": 0.65,
+        "hi": 0.75,
+        "n": 55,
+        "mean_score": 0.696767,
+        "empirical_precision": 0.927273,
+        "gap": -0.230506
+      },
+      {
+        "bin": "[0.75,0.85)",
+        "lo": 0.75,
+        "hi": 0.85,
+        "n": 50,
+        "mean_score": 0.801262,
+        "empirical_precision": 0.98,
+        "gap": -0.178738
+      },
+      {
+        "bin": "[0.85,1.00]",
+        "lo": 0.85,
+        "hi": 1.0,
+        "n": 41,
+        "mean_score": 0.885288,
+        "empirical_precision": 1.0,
+        "gap": -0.114712
+      }
+    ],
+    "after": [
+      {
+        "bin": "[0.00,0.15)",
+        "lo": 0.0,
+        "hi": 0.15,
+        "n": 25,
+        "mean_score": 0.092105,
+        "empirical_precision": 0.12,
+        "gap": -0.027895
+      },
+      {
+        "bin": "[0.15,0.25)",
+        "lo": 0.15,
+        "hi": 0.25,
+        "n": 258,
+        "mean_score": 0.15708,
+        "empirical_precision": 0.189922,
+        "gap": -0.032843
+      },
+      {
+        "bin": "[0.25,0.35)",
+        "lo": 0.25,
+        "hi": 0.35,
+        "n": 185,
+        "mean_score": 0.279761,
+        "empirical_precision": 0.32973,
+        "gap": -0.049969
+      },
+      {
+        "bin": "[0.35,0.45)",
+        "lo": 0.35,
+        "hi": 0.45,
+        "n": 23,
+        "mean_score": 0.362319,
+        "empirical_precision": 0.478261,
+        "gap": -0.115942
+      },
+      {
+        "bin": "[0.45,0.55)",
+        "lo": 0.45,
+        "hi": 0.55,
+        "n": 39,
+        "mean_score": 0.489583,
+        "empirical_precision": 0.589744,
+        "gap": -0.10016
+      },
+      {
+        "bin": "[0.55,0.65)",
+        "lo": 0.55,
+        "hi": 0.65,
+        "n": 8,
+        "mean_score": 0.643328,
+        "empirical_precision": 0.5,
+        "gap": 0.143328
+      },
+      {
+        "bin": "[0.65,0.75)",
+        "lo": 0.65,
+        "hi": 0.75,
+        "n": 69,
+        "mean_score": 0.707753,
+        "empirical_precision": 0.768116,
+        "gap": -0.060363
+      },
+      {
+        "bin": "[0.75,0.85)",
+        "lo": 0.75,
+        "hi": 0.85,
+        "n": 69,
+        "mean_score": 0.80088,
+        "empirical_precision": 0.884058,
+        "gap": -0.083178
+      },
+      {
+        "bin": "[0.85,1.00]",
+        "lo": 0.85,
+        "hi": 1.0,
+        "n": 114,
+        "mean_score": 0.97048,
+        "empirical_precision": 0.973684,
+        "gap": -0.003204
+      }
+    ]
+  },
+  "ece_bin_edges": [
+    0.0,
+    0.15,
+    0.25,
+    0.35,
+    0.45,
+    0.55,
+    0.65,
+    0.75,
+    0.85,
+    1.0
+  ],
+  "artifacts": {
+    "png": "reports/calibration.png",
+    "md": "reports/calibration.md",
+    "json": "reports/calibration.json"
+  }
+}

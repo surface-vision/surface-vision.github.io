@@ -1,0 +1,2480 @@
+{
+  "meta": {
+    "generated_at": "2026-09-09T04:39:04+00:00",
+    "device": "mps",
+    "platform": "macOS-26.6.2-arm64-arm-64bit / arm64",
+    "torch": "2.14.0",
+    "ultralytics": "8.4.144",
+    "json_path": "reports/model_study.json",
+    "protocol": {
+      "metrics": "ultralytics validator defaults: conf 0.001, NMS IoU 0.7, max_det 300",
+      "failure_analysis": "DefectDetector, conf 0.25 and 0.15, NMS IoU 0.45",
+      "split_discipline": "inference size and TTA chosen on val; test scored once at that configuration"
+    }
+  },
+  "dataset": {
+    "name": "NEU-DET",
+    "split": {
+      "train": 1440,
+      "val": 180,
+      "test": 180
+    },
+    "image_px": 200,
+    "classes": [
+      "crazing",
+      "inclusion",
+      "patches",
+      "pitted_surface",
+      "rolled-in_scale",
+      "scratches"
+    ],
+    "test_instances": {
+      "crazing": 79,
+      "inclusion": 89,
+      "patches": 99,
+      "pitted_surface": 46,
+      "rolled-in_scale": 69,
+      "scratches": 64
+    }
+  },
+  "train_imgsz": 320,
+  "checkpoints": {
+    "yolov8n": {
+      "run": "yolov8n_neudet",
+      "weights": "models/yolov8n_neudet/weights/best.pt",
+      "sha256": "6661c7a09037137aa5a2fac73cb9588d4906118f4880b4e2902b39aea9f5f985",
+      "params": 3012018,
+      "params_millions": 3.012,
+      "weight_file_mb": 6.22,
+      "gflops_by_imgsz": {
+        "256": 1.312,
+        "320": 2.049,
+        "416": 3.463,
+        "512": 5.246,
+        "640": 8.197
+      }
+    },
+    "yolov8s": {
+      "run": "yolov8s_neudet",
+      "weights": "models/yolov8s_neudet/weights/best.pt",
+      "sha256": "479abeef28664c5122a0210d2386a5612620932c13be564bf7063ba672823881",
+      "params": 11137922,
+      "params_millions": 11.138,
+      "weight_file_mb": 22.49,
+      "gflops_by_imgsz": {
+        "256": 4.584,
+        "320": 7.163,
+        "416": 12.106,
+        "512": 18.338,
+        "640": 28.653
+      }
+    }
+  },
+  "training_history": {
+    "yolov8n": {
+      "available": true,
+      "epochs_requested": 150,
+      "epochs_run": 135,
+      "early_stopped": true,
+      "best_epoch": 85,
+      "best_val_mAP50": 0.73992,
+      "best_val_mAP50_95": 0.43105,
+      "final_train_box_loss": 1.2607,
+      "final_val_box_loss": 1.5026,
+      "final_train_cls_loss": 1.173,
+      "final_val_cls_loss": 1.1119,
+      "cls_loss_generalisation_gap": -0.0611,
+      "box_loss_generalisation_gap": 0.2419,
+      "wall_seconds": 2090.0,
+      "seconds_per_epoch": 15.48,
+      "seconds_per_epoch_median": 15.24,
+      "stalled_epochs": [],
+      "stall_seconds": 0,
+      "source": "models/yolov8n_neudet/results.csv"
+    },
+    "yolov8s": {
+      "available": true,
+      "epochs_requested": 150,
+      "epochs_run": 150,
+      "early_stopped": false,
+      "best_epoch": 116,
+      "best_val_mAP50": 0.73552,
+      "best_val_mAP50_95": 0.43769,
+      "final_train_box_loss": 1.1181,
+      "final_val_box_loss": 1.5175,
+      "final_train_cls_loss": 0.8229,
+      "final_val_cls_loss": 1.0898,
+      "cls_loss_generalisation_gap": 0.2669,
+      "box_loss_generalisation_gap": 0.3994,
+      "wall_seconds": 7865.4,
+      "seconds_per_epoch": 52.44,
+      "seconds_per_epoch_median": 36.47,
+      "stalled_epochs": [
+        {
+          "epoch": 63,
+          "seconds": 941.6
+        },
+        {
+          "epoch": 64,
+          "seconds": 945.8
+        }
+      ],
+      "stall_seconds": 1887.4,
+      "source": "models/yolov8s_neudet/results.csv"
+    }
+  },
+  "runs": [
+    {
+      "model": "yolov8n",
+      "split": "val",
+      "imgsz": 256,
+      "augment": false,
+      "mAP50": 0.74665,
+      "mAP50_95": 0.43788,
+      "precision": 0.69098,
+      "recall": 0.68736,
+      "per_class_AP50": {
+        "crazing": 0.39171,
+        "inclusion": 0.89883,
+        "patches": 0.9631,
+        "pitted_surface": 0.78879,
+        "rolled-in_scale": 0.51331,
+        "scratches": 0.92415
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.15337,
+        "inclusion": 0.49781,
+        "patches": 0.6362,
+        "pitted_surface": 0.54539,
+        "rolled-in_scale": 0.25847,
+        "scratches": 0.53602
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.084,
+        "inference": 1.091,
+        "loss": 0.0,
+        "postprocess": 2.263
+      },
+      "wall_seconds": 16.36
+    },
+    {
+      "model": "yolov8n",
+      "split": "val",
+      "imgsz": 320,
+      "augment": false,
+      "mAP50": 0.73963,
+      "mAP50_95": 0.43145,
+      "precision": 0.74063,
+      "recall": 0.63994,
+      "per_class_AP50": {
+        "crazing": 0.39868,
+        "inclusion": 0.91025,
+        "patches": 0.95386,
+        "pitted_surface": 0.79258,
+        "rolled-in_scale": 0.5085,
+        "scratches": 0.87391
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.15278,
+        "inclusion": 0.4967,
+        "patches": 0.62977,
+        "pitted_surface": 0.52814,
+        "rolled-in_scale": 0.25305,
+        "scratches": 0.52824
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.089,
+        "inference": 1.249,
+        "loss": 0.0,
+        "postprocess": 2.489
+      },
+      "wall_seconds": 1.62
+    },
+    {
+      "model": "yolov8n",
+      "split": "val",
+      "imgsz": 416,
+      "augment": false,
+      "mAP50": 0.60308,
+      "mAP50_95": 0.29807,
+      "precision": 0.54258,
+      "recall": 0.61299,
+      "per_class_AP50": {
+        "crazing": 0.28577,
+        "inclusion": 0.85079,
+        "patches": 0.94321,
+        "pitted_surface": 0.39608,
+        "rolled-in_scale": 0.3831,
+        "scratches": 0.7595
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.0939,
+        "inclusion": 0.44994,
+        "patches": 0.59394,
+        "pitted_surface": 0.11422,
+        "rolled-in_scale": 0.18276,
+        "scratches": 0.35364
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.097,
+        "inference": 1.428,
+        "loss": 0.0,
+        "postprocess": 3.326
+      },
+      "wall_seconds": 1.98
+    },
+    {
+      "model": "yolov8n",
+      "split": "val",
+      "imgsz": 512,
+      "augment": false,
+      "mAP50": 0.4898,
+      "mAP50_95": 0.22093,
+      "precision": 0.44046,
+      "recall": 0.58191,
+      "per_class_AP50": {
+        "crazing": 0.28451,
+        "inclusion": 0.76313,
+        "patches": 0.84065,
+        "pitted_surface": 0.14111,
+        "rolled-in_scale": 0.37147,
+        "scratches": 0.53796
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.08364,
+        "inclusion": 0.38476,
+        "patches": 0.48749,
+        "pitted_surface": 0.02117,
+        "rolled-in_scale": 0.16993,
+        "scratches": 0.17856
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.106,
+        "inference": 1.731,
+        "loss": 0.0,
+        "postprocess": 4.066
+      },
+      "wall_seconds": 2.37
+    },
+    {
+      "model": "yolov8n",
+      "split": "val",
+      "imgsz": 640,
+      "augment": false,
+      "mAP50": 0.32254,
+      "mAP50_95": 0.14648,
+      "precision": 0.4847,
+      "recall": 0.31531,
+      "per_class_AP50": {
+        "crazing": 0.14247,
+        "inclusion": 0.59988,
+        "patches": 0.66907,
+        "pitted_surface": 0.00417,
+        "rolled-in_scale": 0.27303,
+        "scratches": 0.24663
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.03765,
+        "inclusion": 0.28927,
+        "patches": 0.35952,
+        "pitted_surface": 0.0014,
+        "rolled-in_scale": 0.10084,
+        "scratches": 0.0902
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.124,
+        "inference": 2.181,
+        "loss": 0.0,
+        "postprocess": 5.508
+      },
+      "wall_seconds": 2.98
+    },
+    {
+      "model": "yolov8n",
+      "split": "test",
+      "imgsz": 256,
+      "augment": false,
+      "mAP50": 0.75245,
+      "mAP50_95": 0.39671,
+      "precision": 0.696,
+      "recall": 0.68671,
+      "per_class_AP50": {
+        "crazing": 0.44426,
+        "inclusion": 0.82716,
+        "patches": 0.94861,
+        "pitted_surface": 0.75583,
+        "rolled-in_scale": 0.62951,
+        "scratches": 0.90932
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.18695,
+        "inclusion": 0.45174,
+        "patches": 0.62225,
+        "pitted_surface": 0.42727,
+        "rolled-in_scale": 0.27679,
+        "scratches": 0.41526
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.084,
+        "inference": 0.473,
+        "loss": 0.0,
+        "postprocess": 2.426
+      },
+      "wall_seconds": 1.43
+    },
+    {
+      "model": "yolov8n",
+      "split": "test",
+      "imgsz": 320,
+      "augment": false,
+      "mAP50": 0.7286,
+      "mAP50_95": 0.39263,
+      "precision": 0.73217,
+      "recall": 0.60178,
+      "per_class_AP50": {
+        "crazing": 0.39509,
+        "inclusion": 0.84198,
+        "patches": 0.94475,
+        "pitted_surface": 0.74788,
+        "rolled-in_scale": 0.64675,
+        "scratches": 0.79518
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.15928,
+        "inclusion": 0.45922,
+        "patches": 0.6232,
+        "pitted_surface": 0.43858,
+        "rolled-in_scale": 0.30154,
+        "scratches": 0.37398
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.089,
+        "inference": 0.637,
+        "loss": 0.0,
+        "postprocess": 2.477
+      },
+      "wall_seconds": 1.39
+    },
+    {
+      "model": "yolov8n",
+      "split": "test",
+      "imgsz": 416,
+      "augment": false,
+      "mAP50": 0.623,
+      "mAP50_95": 0.29193,
+      "precision": 0.492,
+      "recall": 0.65563,
+      "per_class_AP50": {
+        "crazing": 0.3695,
+        "inclusion": 0.77936,
+        "patches": 0.92153,
+        "pitted_surface": 0.42365,
+        "rolled-in_scale": 0.57568,
+        "scratches": 0.66825
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.12785,
+        "inclusion": 0.41886,
+        "patches": 0.60625,
+        "pitted_surface": 0.10559,
+        "rolled-in_scale": 0.24814,
+        "scratches": 0.24491
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.104,
+        "inference": 0.721,
+        "loss": 0.0,
+        "postprocess": 2.993
+      },
+      "wall_seconds": 1.79
+    },
+    {
+      "model": "yolov8n",
+      "split": "test",
+      "imgsz": 512,
+      "augment": false,
+      "mAP50": 0.48427,
+      "mAP50_95": 0.21294,
+      "precision": 0.35842,
+      "recall": 0.60558,
+      "per_class_AP50": {
+        "crazing": 0.28562,
+        "inclusion": 0.74047,
+        "patches": 0.91553,
+        "pitted_surface": 0.07446,
+        "rolled-in_scale": 0.49911,
+        "scratches": 0.39046
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.07031,
+        "inclusion": 0.33774,
+        "patches": 0.52675,
+        "pitted_surface": 0.0121,
+        "rolled-in_scale": 0.20744,
+        "scratches": 0.12329
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.128,
+        "inference": 0.828,
+        "loss": 0.0,
+        "postprocess": 3.97
+      },
+      "wall_seconds": 2.23
+    },
+    {
+      "model": "yolov8n",
+      "split": "test",
+      "imgsz": 640,
+      "augment": false,
+      "mAP50": 0.34382,
+      "mAP50_95": 0.1495,
+      "precision": 0.4454,
+      "recall": 0.38918,
+      "per_class_AP50": {
+        "crazing": 0.09009,
+        "inclusion": 0.60968,
+        "patches": 0.76961,
+        "pitted_surface": 0.00566,
+        "rolled-in_scale": 0.40784,
+        "scratches": 0.18004
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.0177,
+        "inclusion": 0.26163,
+        "patches": 0.40118,
+        "pitted_surface": 0.0014,
+        "rolled-in_scale": 0.14668,
+        "scratches": 0.06841
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.162,
+        "inference": 1.09,
+        "loss": 0.0,
+        "postprocess": 5.762
+      },
+      "wall_seconds": 2.83
+    },
+    {
+      "model": "yolov8s",
+      "split": "val",
+      "imgsz": 256,
+      "augment": false,
+      "mAP50": 0.753,
+      "mAP50_95": 0.44932,
+      "precision": 0.70155,
+      "recall": 0.67491,
+      "per_class_AP50": {
+        "crazing": 0.36804,
+        "inclusion": 0.9157,
+        "patches": 0.95585,
+        "pitted_surface": 0.84619,
+        "rolled-in_scale": 0.48347,
+        "scratches": 0.94876
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.14346,
+        "inclusion": 0.52047,
+        "patches": 0.6149,
+        "pitted_surface": 0.60427,
+        "rolled-in_scale": 0.24849,
+        "scratches": 0.56434
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.117,
+        "inference": 2.406,
+        "loss": 0.0,
+        "postprocess": 4.021
+      },
+      "wall_seconds": 2.25
+    },
+    {
+      "model": "yolov8s",
+      "split": "val",
+      "imgsz": 320,
+      "augment": false,
+      "mAP50": 0.72372,
+      "mAP50_95": 0.43861,
+      "precision": 0.63549,
+      "recall": 0.68113,
+      "per_class_AP50": {
+        "crazing": 0.33261,
+        "inclusion": 0.90998,
+        "patches": 0.96007,
+        "pitted_surface": 0.76318,
+        "rolled-in_scale": 0.43763,
+        "scratches": 0.93885
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.12344,
+        "inclusion": 0.52838,
+        "patches": 0.62761,
+        "pitted_surface": 0.52425,
+        "rolled-in_scale": 0.23833,
+        "scratches": 0.58965
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.13,
+        "inference": 2.745,
+        "loss": 0.0,
+        "postprocess": 5.89
+      },
+      "wall_seconds": 2.87
+    },
+    {
+      "model": "yolov8s",
+      "split": "val",
+      "imgsz": 416,
+      "augment": false,
+      "mAP50": 0.63142,
+      "mAP50_95": 0.30696,
+      "precision": 0.52545,
+      "recall": 0.66086,
+      "per_class_AP50": {
+        "crazing": 0.25301,
+        "inclusion": 0.89546,
+        "patches": 0.91511,
+        "pitted_surface": 0.44639,
+        "rolled-in_scale": 0.43573,
+        "scratches": 0.84281
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.08289,
+        "inclusion": 0.45455,
+        "patches": 0.56911,
+        "pitted_surface": 0.12915,
+        "rolled-in_scale": 0.20193,
+        "scratches": 0.40413
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.13,
+        "inference": 2.859,
+        "loss": 0.0,
+        "postprocess": 8.614
+      },
+      "wall_seconds": 3.99
+    },
+    {
+      "model": "yolov8s",
+      "split": "val",
+      "imgsz": 512,
+      "augment": false,
+      "mAP50": 0.53807,
+      "mAP50_95": 0.22392,
+      "precision": 0.47583,
+      "recall": 0.57943,
+      "per_class_AP50": {
+        "crazing": 0.27735,
+        "inclusion": 0.80288,
+        "patches": 0.87721,
+        "pitted_surface": 0.18007,
+        "rolled-in_scale": 0.37246,
+        "scratches": 0.71845
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.08968,
+        "inclusion": 0.36262,
+        "patches": 0.50322,
+        "pitted_surface": 0.02467,
+        "rolled-in_scale": 0.17021,
+        "scratches": 0.1931
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.197,
+        "inference": 2.789,
+        "loss": 0.0,
+        "postprocess": 11.215
+      },
+      "wall_seconds": 4.43
+    },
+    {
+      "model": "yolov8s",
+      "split": "val",
+      "imgsz": 640,
+      "augment": false,
+      "mAP50": 0.33312,
+      "mAP50_95": 0.13887,
+      "precision": 0.34781,
+      "recall": 0.41087,
+      "per_class_AP50": {
+        "crazing": 0.21323,
+        "inclusion": 0.62046,
+        "patches": 0.66365,
+        "pitted_surface": 0.00491,
+        "rolled-in_scale": 0.16248,
+        "scratches": 0.33401
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.04922,
+        "inclusion": 0.28037,
+        "patches": 0.36013,
+        "pitted_surface": 0.0014,
+        "rolled-in_scale": 0.06617,
+        "scratches": 0.07593
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.148,
+        "inference": 2.958,
+        "loss": 0.0,
+        "postprocess": 15.818
+      },
+      "wall_seconds": 4.98
+    },
+    {
+      "model": "yolov8s",
+      "split": "test",
+      "imgsz": 256,
+      "augment": false,
+      "mAP50": 0.73431,
+      "mAP50_95": 0.40606,
+      "precision": 0.70872,
+      "recall": 0.6807,
+      "per_class_AP50": {
+        "crazing": 0.47106,
+        "inclusion": 0.80671,
+        "patches": 0.94295,
+        "pitted_surface": 0.82398,
+        "rolled-in_scale": 0.50212,
+        "scratches": 0.85904
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.20156,
+        "inclusion": 0.46015,
+        "patches": 0.61102,
+        "pitted_surface": 0.51169,
+        "rolled-in_scale": 0.20384,
+        "scratches": 0.44808
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.084,
+        "inference": 0.622,
+        "loss": 0.0,
+        "postprocess": 3.553
+      },
+      "wall_seconds": 1.64
+    },
+    {
+      "model": "yolov8s",
+      "split": "test",
+      "imgsz": 320,
+      "augment": false,
+      "mAP50": 0.6598,
+      "mAP50_95": 0.36181,
+      "precision": 0.61073,
+      "recall": 0.64746,
+      "per_class_AP50": {
+        "crazing": 0.32956,
+        "inclusion": 0.80499,
+        "patches": 0.92106,
+        "pitted_surface": 0.70359,
+        "rolled-in_scale": 0.43773,
+        "scratches": 0.76184
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.13665,
+        "inclusion": 0.45125,
+        "patches": 0.59162,
+        "pitted_surface": 0.4341,
+        "rolled-in_scale": 0.19483,
+        "scratches": 0.36238
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.111,
+        "inference": 0.894,
+        "loss": 0.0,
+        "postprocess": 5.016
+      },
+      "wall_seconds": 2.12
+    },
+    {
+      "model": "yolov8s",
+      "split": "test",
+      "imgsz": 416,
+      "augment": false,
+      "mAP50": 0.5646,
+      "mAP50_95": 0.26014,
+      "precision": 0.46191,
+      "recall": 0.66175,
+      "per_class_AP50": {
+        "crazing": 0.29934,
+        "inclusion": 0.73133,
+        "patches": 0.90807,
+        "pitted_surface": 0.39272,
+        "rolled-in_scale": 0.46612,
+        "scratches": 0.59002
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.09798,
+        "inclusion": 0.3691,
+        "patches": 0.55265,
+        "pitted_surface": 0.10889,
+        "rolled-in_scale": 0.19802,
+        "scratches": 0.23418
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.113,
+        "inference": 1.136,
+        "loss": 0.0,
+        "postprocess": 7.881
+      },
+      "wall_seconds": 2.84
+    },
+    {
+      "model": "yolov8s",
+      "split": "test",
+      "imgsz": 512,
+      "augment": false,
+      "mAP50": 0.49292,
+      "mAP50_95": 0.20629,
+      "precision": 0.37555,
+      "recall": 0.66124,
+      "per_class_AP50": {
+        "crazing": 0.32511,
+        "inclusion": 0.73361,
+        "patches": 0.87419,
+        "pitted_surface": 0.07953,
+        "rolled-in_scale": 0.46057,
+        "scratches": 0.48454
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.0818,
+        "inclusion": 0.28128,
+        "patches": 0.51706,
+        "pitted_surface": 0.0145,
+        "rolled-in_scale": 0.19524,
+        "scratches": 0.14787
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.129,
+        "inference": 1.555,
+        "loss": 0.0,
+        "postprocess": 10.963
+      },
+      "wall_seconds": 3.7
+    },
+    {
+      "model": "yolov8s",
+      "split": "test",
+      "imgsz": 640,
+      "augment": false,
+      "mAP50": 0.32274,
+      "mAP50_95": 0.13462,
+      "precision": 0.27527,
+      "recall": 0.45568,
+      "per_class_AP50": {
+        "crazing": 0.11169,
+        "inclusion": 0.54639,
+        "patches": 0.74374,
+        "pitted_surface": 0.00898,
+        "rolled-in_scale": 0.31548,
+        "scratches": 0.21015
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.02638,
+        "inclusion": 0.18539,
+        "patches": 0.40241,
+        "pitted_surface": 0.00125,
+        "rolled-in_scale": 0.09975,
+        "scratches": 0.09251
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.14,
+        "inference": 2.253,
+        "loss": 0.0,
+        "postprocess": 16.48
+      },
+      "wall_seconds": 4.92
+    },
+    {
+      "model": "yolov8n",
+      "split": "val",
+      "imgsz": 256,
+      "augment": true,
+      "mAP50": 0.74058,
+      "mAP50_95": 0.42333,
+      "precision": 0.63993,
+      "recall": 0.69172,
+      "per_class_AP50": {
+        "crazing": 0.36292,
+        "inclusion": 0.88102,
+        "patches": 0.9576,
+        "pitted_surface": 0.80035,
+        "rolled-in_scale": 0.53622,
+        "scratches": 0.9054
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.132,
+        "inclusion": 0.45803,
+        "patches": 0.62055,
+        "pitted_surface": 0.56278,
+        "rolled-in_scale": 0.27387,
+        "scratches": 0.49273
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.086,
+        "inference": 6.504,
+        "loss": 0.0,
+        "postprocess": 1.324
+      },
+      "wall_seconds": 2.19
+    },
+    {
+      "model": "yolov8n",
+      "split": "test",
+      "imgsz": 256,
+      "augment": true,
+      "mAP50": 0.71443,
+      "mAP50_95": 0.37619,
+      "precision": 0.63933,
+      "recall": 0.66821,
+      "per_class_AP50": {
+        "crazing": 0.4194,
+        "inclusion": 0.80345,
+        "patches": 0.93177,
+        "pitted_surface": 0.73751,
+        "rolled-in_scale": 0.59644,
+        "scratches": 0.79799
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.17991,
+        "inclusion": 0.42205,
+        "patches": 0.60606,
+        "pitted_surface": 0.40067,
+        "rolled-in_scale": 0.26442,
+        "scratches": 0.38402
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.087,
+        "inference": 3.78,
+        "loss": 0.0,
+        "postprocess": 1.271
+      },
+      "wall_seconds": 1.66
+    },
+    {
+      "model": "yolov8s",
+      "split": "val",
+      "imgsz": 256,
+      "augment": true,
+      "mAP50": 0.75535,
+      "mAP50_95": 0.44034,
+      "precision": 0.64053,
+      "recall": 0.74905,
+      "per_class_AP50": {
+        "crazing": 0.39087,
+        "inclusion": 0.8966,
+        "patches": 0.95288,
+        "pitted_surface": 0.85177,
+        "rolled-in_scale": 0.51531,
+        "scratches": 0.92466
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.15291,
+        "inclusion": 0.49809,
+        "patches": 0.60118,
+        "pitted_surface": 0.57524,
+        "rolled-in_scale": 0.26767,
+        "scratches": 0.54695
+      },
+      "instances": {
+        "crazing": 72,
+        "inclusion": 103,
+        "patches": 79,
+        "pitted_surface": 47,
+        "rolled-in_scale": 55,
+        "scratches": 51
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.112,
+        "inference": 9.831,
+        "loss": 0.0,
+        "postprocess": 2.322
+      },
+      "wall_seconds": 3.27
+    },
+    {
+      "model": "yolov8s",
+      "split": "test",
+      "imgsz": 256,
+      "augment": true,
+      "mAP50": 0.72629,
+      "mAP50_95": 0.39171,
+      "precision": 0.65336,
+      "recall": 0.69956,
+      "per_class_AP50": {
+        "crazing": 0.47809,
+        "inclusion": 0.80449,
+        "patches": 0.92752,
+        "pitted_surface": 0.82275,
+        "rolled-in_scale": 0.5027,
+        "scratches": 0.82221
+      },
+      "per_class_AP50_95": {
+        "crazing": 0.20698,
+        "inclusion": 0.43326,
+        "patches": 0.58737,
+        "pitted_surface": 0.47735,
+        "rolled-in_scale": 0.20054,
+        "scratches": 0.44477
+      },
+      "instances": {
+        "crazing": 79,
+        "inclusion": 89,
+        "patches": 99,
+        "pitted_surface": 46,
+        "rolled-in_scale": 69,
+        "scratches": 64
+      },
+      "validator_speed_ms_per_image": {
+        "preprocess": 0.113,
+        "inference": 7.562,
+        "loss": 0.0,
+        "postprocess": 2.205
+      },
+      "wall_seconds": 2.86
+    }
+  ],
+  "latency": {
+    "yolov8n": {
+      "by_imgsz": {
+        "256": {
+          "n": 80,
+          "mean_ms": 5.236,
+          "median_ms": 4.508,
+          "min_ms": 3.483,
+          "p95_ms": 8.942,
+          "std_ms": 1.658,
+          "fps": 191.0,
+          "fps_at_median": 221.9
+        },
+        "320": {
+          "n": 80,
+          "mean_ms": 4.907,
+          "median_ms": 4.972,
+          "min_ms": 3.792,
+          "p95_ms": 5.363,
+          "std_ms": 0.337,
+          "fps": 203.8,
+          "fps_at_median": 201.1
+        },
+        "416": {
+          "n": 80,
+          "mean_ms": 6.942,
+          "median_ms": 6.451,
+          "min_ms": 4.154,
+          "p95_ms": 9.642,
+          "std_ms": 1.759,
+          "fps": 144.1,
+          "fps_at_median": 155.0
+        },
+        "512": {
+          "n": 80,
+          "mean_ms": 7.967,
+          "median_ms": 6.85,
+          "min_ms": 5.097,
+          "p95_ms": 11.319,
+          "std_ms": 1.934,
+          "fps": 125.5,
+          "fps_at_median": 146.0
+        },
+        "640": {
+          "n": 80,
+          "mean_ms": 10.941,
+          "median_ms": 10.923,
+          "min_ms": 7.4,
+          "p95_ms": 15.661,
+          "std_ms": 2.443,
+          "fps": 91.4,
+          "fps_at_median": 91.5
+        }
+      },
+      "tta": {
+        "imgsz": 256,
+        "n": 80,
+        "mean_ms": 19.006,
+        "median_ms": 19.226,
+        "min_ms": 15.852,
+        "p95_ms": 22.28,
+        "std_ms": 1.989,
+        "fps": 52.6,
+        "fps_at_median": 52.0
+      },
+      "tta_paired": {
+        "imgsz": 256,
+        "interleaved": true,
+        "off": {
+          "n": 80,
+          "mean_ms": 8.157,
+          "median_ms": 8.057,
+          "min_ms": 5.876,
+          "p95_ms": 10.302,
+          "std_ms": 1.243,
+          "fps": 122.6,
+          "fps_at_median": 124.1
+        },
+        "on": {
+          "n": 80,
+          "mean_ms": 19.006,
+          "median_ms": 19.226,
+          "min_ms": 15.852,
+          "p95_ms": 22.28,
+          "std_ms": 1.989,
+          "fps": 52.6,
+          "fps_at_median": 52.0
+        },
+        "cost_multiple_at_floor": 2.7,
+        "cost_multiple_at_median": 2.39
+      },
+      "shipping_api_crosscheck": {
+        "api": "DefectDetector.predict",
+        "imgsz": 256,
+        "n": 60,
+        "mean_ms": 7.918,
+        "median_ms": 8.029,
+        "min_ms": 5.35,
+        "p95_ms": 9.804,
+        "std_ms": 1.256,
+        "fps": 126.3,
+        "fps_at_median": 124.5
+      }
+    },
+    "yolov8s": {
+      "by_imgsz": {
+        "256": {
+          "n": 80,
+          "mean_ms": 8.894,
+          "median_ms": 7.816,
+          "min_ms": 5.754,
+          "p95_ms": 13.411,
+          "std_ms": 2.445,
+          "fps": 112.4,
+          "fps_at_median": 127.9
+        },
+        "320": {
+          "n": 80,
+          "mean_ms": 10.915,
+          "median_ms": 8.633,
+          "min_ms": 7.206,
+          "p95_ms": 18.349,
+          "std_ms": 3.938,
+          "fps": 91.6,
+          "fps_at_median": 115.8
+        },
+        "416": {
+          "n": 80,
+          "mean_ms": 14.95,
+          "median_ms": 11.3,
+          "min_ms": 9.593,
+          "p95_ms": 23.332,
+          "std_ms": 5.05,
+          "fps": 66.9,
+          "fps_at_median": 88.5
+        },
+        "512": {
+          "n": 80,
+          "mean_ms": 18.675,
+          "median_ms": 15.009,
+          "min_ms": 12.887,
+          "p95_ms": 27.981,
+          "std_ms": 5.87,
+          "fps": 53.5,
+          "fps_at_median": 66.6
+        },
+        "640": {
+          "n": 80,
+          "mean_ms": 27.159,
+          "median_ms": 23.751,
+          "min_ms": 18.175,
+          "p95_ms": 37.336,
+          "std_ms": 8.181,
+          "fps": 36.8,
+          "fps_at_median": 42.1
+        }
+      },
+      "tta": {
+        "imgsz": 256,
+        "n": 80,
+        "mean_ms": 22.957,
+        "median_ms": 18.317,
+        "min_ms": 16.268,
+        "p95_ms": 37.446,
+        "std_ms": 7.486,
+        "fps": 43.6,
+        "fps_at_median": 54.6
+      },
+      "tta_paired": {
+        "imgsz": 256,
+        "interleaved": true,
+        "off": {
+          "n": 80,
+          "mean_ms": 10.15,
+          "median_ms": 8.053,
+          "min_ms": 6.386,
+          "p95_ms": 17.16,
+          "std_ms": 3.621,
+          "fps": 98.5,
+          "fps_at_median": 124.2
+        },
+        "on": {
+          "n": 80,
+          "mean_ms": 22.957,
+          "median_ms": 18.317,
+          "min_ms": 16.268,
+          "p95_ms": 37.446,
+          "std_ms": 7.486,
+          "fps": 43.6,
+          "fps_at_median": 54.6
+        },
+        "cost_multiple_at_floor": 2.55,
+        "cost_multiple_at_median": 2.27
+      },
+      "shipping_api_crosscheck": {
+        "api": "DefectDetector.predict",
+        "imgsz": 256,
+        "n": 60,
+        "mean_ms": 9.028,
+        "median_ms": 8.886,
+        "min_ms": 7.346,
+        "p95_ms": 10.342,
+        "std_ms": 0.803,
+        "fps": 110.8,
+        "fps_at_median": 112.5
+      }
+    }
+  },
+  "bootstrap": {
+    "at_training_size": {
+      "model_a": "yolov8n",
+      "model_b": "yolov8s",
+      "n_images": 180,
+      "resamples": 2000,
+      "seed": 1337,
+      "resamples_missing_a_class": 0,
+      "seconds": 16.8,
+      "mAP50": {
+        "point_estimate_a": 0.7286,
+        "point_estimate_b": 0.6598,
+        "point_difference": 0.06881,
+        "bootstrap_mean_difference": 0.06584,
+        "bootstrap_std_difference": 0.01725,
+        "ci95_low": 0.03093,
+        "ci95_high": 0.09898,
+        "ci_excludes_zero": true,
+        "share_a_wins": 0.9995,
+        "share_b_wins": 0.0005,
+        "a_marginal_std": 0.01914,
+        "b_marginal_std": 0.02016,
+        "unpaired_std_estimate": 0.0278,
+        "pairing_variance_reduction": 1.61
+      },
+      "mAP50_95": {
+        "point_estimate_a": 0.39263,
+        "point_estimate_b": 0.36181,
+        "point_difference": 0.03083,
+        "bootstrap_mean_difference": 0.0296,
+        "bootstrap_std_difference": 0.00951,
+        "ci95_low": 0.01105,
+        "ci95_high": 0.04838,
+        "ci_excludes_zero": true,
+        "share_a_wins": 0.9985,
+        "share_b_wins": 0.0015,
+        "a_marginal_std": 0.01493,
+        "b_marginal_std": 0.01516,
+        "unpaired_std_estimate": 0.02128,
+        "pairing_variance_reduction": 2.24
+      }
+    },
+    "at_deployment_size": {
+      "model_a": "yolov8n@256",
+      "model_b": "yolov8s@256",
+      "n_images": 180,
+      "resamples": 2000,
+      "seed": 1337,
+      "resamples_missing_a_class": 0,
+      "seconds": 16.1,
+      "mAP50": {
+        "point_estimate_a": 0.75245,
+        "point_estimate_b": 0.73431,
+        "point_difference": 0.01814,
+        "bootstrap_mean_difference": 0.01769,
+        "bootstrap_std_difference": 0.01331,
+        "ci95_low": -0.00841,
+        "ci95_high": 0.04242,
+        "ci_excludes_zero": false,
+        "share_a_wins": 0.902,
+        "share_b_wins": 0.098,
+        "a_marginal_std": 0.01625,
+        "b_marginal_std": 0.01812,
+        "unpaired_std_estimate": 0.02434,
+        "pairing_variance_reduction": 1.83
+      },
+      "mAP50_95": {
+        "point_estimate_a": 0.39671,
+        "point_estimate_b": 0.40606,
+        "point_difference": -0.00935,
+        "bootstrap_mean_difference": -0.00856,
+        "bootstrap_std_difference": 0.00853,
+        "ci95_low": -0.02501,
+        "ci95_high": 0.00842,
+        "ci_excludes_zero": false,
+        "share_a_wins": 0.159,
+        "share_b_wins": 0.841,
+        "a_marginal_std": 0.01426,
+        "b_marginal_std": 0.01463,
+        "unpaired_std_estimate": 0.02043,
+        "pairing_variance_reduction": 2.39
+      }
+    }
+  },
+  "winner_basis": "deployment-size bootstrap interval contains zero, so the tie breaks on cost; yolov8n is the cheaper model on all of parameter count, weight-file size, FLOPs (batch-1 latency does not separate them at this input size)",
+  "fidelity": [
+    {
+      "model": "yolov8n",
+      "split": "test",
+      "imgsz": 320,
+      "validator_mAP50": 0.72860482,
+      "recomputed_mAP50": 0.72860482,
+      "abs_error_mAP50": 0.0,
+      "validator_mAP50_95": 0.39263309,
+      "recomputed_mAP50_95": 0.39263309,
+      "abs_error_mAP50_95": 0.0,
+      "exact": true
+    },
+    {
+      "model": "yolov8s",
+      "split": "test",
+      "imgsz": 320,
+      "validator_mAP50": 0.65979556,
+      "recomputed_mAP50": 0.65979556,
+      "abs_error_mAP50": 0.0,
+      "validator_mAP50_95": 0.36180682,
+      "recomputed_mAP50_95": 0.36180682,
+      "abs_error_mAP50_95": 0.0,
+      "exact": true
+    },
+    {
+      "model": "yolov8n",
+      "split": "test",
+      "imgsz": 256,
+      "validator_mAP50": 0.75244755,
+      "recomputed_mAP50": 0.75244755,
+      "abs_error_mAP50": 0.0,
+      "validator_mAP50_95": 0.39670948,
+      "recomputed_mAP50_95": 0.39670948,
+      "abs_error_mAP50_95": 0.0,
+      "exact": true
+    },
+    {
+      "model": "yolov8s",
+      "split": "test",
+      "imgsz": 256,
+      "validator_mAP50": 0.73430937,
+      "recomputed_mAP50": 0.73430937,
+      "abs_error_mAP50": 0.0,
+      "validator_mAP50_95": 0.40605507,
+      "recomputed_mAP50_95": 0.40605507,
+      "abs_error_mAP50_95": 0.0,
+      "exact": true
+    }
+  ],
+  "split_noise": {
+    "val_gap_mAP50": 0.01591,
+    "test_gap_mAP50": 0.06881,
+    "swing": 0.0529,
+    "note": "same two checkpoints on two disjoint 180-image splits. Neither split was trained on, but val WAS selected on -- best.pt is the max-val-fitness epoch -- so val is optimistically biased for both models and cannot arbitrate between them."
+  },
+  "best_imgsz_on_val": {
+    "yolov8n": 256,
+    "yolov8s": 256
+  },
+  "failure_taxonomy": {
+    "default_conf": {
+      "threshold": 0.25,
+      "per_class": {
+        "crazing": {
+          "instances": 79,
+          "matched": 11,
+          "missed": 68,
+          "class_confusion": 0,
+          "extent_error": 15,
+          "blind_miss": 53,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "crazing": 8
+          },
+          "recall": 0.1392
+        },
+        "inclusion": {
+          "instances": 89,
+          "matched": 62,
+          "missed": 27,
+          "class_confusion": 0,
+          "extent_error": 14,
+          "blind_miss": 13,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "inclusion": 25
+          },
+          "recall": 0.6966
+        },
+        "patches": {
+          "instances": 99,
+          "matched": 83,
+          "missed": 16,
+          "class_confusion": 0,
+          "extent_error": 11,
+          "blind_miss": 5,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "patches": 8
+          },
+          "recall": 0.8384
+        },
+        "pitted_surface": {
+          "instances": 46,
+          "matched": 32,
+          "missed": 14,
+          "class_confusion": 0,
+          "extent_error": 11,
+          "blind_miss": 3,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "pitted_surface": 3,
+            "patches": 2
+          },
+          "recall": 0.6957
+        },
+        "rolled-in_scale": {
+          "instances": 69,
+          "matched": 35,
+          "missed": 34,
+          "class_confusion": 0,
+          "extent_error": 21,
+          "blind_miss": 13,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "rolled-in_scale": 21
+          },
+          "recall": 0.5072
+        },
+        "scratches": {
+          "instances": 64,
+          "matched": 55,
+          "missed": 9,
+          "class_confusion": 0,
+          "extent_error": 7,
+          "blind_miss": 2,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "scratches": 19,
+            "rolled-in_scale": 1
+          },
+          "recall": 0.8594
+        }
+      }
+    },
+    "tuned_conf": {
+      "threshold": 0.15,
+      "per_class": {
+        "crazing": {
+          "instances": 79,
+          "matched": 28,
+          "missed": 51,
+          "class_confusion": 0,
+          "extent_error": 30,
+          "blind_miss": 21,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "crazing": 25
+          },
+          "recall": 0.3544
+        },
+        "inclusion": {
+          "instances": 89,
+          "matched": 66,
+          "missed": 23,
+          "class_confusion": 0,
+          "extent_error": 11,
+          "blind_miss": 12,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "inclusion": 40,
+            "scratches": 1
+          },
+          "recall": 0.7416
+        },
+        "patches": {
+          "instances": 99,
+          "matched": 88,
+          "missed": 11,
+          "class_confusion": 0,
+          "extent_error": 9,
+          "blind_miss": 2,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "patches": 13,
+            "inclusion": 1
+          },
+          "recall": 0.8889
+        },
+        "pitted_surface": {
+          "instances": 46,
+          "matched": 34,
+          "missed": 12,
+          "class_confusion": 0,
+          "extent_error": 10,
+          "blind_miss": 2,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "pitted_surface": 12,
+            "patches": 3
+          },
+          "recall": 0.7391
+        },
+        "rolled-in_scale": {
+          "instances": 69,
+          "matched": 45,
+          "missed": 24,
+          "class_confusion": 0,
+          "extent_error": 19,
+          "blind_miss": 5,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "rolled-in_scale": 33
+          },
+          "recall": 0.6522
+        },
+        "scratches": {
+          "instances": 64,
+          "matched": 56,
+          "missed": 8,
+          "class_confusion": 0,
+          "extent_error": 7,
+          "blind_miss": 1,
+          "confused_with": {},
+          "false_positives_on_this_class_image": {
+            "scratches": 34,
+            "rolled-in_scale": 1,
+            "inclusion": 1
+          },
+          "recall": 0.875
+        }
+      }
+    }
+  },
+  "appearance": {
+    "crazing": {
+      "n_boxes": 79,
+      "separability": 0.3188,
+      "separability_n": 79,
+      "edge_energy_ratio": 1.0135,
+      "rms_intensity_in_box": 28.871,
+      "box_area_frac": 0.2379,
+      "mean_pairwise_gt_iou": 0.0369,
+      "boxes_per_image": 2.899
+    },
+    "inclusion": {
+      "n_boxes": 89,
+      "separability": 0.8289,
+      "separability_n": 89,
+      "edge_energy_ratio": 1.6305,
+      "rms_intensity_in_box": 9.949,
+      "box_area_frac": 0.0569,
+      "mean_pairwise_gt_iou": 0.0218,
+      "boxes_per_image": 3.809
+    },
+    "patches": {
+      "n_boxes": 99,
+      "separability": 1.5877,
+      "separability_n": 99,
+      "edge_energy_ratio": 0.9221,
+      "rms_intensity_in_box": 36.469,
+      "box_area_frac": 0.1195,
+      "mean_pairwise_gt_iou": 0.0194,
+      "boxes_per_image": 3.303
+    },
+    "pitted_surface": {
+      "n_boxes": 46,
+      "separability": 0.6219,
+      "separability_n": 46,
+      "edge_energy_ratio": 1.0419,
+      "rms_intensity_in_box": 21.364,
+      "box_area_frac": 0.5214,
+      "mean_pairwise_gt_iou": 0.0441,
+      "boxes_per_image": 2.217
+    },
+    "rolled-in_scale": {
+      "n_boxes": 69,
+      "separability": 0.5129,
+      "separability_n": 69,
+      "edge_energy_ratio": 1.1272,
+      "rms_intensity_in_box": 13.465,
+      "box_area_frac": 0.1789,
+      "mean_pairwise_gt_iou": 0.0258,
+      "boxes_per_image": 2.536
+    },
+    "scratches": {
+      "n_boxes": 64,
+      "separability": 2.432,
+      "separability_n": 64,
+      "edge_energy_ratio": 2.7632,
+      "rms_intensity_in_box": 30.433,
+      "box_area_frac": 0.0967,
+      "mean_pairwise_gt_iou": 0.0054,
+      "boxes_per_image": 2.688
+    }
+  },
+  "difficulty_correlation": {
+    "n_classes": 6,
+    "classes": [
+      "crazing",
+      "inclusion",
+      "patches",
+      "pitted_surface",
+      "rolled-in_scale",
+      "scratches"
+    ],
+    "separability": {
+      "rho_vs_AP50": 0.9429,
+      "p_value": 0.0048,
+      "values": {
+        "crazing": 0.3188,
+        "inclusion": 0.8289,
+        "patches": 1.5877,
+        "pitted_surface": 0.6219,
+        "rolled-in_scale": 0.5129,
+        "scratches": 2.432
+      }
+    },
+    "edge_energy_ratio": {
+      "rho_vs_AP50": 0.0857,
+      "p_value": 0.8717,
+      "values": {
+        "crazing": 1.0135,
+        "inclusion": 1.6305,
+        "patches": 0.9221,
+        "pitted_surface": 1.0419,
+        "rolled-in_scale": 1.1272,
+        "scratches": 2.7632
+      }
+    },
+    "box_area_frac": {
+      "rho_vs_AP50": -0.6,
+      "p_value": 0.208,
+      "values": {
+        "crazing": 0.2379,
+        "inclusion": 0.0569,
+        "patches": 0.1195,
+        "pitted_surface": 0.5214,
+        "rolled-in_scale": 0.1789,
+        "scratches": 0.0967
+      }
+    },
+    "mean_pairwise_gt_iou": {
+      "rho_vs_AP50": -0.7714,
+      "p_value": 0.0724,
+      "values": {
+        "crazing": 0.0369,
+        "inclusion": 0.0218,
+        "patches": 0.0194,
+        "pitted_surface": 0.0441,
+        "rolled-in_scale": 0.0258,
+        "scratches": 0.0054
+      }
+    }
+  },
+  "class_ordering": {
+    "ours_hardest_first": [
+      "crazing",
+      "rolled-in_scale",
+      "pitted_surface",
+      "inclusion",
+      "scratches",
+      "patches"
+    ],
+    "published_hardest_first": [
+      "crazing",
+      "rolled-in_scale",
+      "scratches",
+      "pitted_surface",
+      "inclusion",
+      "patches"
+    ],
+    "published_source": "Maity & Ghosh, arXiv:2510.21811 Table 1 (YOLOv11 column), via docs/research_notes.md s1c",
+    "identical": false,
+    "spearman_rho": 0.8286,
+    "p_value": 0.0416,
+    "rank_shifts": {
+      "crazing": {
+        "ours": 0,
+        "published": 0,
+        "shift": 0
+      },
+      "rolled-in_scale": {
+        "ours": 1,
+        "published": 1,
+        "shift": 0
+      },
+      "scratches": {
+        "ours": 4,
+        "published": 2,
+        "shift": 2
+      },
+      "pitted_surface": {
+        "ours": 2,
+        "published": 3,
+        "shift": -1
+      },
+      "inclusion": {
+        "ours": 3,
+        "published": 4,
+        "shift": -1
+      },
+      "patches": {
+        "ours": 5,
+        "published": 5,
+        "shift": 0
+      }
+    }
+  },
+  "training_cost": {
+    "measured": true,
+    "note": "Forward + loss + backward + optimiser step on synthetic batches of the real shape. Convolution cost depends on tensor shape, not tensor content.",
+    "by_model": {
+      "yolov8n": {
+        "probe_batch": 8,
+        "training_batch": 32,
+        "steps_timed": 4,
+        "train_images": 1440,
+        "steps_per_epoch": 45,
+        "note": "step times measured at batch 8; the 640/320 ratio is the transferable quantity, not the absolute time",
+        "by_imgsz": {
+          "320": {
+            "ok": true,
+            "step_ms_min": 154.9,
+            "step_ms_median": 168.3,
+            "step_ms_max": 170.3,
+            "step_ms_samples": [
+              154.9,
+              167.7,
+              168.8,
+              170.3
+            ],
+            "samples_taken": 4,
+            "budget_hit": false,
+            "swap": {
+              "total": "5120.00M",
+              "used": "3421.19M",
+              "free": "1698.81M"
+            },
+            "raw": "total = 5120.00M  used = 3421.19M  free = 1698.81M  (encrypted)",
+            "gpu_only_seconds_per_epoch_at_probe_batch": 27.9
+          },
+          "640": {
+            "ok": true,
+            "step_ms_min": 466.8,
+            "step_ms_median": 506.1,
+            "step_ms_max": 526.0,
+            "step_ms_samples": [
+              526.0,
+              508.5,
+              503.7,
+              466.8
+            ],
+            "samples_taken": 4,
+            "budget_hit": false,
+            "swap": {
+              "total": "5120.00M",
+              "used": "3421.19M",
+              "free": "1698.81M"
+            },
+            "raw": "total = 5120.00M  used = 3421.19M  free = 1698.81M  (encrypted)",
+            "gpu_only_seconds_per_epoch_at_probe_batch": 84.0
+          }
+        },
+        "ratio_640_over_320": 3.014
+      },
+      "yolov8s": {
+        "probe_batch": 8,
+        "training_batch": 32,
+        "steps_timed": 4,
+        "train_images": 1440,
+        "steps_per_epoch": 45,
+        "note": "step times measured at batch 8; the 640/320 ratio is the transferable quantity, not the absolute time",
+        "by_imgsz": {
+          "320": {
+            "ok": true,
+            "step_ms_min": 273.2,
+            "step_ms_median": 331.7,
+            "step_ms_max": 358.6,
+            "step_ms_samples": [
+              358.6,
+              273.2,
+              323.5,
+              339.9
+            ],
+            "samples_taken": 4,
+            "budget_hit": false,
+            "swap": {
+              "total": "5120.00M",
+              "used": "3381.19M",
+              "free": "1738.81M"
+            },
+            "raw": "total = 5120.00M  used = 3381.19M  free = 1738.81M  (encrypted)",
+            "gpu_only_seconds_per_epoch_at_probe_batch": 49.2
+          },
+          "640": {
+            "ok": true,
+            "step_ms_min": 863.6,
+            "step_ms_median": 905.3,
+            "step_ms_max": 1060.5,
+            "step_ms_samples": [
+              1060.5,
+              863.6,
+              931.9,
+              878.7
+            ],
+            "samples_taken": 4,
+            "budget_hit": false,
+            "swap": {
+              "total": "5120.00M",
+              "used": "3381.19M",
+              "free": "1738.81M"
+            },
+            "raw": "total = 5120.00M  used = 3381.19M  free = 1738.81M  (encrypted)",
+            "gpu_only_seconds_per_epoch_at_probe_batch": 155.5
+          }
+        },
+        "ratio_640_over_320": 3.161
+      }
+    },
+    "calibrated": {
+      "yolov8n": {
+        "probe_batch": 8,
+        "step_320_ms": 154.9,
+        "step_640_ms": 466.8,
+        "ratio": 3.014,
+        "gpu_only_320_s": 27.9,
+        "logged_320_s": 15.24,
+        "overhead_multiple": 0.55,
+        "calibrated_640_s_per_epoch": 45.9,
+        "calibrated_640_hours_150_epochs": 1.91,
+        "logged_320_hours_150_epochs": 0.64
+      },
+      "yolov8s": {
+        "probe_batch": 8,
+        "step_320_ms": 273.2,
+        "step_640_ms": 863.6,
+        "ratio": 3.161,
+        "gpu_only_320_s": 49.2,
+        "logged_320_s": 36.47,
+        "overhead_multiple": 0.74,
+        "calibrated_640_s_per_epoch": 115.3,
+        "calibrated_640_hours_150_epochs": 4.8,
+        "logged_320_hours_150_epochs": 1.52
+      }
+    }
+  },
+  "figures": {
+    "imgsz": "reports/model_study_imgsz.png",
+    "bootstrap": "reports/model_study_bootstrap.png",
+    "bootstrap_deploy": "reports/model_study_bootstrap_deploy.png",
+    "difficulty": "reports/model_study_difficulty.png",
+    "failures": "reports/model_study_failures.png"
+  },
+  "headline": {
+    "table": [
+      [
+        "yolov8n",
+        "0.7286",
+        "0.3926",
+        "0.7322",
+        "0.6018",
+        3.012,
+        2.049,
+        6.22,
+        "4.97",
+        "5.36",
+        "201"
+      ],
+      [
+        "yolov8s",
+        "0.6598",
+        "0.3618",
+        "0.6107",
+        "0.6475",
+        11.138,
+        7.163,
+        22.49,
+        "8.63",
+        "18.35",
+        "116"
+      ]
+    ],
+    "per_class_header": [
+      "model",
+      "crazing",
+      "inclusion",
+      "patches",
+      "pitted_surface",
+      "rolled-in_scale",
+      "scratches"
+    ],
+    "per_class_rows": [
+      [
+        "yolov8n",
+        "0.395",
+        "0.842",
+        "0.945",
+        "0.748",
+        "0.647",
+        "0.795"
+      ],
+      [
+        "yolov8s",
+        "0.330",
+        "0.805",
+        "0.921",
+        "0.704",
+        "0.438",
+        "0.762"
+      ],
+      [
+        "**difference**",
+        "+0.066",
+        "+0.037",
+        "+0.024",
+        "+0.044",
+        "+0.209",
+        "+0.033"
+      ]
+    ],
+    "bootstrap_reading": [
+      "**Reading.** The observed test-set gap is +0.0688 mAP50 in favour of yolov8n. The 95% interval on that difference is [+0.0309, +0.0990], which **excludes zero**: on a differently drawn 180-image test set from the same distribution, the ordering would come out the same way 99.95% of the time. The gap is not an artefact of which 180 images we happened to hold out.",
+      "On mAP50-95 the difference is +0.0308 with 95% CI [+0.0111, +0.0484] (excludes zero); yolov8n wins 99.9% of resamples.",
+      "Pairing was worth having: the standard deviation of the paired difference is 0.0173, against 0.0278 if the two models had been scored on independently drawn test sets. That is a 1.6x tighter interval for no extra compute, and it is the whole reason a 0.07 gap on 180 images can be resolved at all.",
+      "**A tension worth confronting, because it looks like a contradiction.** On the validation split the same two checkpoints are nearly tied: +0.0159 mAP50, against +0.0688 on test. A reader is entitled to ask which split to believe, and the answer is not 'average them'. **`best.pt` was chosen on val.** Ultralytics saves the epoch with the highest validation fitness, so each checkpoint is the maximum over 135 (nano) and 150 (small) validation evaluations. A maximum over many draws is biased upward, and it is biased upward *on the split it was maximised over*. Val therefore over-states both models by an unknown amount and cannot referee a comparison between them; it is a selection split wearing an evaluation split's clothes. Test is the only measurement here that no decision was made on, which is why it is the one the verdict rests on.",
+      "That resolution is worth stating as a limit as well as a defence. It explains why the two splits disagree without appealing to luck, but it does not prove the test figure is unbiased in every respect -- only that it is the less contaminated of the two."
+    ],
+    "deployment_reading": [
+      "**The comparison above is not the one the deployment faces.** It scores both models at 320 px, the size they were trained at, which is the right way to answer 'which of these two training runs came out better'. But section 2 shows input size moves mAP50 by far more than the architecture does, and neither model's best input size is 320. The question that decides what ships is which checkpoint is better **at its own best configuration**, so the bootstrap is repeated with each model at the size val chose for it (nano at 256 px, small at 256 px), paired over the same resampled test sets.",
+      "At their own best sizes the gap is +0.0181 mAP50 (0.7524 against 0.7343), 95% CI [-0.0084, +0.0424], which **contains zero**. yolov8n@256 wins 90.2% of resamples and yolov8s@256 the rest, so at their best configurations the two checkpoints are not separable on accuracy at all.",
+      "**Both results are true and they answer different questions.** At the trained size, nano is ahead by +0.0688 with an interval that excludes zero. At each model's best size, the gap is +0.0181 with an interval that contains zero. The honest headline is therefore the narrower one: **the original claim that nano beats small survives at the size the claim was made about, but it does not survive once both models are given their best input size.** Most of what looked like an architecture difference was a resolution effect that happened to hurt the larger model more at 320 px. Anyone quoting the +0.069 figure as evidence that a smaller detector is better on small datasets is over-reading it. Note also that the two metrics disagree in sign at the deployment size: nano leads on mAP50 by +0.0181 and trails on mAP50-95 by -0.0094, both intervals containing zero. Two metrics pointing opposite ways, neither significantly, is what a genuine tie looks like -- and it is why the deployment decision below is made on cost. **The strongest form of the objection should be stated outright**, because a reader will find it: ultralytics' own model-selection criterion is the composite fitness 0.1*mAP50 + 0.9*mAP50-95, which is what chose both of these checkpoints epoch by epoch. Evaluated at the deployment size on test it gives 0.4323 for yolov8n@256 against 0.4389 for yolov8s@256 -- so on the project's own composite metric the ordering favours **yolov8s** by 0.0066, because that metric weights mAP50-95 nine to one and mAP50-95 is the metric nano trails on. That difference is well inside the bootstrap interval and decides nothing, but it does mean no accuracy metric picks yolov8n here. The recommendation below rests on cost, and it has to."
+    ],
+    "mechanism": [
+      "The direct evidence for the capacity explanation is in the loss curves, not the mAP. At the end of training yolov8s sits at train cls loss 0.823 against val 1.090 -- a generalisation gap of +0.267. yolov8n sits at 1.173 against 1.112, a gap of -0.061 -- it is scoring *better* on data it has never seen than on data it trains on, which is what a model with too little capacity to memorise looks like when the training set is also being augmented hard. The larger model is fitting structure in the 1440 training images that does not transfer. That is the mechanism, and it is measured rather than assumed.",
+      "The scale of the effect is what needs care. 1440 training images across six classes is roughly 240 images per class, which is thin for an 11.1M-parameter detector and comfortable for a 3.0M-parameter one. The recipe made this worse in one specific way: both runs used the ultralytics default schedule with mosaic, mixup and 150 epochs, tuned for COCO-scale data. Nothing in it -- no extra weight decay, no shorter schedule, no frozen backbone -- was adjusted for the larger model on the smaller dataset. So the honest claim is not 'yolov8s is the wrong architecture for NEU-DET' but '**yolov8s trained with this recipe on this much data is worse than yolov8n trained the same way**'. Those are different claims, and only the second one is measured.",
+      "Re-evaluated at 320 px, the two checkpoints score 0.7396 and 0.7237 mAP50 on val -- close, for the selection reason given above -- and 0.7286 against 0.6598 on test. yolov8n also stopped early at epoch 135 of 150 with its best weights at epoch 85, while yolov8s ran the full 150 with its best at epoch 116. Neither run was starved of epochs, and neither was still improving when it stopped."
+    ],
+    "history_rows": [
+      [
+        "yolov8n",
+        135,
+        85,
+        "0.7399",
+        "1.173",
+        "1.112",
+        "-0.061",
+        15.24,
+        15.48
+      ],
+      [
+        "yolov8s",
+        150,
+        116,
+        "0.7355",
+        "0.823",
+        "1.090",
+        "+0.267",
+        36.47,
+        52.44
+      ]
+    ]
+  },
+  "imgsz": {
+    "header": [
+      "model",
+      "split",
+      "256 px",
+      "320 px",
+      "416 px",
+      "512 px",
+      "640 px"
+    ],
+    "rows": [
+      [
+        "yolov8n",
+        "val",
+        "0.7466 *",
+        "0.7396",
+        "0.6031",
+        "0.4898",
+        "0.3225"
+      ],
+      [
+        "yolov8n",
+        "test",
+        "0.7524",
+        "0.7286",
+        "0.6230",
+        "0.4843",
+        "0.3438"
+      ],
+      [
+        "yolov8s",
+        "val",
+        "0.7530 *",
+        "0.7237",
+        "0.6314",
+        "0.5381",
+        "0.3331"
+      ],
+      [
+        "yolov8s",
+        "test",
+        "0.7343",
+        "0.6598",
+        "0.5646",
+        "0.4929",
+        "0.3227"
+      ],
+      [
+        "latency (median ms)",
+        "batch 1",
+        "4.5 / 7.8",
+        "5.0 / 8.6",
+        "6.5 / 11.3",
+        "6.8 / 15.0",
+        "10.9 / 23.8"
+      ]
+    ],
+    "reading": [
+      "`*` marks the size chosen on val. The last row is nano / small single-frame latency in ms at batch 1, quoted as the **median** of the timed calls: this laptop was running other work throughout, and the median is robust to both an occasional stall and a single lucky call in a way that neither the mean nor the minimum is. Mean, min and p95 for every cell are in the JSON.",
+      "**Resolution mismatch is the single largest effect in this entire study, and it is catastrophic rather than marginal.** Going from the best input size to 640 px costs between 54% and 57% of mAP50 depending on the model and split -- far more than the difference between the two architectures, more than TTA, more than anything else measured here. Feeding a detector trained at 320 px an image at 640 px is not a mild extrapolation; it roughly halves it.",
+      "The mechanism is scale, not detail. A YOLOv8 head assigns each object to a feature level by its pixel size, and those assignments were learned from 320 px inputs. At 640 px every defect is twice as many pixels across as anything the model was trained to regress, so boxes land on the wrong stride and the classifier sees a texture at a spatial frequency it never saw. Because NEU-DET defects are large relative to the frame -- a crazing label alone covers about a quarter of it -- there is no small-object regime that benefits to offset the loss.",
+      "Peak performance sits **at or below the training size**, which is the second thing worth noting: the source images are 200x200, so 320 px is already upsampling and 256 px is the only size in the grid that does not. There is no information above 200 px to recover, so nothing above the training size can pay for its own compute. yolov8n on val peaks at 256 px (0.7466); yolov8n on test peaks at 256 px (0.7524); yolov8s on val peaks at 256 px (0.7530); yolov8s on test peaks at 256 px (0.7343).",
+      "For yolov8n the val sweep runs 256:0.7466, 320:0.7396, 416:0.6031, 512:0.4898, 640:0.3225, best at 256 px. On test the same model runs 256:0.7524, 320:0.7286, 416:0.6230, 512:0.4843, 640:0.3438.",
+      "For yolov8s the val sweep runs 256:0.7530, 320:0.7237, 416:0.6314, 512:0.5381, 640:0.3331, best at 256 px. On test: 256:0.7343, 320:0.6598, 416:0.5646, 512:0.4929, 640:0.3227.",
+      "**The deployment consequence is a rule, not a number.** The curve is not symmetric: dropping *below* the training size is nearly free here (256 px is the peak on every model and split), while going above it is ruinous. So the rule is **never run above the size the model was trained at, and validate any size you do run**. If mill frames need a larger input -- and they will, because a 2048 px camera frame is not a 200 px tile -- the model must be *retrained* at that size, not merely evaluated at it. This is a live operational hazard, not a theoretical one: `imgsz` is an argument anyone can change, it raises no error, and at 640 px it silently costs more than half the accuracy."
+    ]
+  },
+  "tta": {
+    "header": [
+      "model",
+      "imgsz",
+      "split",
+      "mAP50 no TTA",
+      "mAP50 with TTA",
+      "delta",
+      "latency no TTA (ms)",
+      "latency TTA (ms)",
+      "cost multiple"
+    ],
+    "rows": [
+      [
+        "yolov8n",
+        256,
+        "val",
+        "0.7466",
+        "0.7406",
+        "-0.0061",
+        "8.06",
+        "19.23",
+        "2.39x"
+      ],
+      [
+        "yolov8n",
+        256,
+        "test",
+        "0.7524",
+        "0.7144",
+        "-0.0380",
+        "8.06",
+        "19.23",
+        "2.39x"
+      ],
+      [
+        "yolov8s",
+        256,
+        "val",
+        "0.7530",
+        "0.7553",
+        "+0.0023",
+        "8.05",
+        "18.32",
+        "2.27x"
+      ],
+      [
+        "yolov8s",
+        256,
+        "test",
+        "0.7343",
+        "0.7263",
+        "-0.0080",
+        "8.05",
+        "18.32",
+        "2.27x"
+      ]
+    ],
+    "reading": [
+      "On the split that is allowed to decide -- val -- TTA moves yolov8n from 0.7466 to 0.7406 mAP50, -0.0061. It costs 2.39x the latency (8.06 ms to 19.23 ms per frame, 2.70x at the floor), i.e. it throws away 58% of the throughput of the accelerator. Both arms of that ratio were timed alternately inside one loop, so it is a cost multiple rather than the quotient of two separately-contended measurements.",
+      "On test the same change is 0.7524 to 0.7144 (-0.0380), reported for completeness and not used to decide anything.",
+      "**Not worth it on a production line.** The accuracy it buys is inside the noise band the bootstrap already measured (a 95% interval 0.0680 wide on a difference of this size), while the throughput cost is certain and large. Section 2f of docs/research_notes.md puts the required tile rate at roughly 10,800 200x200 tiles per second at the slowest well-sourced line speed; multiplying per-frame cost by 2.39 multiplies the accelerator count by the same factor for a gain nobody can demonstrate. Spend the silicon on more cameras or a second inspection point, not on re-running the same frame at three scales."
+    ]
+  },
+  "failures": {
+    "intro": "Failure analysis is run on the recommended checkpoint (**yolov8n** at 256 px) through the shipping `DefectDetector` path at the deployment NMS IoU 0.45, not at the validator's mAP protocol -- these are the boxes an operator would actually be shown. Columns are at conf=0.25 (the `DefectDetector` default); the last column repeats recall at conf=0.15, the threshold the operating-point study currently recommends (src/false_alarm.py (tuned on val)). Every missed label is sorted by the best overlapping prediction of any class: **class confusion** = something drawn in the right place (IoU >= 0.5) with the wrong name; **extent error** = best overlap between 0.1 and 0.5, the defect was seen but the rectangle disagrees; **blind miss** = nothing overlaps at all. The AP50 column, and every correlation below it, is the validator's per-class AP50 for the same checkpoint at the same 256 px -- not the 320 px figure quoted in section 1, which describes a configuration this project is not shipping. The two differ enough to matter: at 320 px crazing scores 0.395 against 0.444 here.",
+    "taxonomy_header": [
+      "class",
+      "AP50",
+      "GT boxes",
+      "recall @0.25",
+      "class confusion",
+      "extent error",
+      "blind miss",
+      "confused with",
+      "recall @0.15"
+    ],
+    "taxonomy_rows": [
+      [
+        "crazing",
+        "0.444",
+        79,
+        "0.14",
+        0,
+        15,
+        53,
+        "-",
+        "0.35"
+      ],
+      [
+        "inclusion",
+        "0.827",
+        89,
+        "0.70",
+        0,
+        14,
+        13,
+        "-",
+        "0.74"
+      ],
+      [
+        "patches",
+        "0.949",
+        99,
+        "0.84",
+        0,
+        11,
+        5,
+        "-",
+        "0.89"
+      ],
+      [
+        "pitted_surface",
+        "0.756",
+        46,
+        "0.70",
+        0,
+        11,
+        3,
+        "-",
+        "0.74"
+      ],
+      [
+        "rolled-in_scale",
+        "0.630",
+        69,
+        "0.51",
+        0,
+        21,
+        13,
+        "-",
+        "0.65"
+      ],
+      [
+        "scratches",
+        "0.909",
+        64,
+        "0.86",
+        0,
+        7,
+        2,
+        "-",
+        "0.88"
+      ]
+    ],
+    "appearance_header": [
+      "class",
+      "AP50",
+      "boxes",
+      "separability",
+      "edge energy ratio",
+      "mean box area",
+      "label overlap IoU",
+      "boxes/image (box-weighted)"
+    ],
+    "appearance_rows": [
+      [
+        "crazing",
+        "0.444",
+        79,
+        "0.319",
+        "1.014",
+        "23.8%",
+        "0.037",
+        "2.90"
+      ],
+      [
+        "inclusion",
+        "0.827",
+        89,
+        "0.829",
+        "1.631",
+        "5.7%",
+        "0.022",
+        "3.81"
+      ],
+      [
+        "patches",
+        "0.949",
+        99,
+        "1.588",
+        "0.922",
+        "11.9%",
+        "0.019",
+        "3.30"
+      ],
+      [
+        "pitted_surface",
+        "0.756",
+        46,
+        "0.622",
+        "1.042",
+        "52.1%",
+        "0.044",
+        "2.22"
+      ],
+      [
+        "rolled-in_scale",
+        "0.630",
+        69,
+        "0.513",
+        "1.127",
+        "17.9%",
+        "0.026",
+        "2.54"
+      ],
+      [
+        "scratches",
+        "0.909",
+        64,
+        "2.432",
+        "2.763",
+        "9.7%",
+        "0.005",
+        "2.69"
+      ]
+    ],
+    "reading": [
+      "**The failure is not class confusion, and that is a measurement, not an impression.** Across all six classes and all 168 missed labels at conf=0.25, exactly **0** were cases of a box drawn in the right place carrying the wrong class name. The false positives tell the same story from the other side: they land almost entirely on frames of their own class (crazing -> crazing x8; rolled-in_scale -> rolled-in_scale x21), i.e. they are extra or badly drawn boxes of the *correct* type, not hallucinated defects of another type. The detector knows what it is looking at. It does not reliably know whether the defect is there, or where it ends.",
+      "**crazing** (AP50 0.444) fails by blind miss (53 of 68 misses, 78%). Its measured defect-vs-background separability is 0.32 standard deviations of background roughness -- the lowest of the six classes, against 2.43 for scratches -- and its edge-energy ratio is 1.01, meaning the pixels inside the label are no busier than the pixels outside it. The defect is neither a different grey level nor a texture discontinuity. On top of that, each label claims 24% of a 200x200 frame and there are 2.9 of them per image. The montage shows what that combination means in practice: the labelled and unlabelled parts of a crazing tile are visually indistinguishable, and the boxes carve arbitrary slabs out of a texture that covers the whole strip. Both the low-contrast and the ambiguous-extent hypotheses are true here, and they compound.",
+      "**rolled-in_scale** (AP50 0.630) fails differently: by extent error (21 of 34 misses, 62%). Separability 0.51 is the second lowest, but the edge-energy ratio 1.13 is above 1.0, so the defect region is at least texturally distinct. The detector fires -- the montage row shows boxes at confidence 0.28 to 0.42 sitting on or beside the labelled scale -- but the rectangles disagree with the annotator about where one patch of rolled-in scale ends and the next begins. This is an IoU-0.5 scoring failure on a defect that was found, not a detection failure.",
+      "Across the six classes, exactly one of these statistics orders them: AP50 against measured separability gives Spearman rho = 0.9429 (p = 0.0048). The others do not. Edge-energy ratio gives rho = 0.0857 -- essentially nothing -- because patches is the easiest class of all at an edge ratio of 0.92, i.e. *smoother* than its background: patches is easy because it is a different grey level, not because it is a different texture. Label overlap gives rho = -0.7714 (p = 0.0724) and mean label area rho = -0.6 (p = 0.208) -- both weak, both negative, and neither significant on six points. Note that box size is the weaker of the two despite the intuition that big boxes are easy: pitted surface has the largest boxes of any class (52% of frame) and is only mid-table for accuracy. So the ranking of causes that the data actually supports is: **grey-level separability first and by a distance; extent/annotation geometry a secondary effect that shows up in the per-class miss taxonomy but not in the aggregate correlations; texture contrast not at all; class confusion not at all.** Six classes is six data points, so these rho values describe this table rather than test a hypothesis -- but the one that is strong is the one the physics predicts, and the class ordering it produces matches every source in docs/research_notes.md section 1c.",
+      "The practical reading is that neither weak class is fixed by a bigger network. crazing-style failure -- invisible in the pixels, arbitrary in extent -- is an optics and annotation-protocol problem: dark-field or oblique illumination changes measured separability in a way no loss function can, and a written rule about where a craze network stops is worth more than another 50 epochs. It is also a fair question whether crazing should be scored as a box at all rather than as a whole-frame label or a segmentation mask. rolled-in_scale-style failure -- found but mis-drawn -- is the one that would genuinely respond to more labelled data and to a loss that is less brittle about box edges (the Shape-IoU and Focaler-IoU work in docs/research_notes.md section 6b targets exactly this)."
+    ],
+    "ordering_header": [
+      "rank (hardest first)",
+      "ours",
+      "our AP50",
+      "published"
+    ],
+    "ordering_rows": [
+      [
+        1,
+        "crazing",
+        "0.444",
+        "crazing"
+      ],
+      [
+        2,
+        "rolled-in_scale",
+        "0.630",
+        "rolled-in_scale"
+      ],
+      [
+        3,
+        "pitted_surface",
+        "0.756",
+        "scratches"
+      ],
+      [
+        4,
+        "inclusion",
+        "0.827",
+        "pitted_surface"
+      ],
+      [
+        5,
+        "scratches",
+        "0.909",
+        "inclusion"
+      ],
+      [
+        6,
+        "patches",
+        "0.949",
+        "patches"
+      ]
+    ],
+    "ordering_reading": [
+      "Our hardest-first ordering **differs from** the published one (Spearman rho = 0.8286 on the ranks). Source: Maity & Ghosh, arXiv:2510.21811 Table 1 (YOLOv11 column), via docs/research_notes.md s1c.",
+      "The largest disagreement is **scratches**: rank 5 here against rank 3 published. Both endpoints of the ordering -- the hardest and the easiest class -- agree.",
+      "Note the published values are AP@[.5:.95] on a different 70/20/10 split of NEU-DET, so only the *ordering* is comparable, not the numbers. What transfers is the finding that crazing and rolled-in scale are the hard classes and patches is the easy one, which every source in docs/research_notes.md section 1c agrees on and which we reproduce independently."
+    ]
+  },
+  "selection": {
+    "winner": "yolov8n",
+    "imgsz": 256,
+    "tta": false,
+    "conf": 0.15,
+    "conf_source": "src/false_alarm.py (tuned on val)",
+    "nms_iou": 0.45,
+    "decisions": [
+      {
+        "decision": "checkpoint",
+        "value": "`models/yolov8n_neudet/weights/best.pt`",
+        "decided_on": "test bootstrap at each model's best size, then cost",
+        "evidence": "at best sizes 0.7524 vs 0.7343 mAP50, CI [-0.0084, +0.0424] contains 0; deployment-size bootstrap interval contains zero, so the tie breaks on cost; yolov8n is the cheaper model on all of parameter count, weight-file size, FLOPs (batch-1 latency does not separate them at this input size)"
+      },
+      {
+        "decision": "inference imgsz",
+        "value": "256 px",
+        "decided_on": "val",
+        "evidence": "best val mAP50 across (256, 320, 416, 512, 640); the curve collapses above the training size -- up to 57% of mAP50 lost by 640 px"
+      },
+      {
+        "decision": "test-time augmentation",
+        "value": "off",
+        "decided_on": "val + latency",
+        "evidence": "val gain -0.0061 mAP50 for 2.39x latency"
+      },
+      {
+        "decision": "confidence threshold",
+        "value": "0.15",
+        "decided_on": "val (operating-point study)",
+        "evidence": "minimum expected mill cost subject to a 90% detection floor; src/false_alarm.py (tuned on val)"
+      },
+      {
+        "decision": "NMS IoU",
+        "value": "0.45",
+        "decided_on": "shipping default",
+        "evidence": "DefectDetector default; not swept in this study"
+      }
+    ],
+    "verdict_paragraph": "**Ship `yolov8n` at 256 px with TTA off.** On the held-out test split, at the input size validation chose, it scores mAP50 0.7524 / mAP50-95 0.3967, from a 6.22 MB checkpoint with 3.012M parameters, at a batch-1 floor of 3.5 ms per 200x200 frame on this machine (median 4.5 ms; see the latency caveat in section 5 -- the absolute milliseconds are not reproducible run to run on a contended laptop and should not be quoted as a throughput figure). With both models at their own best input size the gap over yolov8s is +0.0181 mAP50, 95% CI [-0.0084, +0.0424], which **contains zero**. The honest statement is therefore not 'nano is the better detector' but '**nano is not worse, and it is 3.7x smaller, 3.5x cheaper in FLOPs**'. That is more than sufficient to decide a deployment, and it is the reason to ship it. The larger claim -- that the nano architecture is better on a dataset this size -- is not supported once both models are given their best configuration.",
+    "recommendation": [
+      "**Ship `yolov8n` at 256 px with TTA off.** On the held-out test split, at the input size validation chose, it scores mAP50 0.7524 / mAP50-95 0.3967, from a 6.22 MB checkpoint with 3.012M parameters, at a batch-1 floor of 3.5 ms per 200x200 frame on this machine (median 4.5 ms; see the latency caveat in section 5 -- the absolute milliseconds are not reproducible run to run on a contended laptop and should not be quoted as a throughput figure). With both models at their own best input size the gap over yolov8s is +0.0181 mAP50, 95% CI [-0.0084, +0.0424], which **contains zero**. The honest statement is therefore not 'nano is the better detector' but '**nano is not worse, and it is 3.7x smaller, 3.5x cheaper in FLOPs**'. That is more than sufficient to decide a deployment, and it is the reason to ship it. The larger claim -- that the nano architecture is better on a dataset this size -- is not supported once both models are given their best configuration.",
+      "**Why this checkpoint.** On accuracy at best configurations the two are not separable: yolov8n leads on mAP50 by +0.0181 and trails on mAP50-95 by -0.0094, both intervals containing zero. What separates them is cost. yolov8n is 3.7x smaller (3.012M against 11.138M parameters), 6.22 MB against 22.49 MB on disk, and 3.5x cheaper in arithmetic at 256 px. Measured batch-1 latency agrees in direction but understates the margin (4.5 ms against 7.8 ms median, 1.73x against 3.5x of arithmetic), and that is expected rather than awkward -- see the caveat below: at 256 px a single frame does not saturate the GPU, so batch-1 wall clock is part dispatch overhead. The arithmetic ratio is what governs a line running many streams per accelerator. With accuracy tied and every cost axis favouring the smaller model, there is no reading of this evidence in which yolov8s is the right choice.",
+      "**Why 256 px.** Chosen on val, where it was the best of 256/320/416/512/640. This is the highest-stakes knob in the whole configuration: section 2 measures a fall of up to 57% of mAP50 between the best size and 640 px, because the model can only regress boxes at the scale it was trained on. Pin it, and treat any change to it as requiring a retrain rather than a config edit. On real mill frames the decision must be retaken from scratch, since there the input size also determines how many source pixels survive per network pixel and therefore the smallest detectable defect -- see the tiling arithmetic in `src/benchmark.py`.",
+      "**Why no TTA.** 2.39x the latency for -0.0061 mAP50 on val. The cost is certain, the benefit is inside the noise the bootstrap measured, and the binding constraint on a rolling line is throughput.",
+      "**What must be re-measured before this runs on a line.** This model was trained and tested on NEU-DET, which is hot-rolled carbon steel photographed under one lighting setup. The vendors themselves admit that the same defect class looks different from different upstream mills (AMETEK/Ternium, quoted in docs/research_notes.md section 2a). Every number in this report is a capability demonstration on a public benchmark, not a prediction of performance on Jindal stainless strip. The per-line calibration protocol, not the architecture, is what determines whether this works.",
+      "**A caveat on the speed claim, because the measurement does not say what the FLOPs say.** At 256 px and batch 1 the two models are close to the same speed on this machine -- median 4.5 ms against 7.8 ms, a ratio of 1.73x -- even though yolov8s is 3.5x the arithmetic. At this input size a single frame does not saturate the GPU, so the wall clock is dominated by fixed per-call cost (Python dispatch, host-device transfer, NMS) rather than by convolution. The 3.5x shows up once the accelerator is actually busy -- it is already visible at 640 px in the table above (10.9 ms against 23.8 ms median) and it is what governs a mill deployment, where one accelerator serves many camera streams in batches. `src/benchmark.py` measures that regime. Do not quote a batch-1 latency ratio as the throughput argument. Every latency figure here was also taken on a laptop running other work at the time -- swap in use during the sweep: total = 5120.00M  used = 3421.19M  free = 1698.81M  (encrypted).",
+      "**And a harder caveat: no absolute latency in this report is reproducible, so none of them belongs on a slide.** Re-running this sweep on the same machine moves the yolov8n@256 batch-1 *median* by more than a factor of two between sessions -- the floor is stable to about 10% but the median, the p95 and every FPS derived from them are dominated by whatever else the laptop is doing. Two consequences. First, quote the ordering and the ratios, never the milliseconds: within one interleaved measurement the two models sit in the right order at every input size, and that ordering survives re-measurement. Second, comparisons are only valid when the two arms were timed alternately in one loop, which is how the TTA multiple in section 3 is now measured and is not how the `by_imgsz` sweep was measured -- so ratios taken *across* rows of that table (including the 3.5x-at-640 point above) are indicative only. A defensible per-frame number for a mill sizing exercise has to come from a quiet machine and a batched sweep, which is `src/benchmark.py`'s job, not this one's.",
+      "**The shipping API was cross-checked, and the raw numbers need reading with the caveat above.** `DefectDetector.predict` -- the path production actually calls, with letterboxing, severity scoring and record construction on top of the forward pass -- measured a median 8.0 ms and a floor of 5.3 ms at 256 px, against a floor of 3.5 ms for the bare ultralytics call. Compared at the floor, where contention is squeezed out, the wrapper costs a few tenths of a millisecond and the framework is right that it is close to free; compared at the median it looks several times more expensive, which is an artefact of the two having been timed in separate phases rather than a real cost. This is recorded because it was measured, and because the median reading of it is the sort of number that would otherwise get quoted.",
+      "**One consequence to action, and it is worse than a config tidy-up.** The default input size in the shipping code is not 256 px and it is not 320 px either -- it is **640 px**, the single worst size this study measured. `DefectDetector.__init__` and `inference.load_detector` both default to `imgsz=640`, `src/export_model.py` defaults to `--imgsz 640`, and the ONNX artefact currently sitting at `export/yolov8n_neudet_best.onnx` has a frozen `[1, 3, 640, 640]` input. Anyone who constructs a detector without naming an input size, or who deploys that ONNX file, gets test mAP50 0.3438 instead of 0.7524 -- a 54% loss -- silently, with no error and no warning. The Streamlit demo is the one place that is already correct: it defaults to 256 px. The actions are to change the two library defaults, re-export ONNX and CoreML at 256, and delete or clearly retire the 640 px artefact so it cannot be picked up by mistake.",
+      "**On retraining cost.** A per-line recalibration of yolov8n at 320 px costs 15 s/epoch, or about 0.6 h for a 150-epoch run, measured from `models/yolov8n_neudet/results.csv`. At 640 px the measured GPU step cost is 3.0x higher, which puts the same run at roughly 1.9 h. Budget the 320 px figure: an overnight retrain per line is affordable, and section 2 showed 640 buys nothing at inference."
+    ]
+  },
+  "positioning": [
+    "docs/research_notes.md section 1a puts the credible band for well-run NEU-DET *detection* baselines at mAP50 0.70-0.80. Our best held-out figure is **0.7524** (yolov8n at 256 px on the held-out test split), which sits inside that band. For reference, the same notes record YOLOv8n at 74.0 and 78.6 mAP50 in two 2025-26 papers, YOLOv11n at 77.2, and the 2020 IEEE TIM DDN paper at 74.8 on a ResNet34 backbone [all HARD]. We are level with a competent stock baseline and below the tuned published improvements, which is where an untuned 150-epoch fine-tune on a laptop GPU should be. Note that the figure recorded before this study, 0.7286, was the same weights scored at 320 px; choosing the inference size on val is worth +0.0238 mAP50 and cost nothing but a sweep.",
+    "**Two specific reasons we are not higher, both of them choices rather than accidents.**",
+    "*First, we trained at 320 px, not 640, while essentially every published NEU-DET number is at 640.* The measured cost of that choice on this machine: one optimiser step for yolov8s at batch 8 takes 273 ms at 320 px and 864 ms at 640 px, a ratio of 3.2x. (The probe uses batch 8, not the 32 the real runs used. A batch-32 attempt at 640 px was made first and abandoned: with the machine under concurrent memory pressure it went into swap and a single step did not return inside a two-minute budget. The 640/320 ratio is close to batch-independent, so it is measured at a batch that reliably fits, and the batch is recorded so the figure is not misread.) The training run itself logged 36 s/epoch at 320 px (1.5 h for 150 epochs), so 640 px projects to about 1.9 min/epoch, or 4.8 h for the same schedule -- on a laptop GPU that is shared with everything else this project needs to run. **A correction worth stating, and it partly goes the brief's way.** The project brief records 640 px as costing 'more than 11 minutes per epoch versus 35 s at 320'. The 35 s half of that reproduces: per-epoch wall time in `models/*/results.csv` runs at a median of 15 s (nano) and 36 s (small), and the yolov8s median is within a few per cent of the brief's figure. An earlier draft of this report used the *mean* epoch time to say 35 s did not reproduce; that was wrong, because the yolov8s mean (52 s) is inflated by 2 stalled epochs (epoch 63 at 16 min, epoch 64 at 16 min) that between them account for 31 minutes of a 2.2 h run. The same reasoning this report applies to latency -- contention only ever adds time, so quote the median -- applies here and had not been. The 11-minute half still does not reproduce: the measured 3.2x step-cost ratio projects 640 px to about 1.9 min/epoch for yolov8s, not 11, and `reports/training.log` contains no 640 px run to check it against. But the stalls above are direct evidence for the mechanism that would explain it: this machine already produced two ~16 minute epochs at 320 px under memory pressure, so an 11-minute epoch at 640 px is entirely plausible as a paging effect rather than an arithmetic one. The *direction* of the original claim survives either way: 640 px training costs several times more on this machine and may not fit in memory at this batch size, which is why it was not run. The specific 11-minute figure should be quoted as an observation from the original run, not as an arithmetic cost -- what this study can measure is a 3.2x step-cost ratio if nothing pages, and a machine that demonstrably does page.",
+    "*Second, we report a genuine held-out test split.* The 1800 NEU-DET images are split 1440/180/180 by `src/prepare_data.py`, and the 180 test images were used for nothing except the final score. Many published NEU-DET numbers are validation numbers, tuned on the same images they are reported on. The size of that effect is visible in this very report: at 320 px, yolov8n scores 0.7396 on val against 0.7286 on test, and yolov8s 0.7237 against 0.6598. Reporting the val column instead would have moved our headline without changing the model.",
+    "Neither reason is an excuse for a number, and neither should be presented as one. They are the two knobs a reviewer would ask about, and both have a measurement attached."
+  ],
+  "limitations": [
+    "**Training-seed variance is not measured.** The bootstrap resamples images, holding the weights fixed. It cannot tell you whether retraining yolov8s with a different seed would close the gap. Measuring that needs several seeds per architecture; at the logged 15 s/epoch (nano) and 36 s/epoch (small), three seeds each at 150 epochs is about 6.5 hours on this machine. That is the single experiment that would upgrade this study's central claim from 'these weights, on these images' to 'this architecture, on this dataset', and it is affordable.",
+    "**The nano-versus-small question was known before this study ran.** The ordering was already visible in `reports/train_summary_*.json`, so the test split had been looked at once before the bootstrap was designed. The bootstrap quantifies the uncertainty in a comparison that was not pre-registered; it does not make it a blind test.",
+    "**The validation split is not a clean second opinion.** `best.pt` is the epoch that maximised validation fitness, so val is a selection split for both checkpoints and is biased upward on both. This report uses val only to choose inference-time knobs (input size, TTA), where the bias is common to every option being compared and largely cancels. It is deliberately not used to compare the two models.",
+    "**The two checkpoints differ in more than capacity.** They share a recipe, a seed and a split, but one early-stopped at 135 epochs and one ran 150, and neither had its hyperparameters adapted to its size. A fair architecture comparison would tune each model separately; this is a comparison of two checkpoints produced by one recipe, which is the question a deployment actually faces but not the question a paper would ask.",
+    "**One dataset, one imaging setup.** NEU-DET is 1800 200x200 grayscale images of hot-rolled carbon steel. Nothing here has been measured on stainless, on a different camera, or under different illumination, and section 6a of docs/research_notes.md documents domain shift between mills as the primary deployment failure mode -- in the vendors' own words.",
+    "**The failure taxonomy uses one matching convention.** Misses are classified by the best overlapping prediction at a 0.10 IoU floor. A different floor moves boxes between the 'extent error' and 'blind miss' columns. The floor is a stated constant (`EXTENT_IOU_FLOOR`), not a tuned one.",
+    "**Spearman rho on six classes is descriptive.** The appearance-versus-AP50 correlations have six data points. They are reported with their p-values so nobody mistakes them for evidence of a law.",
+    "**NMS IoU, batch size and half precision were not swept.** The deployment recommendation fixes them at the shipping defaults. `src/benchmark.py` covers batch and device; NMS IoU and quantisation remain unmeasured."
+  ]
+}

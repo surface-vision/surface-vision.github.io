@@ -1,0 +1,21 @@
+{
+  "model": "yolov8n.pt",
+  "name": "yolov8n_neudet",
+  "epochs": 150,
+  "imgsz": 320,
+  "device": "mps",
+  "test": {
+    "mAP50": 0.7286048170146325,
+    "mAP50_95": 0.39263308726169216,
+    "precision": 0.7321659050963781,
+    "recall": 0.6017794786618729,
+    "per_class_mAP50": {
+      "crazing": 0.3950934045801764,
+      "inclusion": 0.8419821327167115,
+      "patches": 0.9447464394447143,
+      "pitted_surface": 0.7478801804652706,
+      "rolled-in_scale": 0.6467453745772742,
+      "scratches": 0.7951813703036483
+    }
+  }
+}

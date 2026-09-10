@@ -1,0 +1,68 @@
+# Streamlit configuration for the Spaces build of the surface inspection console.
+#
+# The theme is the repository's, unchanged: a dark industrial palette -- near-black
+# steel greys, safety amber as the accent, and a categorical chart ramp whose six
+# entries are the defect-class colours from vendor/inference.py CLASS_COLORS, in
+# class-index order. A class then reads the same in a bounding box, a legend chip
+# and a bar chart.
+#
+# The [server] block is NOT the repository's. Spaces starts streamlit itself and
+# passes its own --server.port / --server.address / CORS flags, so anything set
+# here that the platform also sets is either ignored or a conflict warning in the
+# build log. Only the two settings the platform does not manage are set, and both
+# are set for a reason given below.
+
+[theme]
+base = "dark"
+primaryColor = "#F5A524"
+backgroundColor = "#0C0F13"
+secondaryBackgroundColor = "#151A21"
+textColor = "#E4E8EE"
+borderColor = "#232A33"
+linkColor = "#F5A524"
+linkUnderline = false
+codeBackgroundColor = "#0F141A"
+font = "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+headingFont = "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+codeFont = "'SF Mono', ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace"
+baseFontSize = 15
+baseRadius = "small"
+buttonRadius = "small"
+showWidgetBorder = true
+showSidebarBorder = true
+dataframeHeaderBackgroundColor = "#11161C"
+metricValueFontSize = "1.9rem"
+chartCategoricalColors = [
+    "#FF8200",  # crazing
+    "#DC1E2D",  # inclusion
+    "#3796FF",  # patches
+    "#AA50DC",  # pitted_surface
+    "#F0BE00",  # rolled-in_scale
+    "#00C8A0",  # scratches
+]
+
+[theme.sidebar]
+backgroundColor = "#0A0D10"
+secondaryBackgroundColor = "#141920"
+borderColor = "#232A33"
+
+[server]
+# 400 MB in the repository. A frame past app.py's MAX_INPUT_PIXELS (12 MP) is
+# downscaled before the network sees it, so accepting a 400 MB upload only buys a
+# long transfer into a resize. 32 MB comfortably holds a 12 MP photograph as JPEG
+# or PNG and a 16-bit line-scan TIFF of the size this console is built for.
+maxUploadSize = 32
+# The container's filesystem does not change under a running Space, and the
+# watchdog thread on a 2 vCPU host is 2 vCPU spent watching files that cannot move.
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false
+
+[client]
+# Hide the developer toolbar: a viewer of a public Space has nothing to rerun.
+toolbarMode = "viewer"
+# Errors stay legible on screen. The console catches its own exceptions and renders
+# them as messages; this covers the ones it does not anticipate, and every path a
+# traceback can print here is inside the Space itself.
+showErrorDetails = "full"

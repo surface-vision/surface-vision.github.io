@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence | Surface defect detection</title>
+<meta name="description" content="Every number on the surface-defect detection site, traced to the file it came from: 14 report narratives, 28 JSON artefacts, the deck, the parity harness output and the Python console source.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230C0F13'/%3E%3Crect x='5' y='5' width='22' height='22' fill='none' stroke='%23F5A524' stroke-width='2.5'/%3E%3Cpath d='M11 20 L16 11 L21 20' fill='none' stroke='%23F5A524' stroke-width='2.5'/%3E%3C/svg%3E">
+<style>
+  .ev table.data td { vertical-align: top; }
+  .ev .fn { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+  .ev .ds { color: var(--dim); font-size: 0.85rem; max-width: 62ch; }
+  .jchips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .jchip {
+    font-family: var(--mono); font-size: 0.72rem; padding: 4px 8px;
+    border: 1px solid var(--border); border-radius: 2px; color: var(--muted);
+    background: var(--panel-alt); word-break: break-all;
+  }
+  .jchip:hover { color: var(--text); border-color: #3A4553; text-decoration: none; }
+</style>
+</head>
+<body class="ev">
+
+<header class="mast">
+  <div class="wrap">
+    <div class="brand">Jindal Stainless <span>/</span> evidence</div>
+    <nav>
+      <a href="../">Back to the detector</a>
+      <a href="#reports">Reports</a>
+      <a href="#json">JSON</a>
+      <a href="#deck">Deck</a>
+      <a href="#console">Console source</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="kicker">Audit trail</p>
+    <h1>Every number, and the file it came from.</h1>
+    <p class="lede">
+      The site states figures and names its sources inline. This is where those sources actually are:
+      14 report narratives, 28 JSON artefacts, the deck, the parity harness output, and the full source
+      of the Python console. Nothing here is a summary written for the page &mdash; these are the files
+      the experiments wrote.
+    </p>
+    <p class="note">
+      One transformation was applied on copy, and only one: absolute build paths of the form
+      <code>/Users/&hellip;/JSW-PS1/</code> were rewritten to repository-relative, because a file served
+      publicly should not publish the build host's home directory. No number, table or sentence was
+      changed. The originals live in the project's <code>reports/</code> and <code>deck/</code>.
+    </p>
+  </div>
+</div>
+
+<section id="reports">
+  <div class="wrap">
+    <h2>Report narratives</h2>
+    <p class="sub">
+      Each one is the write-up of an experiment, including the ones that did not go the way they were
+      supposed to. Markdown renders as plain text in the browser; GitHub renders it formatted.
+    </p>
+    <div class="tbl-wrap" style="margin-top:20px">
+      <table class="data">
+        <thead><tr><th>Report</th><th>What it establishes</th><th class="num">Size</th></tr></thead>
+        <tbody>
+      <tr>
+        <td><a href="reports/evaluation.md">Evaluation report</a><div class="fn">evaluation.md</div></td>
+        <td class="ds">The shipped model on the held-out test split: mAP50 0.7524, mAP50-95 0.3967, precision 0.696, recall 0.687, and 98.3% classification accuracy (177 of 180 frames).</td>
+        <td class="num">10 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/model_study.md">Model selection study</a><div class="fn">model_study.md</div></td>
+        <td class="ds">YOLOv8n against YOLOv8s on NEU-DET. Nano wins by +0.0688 mAP50 at training size, 95% CI [+0.0309, +0.0990], in 99.95% of 2,000 bootstrap resamples -- with 3.012 M parameters against 11.138 M.</td>
+        <td class="num">48 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/resolution_study.md">Resolution study</a><div class="fn">resolution_study.md</div></td>
+        <td class="ds">128 px to 640 px, inference and training. The 640 px arm scores 0.7338, inside the +/-0.0254 noise band, at roughly 65 s per epoch.</td>
+        <td class="num">30 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/input_pipeline_decision.md">Input pipeline: the decision</a><div class="fn">input_pipeline_decision.md</div></td>
+        <td class="ds">Why the frame is scaled rather than letterboxed. Lossless padding loses 0.024-0.052 mAP50 to ordinary bilinear scaling on 8 of 8 configurations.</td>
+        <td class="num">26 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/input_study.md">Input pipeline: the study</a><div class="fn">input_study.md</div></td>
+        <td class="ds">The five-arm experiment behind that decision -- preserve the pixels, or interpolate them.</td>
+        <td class="num">22 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/calibration.md">Confidence calibration</a><div class="fn">calibration.md</div></td>
+        <td class="ds">Isotonic regression fitted on val. Expected calibration error 0.142 -> 0.046 with mAP unchanged, which is what makes the probability this page prints a probability.</td>
+        <td class="num">8 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/gap1_cross_domain_fix.md">Cross-domain fix</a><div class="fn">gap1_cross_domain_fix.md</div></td>
+        <td class="ds">The joint checkpoint: clean-frame false alarms 93.7% -> 32.5%, cross-domain ROC AUC 0.608 -> 0.958, Severstal defect recall 72.0% -> 86.6%, mAP50 0.7642.</td>
+        <td class="num">39 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/gap1_cross_domain.md">Cross-domain measurement</a><div class="fn">gap1_cross_domain.md</div></td>
+        <td class="ds">The measurement the fix was built against: what the baseline detector does on steel it was never trained on.</td>
+        <td class="num">19 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/cross_domain.md">Cross-domain generalisation</a><div class="fn">cross_domain.md</div></td>
+        <td class="ds">The earlier cross-domain run, kept because the fix report is a comparison against it.</td>
+        <td class="num">14 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/false_alarm.md">Clean-steel false alarms</a><div class="fn">false_alarm.md</div></td>
+        <td class="ds">The false alarm rate on defect-free frames and the operating point it implies. conf 0.15 is set by a 90% detection floor, not by the cost model.</td>
+        <td class="num">19 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/ood_guard.md">Out-of-scope gate</a><div class="fn">ood_guard.md</div></td>
+        <td class="ds">Photometric normalisation and the OOD gate: 0 false rejections across 3,200 genuine steel frames. This gate is in the Python console, not in this page.</td>
+        <td class="num">22 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/gc10_coverage.md">GC10 coverage</a><div class="fn">gc10_coverage.md</div></td>
+        <td class="ds">Overall mAP50 0.5821. Roll marks are weak -- mean AP50 0.203 on 24 instances -- and it says so.</td>
+        <td class="num">18 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/gc10_dataset.md">GC10 dataset and edge defects</a><div class="fn">gc10_dataset.md</div></td>
+        <td class="ds">Roll-mark and edge-defect coverage, and exactly how far it goes. Edge cracks have no public dataset; the geometric proxy (crescent_gap + waist_fold) reaches AP50 0.880.</td>
+        <td class="num">16 KB</td>
+      </tr>
+      <tr>
+        <td><a href="reports/severstal_dataset.md">Severstal and the joint dataset</a><div class="fn">severstal_dataset.md</div></td>
+        <td class="ds">How the joint NEU-DET + Severstal training set was assembled.</td>
+        <td class="num">11 KB</td>
+      </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      Prefer them formatted? <a href="https://github.com/surface-vision/surface-vision.github.io/tree/main/evidence/reports">Browse the same folder on GitHub</a>.
+    </p>
+  </div>
+</section>
+
+<section id="json">
+  <div class="wrap">
+    <h2>JSON artefacts</h2>
+    <p class="sub">
+      The machine-readable output of each run &mdash; 28 files. These are what the report
+      narratives quote and what the site's inline <span class="src" style="display:inline">tags</span>
+      point at. <code>calibration.json</code> is the one this page's JavaScript transcribes directly:
+      its knots are <code>js/calibration.js</code>.
+    </p>
+    <div class="jchips">
+        <a class="jchip" href="reports/benchmark.json" title="latency and throughput measurements">benchmark.json</a>
+        <a class="jchip" href="reports/benchmark_verify.json" title="">benchmark_verify.json</a>
+        <a class="jchip" href="reports/calibration.json" title="the isotonic knots this page transcribes into js/calibration.js">calibration.json</a>
+        <a class="jchip" href="reports/coil_report.json" title="">coil_report.json</a>
+        <a class="jchip" href="reports/cross_domain.json" title="">cross_domain.json</a>
+        <a class="jchip" href="reports/cross_domain_clean_coil_audit_negatives_only.json" title="">cross_domain_clean_coil_audit_negatives_only.json</a>
+        <a class="jchip" href="reports/cross_domain_clean_coil_baseline.json" title="">cross_domain_clean_coil_baseline.json</a>
+        <a class="jchip" href="reports/cross_domain_clean_coil_joint.json" title="">cross_domain_clean_coil_joint.json</a>
+        <a class="jchip" href="reports/evaluation.json" title="per-class AP, precision, recall behind the results table">evaluation.json</a>
+        <a class="jchip" href="reports/export_summary.json" title="the ONNX graph verification this page relies on for its tensor layout">export_summary.json</a>
+        <a class="jchip" href="reports/export_summary_320.json" title="">export_summary_320.json</a>
+        <a class="jchip" href="reports/false_alarm.json" title="clean-frame false alarm curve">false_alarm.json</a>
+        <a class="jchip" href="reports/gap1_cross_domain.json" title="the confidence sweep behind the cross-domain table">gap1_cross_domain.json</a>
+        <a class="jchip" href="reports/gap1_dataset_verification.json" title="">gap1_dataset_verification.json</a>
+        <a class="jchip" href="reports/gap1_detection_metrics.json" title="joint-checkpoint detection metrics">gap1_detection_metrics.json</a>
+        <a class="jchip" href="reports/gap1_detection_metrics_baseline.json" title="">gap1_detection_metrics_baseline.json</a>
+        <a class="jchip" href="reports/gap1_operating_point.json" title="">gap1_operating_point.json</a>
+        <a class="jchip" href="reports/gc10_coverage.json" title="per-class GC10 AP">gc10_coverage.json</a>
+        <a class="jchip" href="reports/input_pipeline_probe.json" title="">input_pipeline_probe.json</a>
+        <a class="jchip" href="reports/input_study.json" title="">input_study.json</a>
+        <a class="jchip" href="reports/model_study.json" title="the nano-vs-small bootstrap">model_study.json</a>
+        <a class="jchip" href="reports/ood_guard.json" title="the gate sweep, including the 3,200-frame false-rejection count">ood_guard.json</a>
+        <a class="jchip" href="reports/operating_point.evaluate.json" title="">operating_point.evaluate.json</a>
+        <a class="jchip" href="reports/operating_point.json" title="conf 0.15 and IoU 0.45, the two constants in js/detect.js">operating_point.json</a>
+        <a class="jchip" href="reports/resolution_study.json" title="the resolution sweep">resolution_study.json</a>
+        <a class="jchip" href="reports/train_summary_calib320.json" title="">train_summary_calib320.json</a>
+        <a class="jchip" href="reports/train_summary_yolov8n_neudet.json" title="">train_summary_yolov8n_neudet.json</a>
+        <a class="jchip" href="reports/train_summary_yolov8s_neudet.json" title="">train_summary_yolov8s_neudet.json</a>
+    </div>
+  </div>
+</section>
+
+<section id="deck">
+  <div class="wrap">
+    <h2>Deck</h2>
+    <div class="cards">
+      <div class="card">
+        <h4>The submission deck</h4>
+        <p>
+          The slide deck as built.
+          <a href="deck/JSW_Surface_Defect_Detection.pptx">JSW_Surface_Defect_Detection.pptx</a>
+          (1.0 MB).
+        </p>
+      </div>
+      <div class="card">
+        <h4>Deck content and the audit table</h4>
+        <p>
+          <a href="deck/deck_content.md">deck_content.md</a> is the deck's text in full, and it carries
+          the 54-row table mapping every number in the deck to the file that produced it.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="console">
+  <div class="wrap">
+    <h2>Verification and console source</h2>
+    <div class="cards">
+      <div class="card">
+        <h4>Parity harness output</h4>
+        <p>
+          <a href="../verify/parity_report.json">parity_report.json</a> is the browser decode path
+          against Python ultralytics under onnxruntime-node;
+          <a href="../verify/parity_browser.json">parity_browser.json</a> is the published page itself
+          driven in headless Chrome; <a href="../verify/strip_check.json">strip_check.json</a> is the
+          wide-strip comparison, squashed against tiled. The harness that writes them is
+          <a href="https://github.com/surface-vision/surface-vision.github.io/tree/main/verify">verify/</a>.
+        </p>
+      </div>
+      <div class="card">
+        <h4>Python console</h4>
+        <p>
+          The Streamlit console in full at <a href="../console/">console/</a> &mdash; the app, the six
+          <code>vendor/</code> modules, the Dockerfile, the CPU-pinned requirements, the sample frames
+          and both checkpoints.
+          <a href="https://github.com/surface-vision/surface-vision.github.io/tree/main/console">Browse it on GitHub</a>.
+        </p>
+      </div>
+      <div class="card">
+        <h4>Detector source</h4>
+        <p>
+          The three modules that produce every box on the live page:
+          <a href="../js/detect.js">detect.js</a>, <a href="../js/tiling.js">tiling.js</a> and
+          <a href="../js/calibration.js">calibration.js</a>. The same files the harness imports.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="../">Back to the detector</a>
+      <a href="https://github.com/surface-vision/surface-vision.github.io">Repository</a>
+      <a href="deck/JSW_Surface_Defect_Detection.pptx">Deck</a>
+      <a href="../console/">Console source</a>
+    </div>
+    <p>
+      Datasets are public research sets: NEU-DET (Northeastern University hot-rolled steel strip surface
+      defect database), GC10-DET (CC BY 4.0) and Severstal. This is a capability demonstration on public
+      data, not a Jindal Stainless production system; no line data was used.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

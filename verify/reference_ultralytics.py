@@ -64,7 +64,10 @@ def main() -> int:
 
     model = YOLO(str(WEIGHTS))
     payload = {
-        "weights": str(WEIGHTS),
+        # Repo-relative on purpose: this file is served by GitHub Pages and the
+        # page fetches it, so an absolute path here publishes the build host's
+        # home directory to every visitor.
+        "weights": str(WEIGHTS.relative_to(ROOT)),
         "conf": CONF,
         "iou": IOU,
         "imgsz": DEFAULT_IMGSZ,

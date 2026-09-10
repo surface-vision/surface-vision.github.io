@@ -1,0 +1,220 @@
+{
+  "generated_at": "2026-09-10T07:41:17.543Z",
+  "conf": 0.15,
+  "iou": 0.45,
+  "imgsz": 256,
+  "strips": [
+    {
+      "file": "strip_rollmark.jpg",
+      "size": [
+        2048,
+        1000
+      ],
+      "squash": {
+        "scale_x": 8,
+        "scale_y": 3.906,
+        "aspect_distortion": 2.048,
+        "forward_passes": 1,
+        "ms": 14.2,
+        "n": 6,
+        "detections": [
+          {
+            "className": "inclusion",
+            "raw": 0.4338,
+            "calibrated": 0.5,
+            "box": [
+              963.7,
+              0,
+              1269.7,
+              244.2
+            ]
+          },
+          {
+            "className": "inclusion",
+            "raw": 0.3658,
+            "calibrated": 0.4518,
+            "box": [
+              362.7,
+              29.2,
+              585.8,
+              771.4
+            ]
+          },
+          {
+            "className": "inclusion",
+            "raw": 0.2921,
+            "calibrated": 0.3298,
+            "box": [
+              364.8,
+              0.4,
+              562.7,
+              226.7
+            ]
+          },
+          {
+            "className": "inclusion",
+            "raw": 0.2105,
+            "calibrated": 0.2674,
+            "box": [
+              853.8,
+              255.2,
+              1208.7,
+              760.8
+            ]
+          },
+          {
+            "className": "inclusion",
+            "raw": 0.2032,
+            "calibrated": 0.2674,
+            "box": [
+              1052.4,
+              245.1,
+              1306.6,
+              776
+            ]
+          },
+          {
+            "className": "inclusion",
+            "raw": 0.1771,
+            "calibrated": 0.2674,
+            "box": [
+              1825.2,
+              0,
+              2001.9,
+              70.1
+            ]
+          }
+        ]
+      },
+      "tiled": {
+        "tiles": [
+          [
+            0,
+            0,
+            1000,
+            1000
+          ],
+          [
+            524,
+            0,
+            1000,
+            1000
+          ],
+          [
+            1048,
+            0,
+            1000,
+            1000
+          ]
+        ],
+        "scale": 3.906,
+        "forward_passes": 3,
+        "ms": 27.1,
+        "candidates_before_global_nms": 2,
+        "n": 2,
+        "detections": [
+          {
+            "className": "rolled-in_scale",
+            "raw": 0.351,
+            "calibrated": 0.3571,
+            "box": [
+              1851,
+              0,
+              1985.5,
+              69.7
+            ]
+          },
+          {
+            "className": "inclusion",
+            "raw": 0.2727,
+            "calibrated": 0.3298,
+            "box": [
+              947.4,
+              0,
+              1080.6,
+              176
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "file": "strip_weldline.jpg",
+      "size": [
+        2048,
+        1000
+      ],
+      "squash": {
+        "scale_x": 8,
+        "scale_y": 3.906,
+        "aspect_distortion": 2.048,
+        "forward_passes": 1,
+        "ms": 9.3,
+        "n": 0,
+        "detections": []
+      },
+      "tiled": {
+        "tiles": [
+          [
+            0,
+            0,
+            1000,
+            1000
+          ],
+          [
+            524,
+            0,
+            1000,
+            1000
+          ],
+          [
+            1048,
+            0,
+            1000,
+            1000
+          ]
+        ],
+        "scale": 3.906,
+        "forward_passes": 3,
+        "ms": 26.8,
+        "candidates_before_global_nms": 3,
+        "n": 3,
+        "detections": [
+          {
+            "className": "patches",
+            "raw": 0.5202,
+            "calibrated": 0.7051,
+            "box": [
+              1970.3,
+              344.8,
+              2047.6,
+              502.5
+            ]
+          },
+          {
+            "className": "scratches",
+            "raw": 0.3687,
+            "calibrated": 0.4687,
+            "box": [
+              0,
+              495.2,
+              66.4,
+              560.8
+            ]
+          },
+          {
+            "className": "patches",
+            "raw": 0.3134,
+            "calibrated": 0.3298,
+            "box": [
+              1957.2,
+              85.5,
+              2048,
+              506.4
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

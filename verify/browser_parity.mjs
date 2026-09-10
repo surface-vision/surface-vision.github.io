@@ -205,9 +205,14 @@ console.log(`verdict                   ${fails === 0 ? 'PASS -- identical detect
 
 const strips = caught.filter((c) => !PY.images.some((p) => p.name === c.image));
 if (strips.length) {
-  console.log('\nout-of-domain strip frames (squashed to 256x256, no Python reference):');
+  // No Python reference for these: reference_ultralytics.py runs the twelve square
+  // NEU-DET frames. What this shows is that the tiled path fires in the real browser
+  // and on how many windows -- strip_check.mjs is where tiled is measured against
+  // squashed on the same two frames.
+  console.log('\nout-of-domain strip frames (GC10-DET, tiled, no Python reference):');
   for (const s of strips) {
-    console.log(`  ${s.image}  ${s.width}x${s.height}  ${s.detections.length} det  `
+    const t = s.tiles ? `${s.tiles.length} tile${s.tiles.length === 1 ? '' : 's'}` : 'tiles n/a';
+    console.log(`  ${s.image}  ${s.width}x${s.height}  ${t}  ${s.detections.length} det  `
       + (s.detections.map((d) => `${d.className} ${d.raw.toFixed(3)}`).join(', ') || '(none)'));
   }
 }
@@ -237,6 +242,7 @@ writeFileSync(OUT, JSON.stringify({
   },
   rows,
   out_of_domain: strips.map((s) => ({
+    tiles: s.tiles || null,
     image: s.image, width: s.width, height: s.height,
     detections: s.detections.map((d) => ({ className: d.className, raw: d.raw, calibrated: d.calibrated })),
   })),

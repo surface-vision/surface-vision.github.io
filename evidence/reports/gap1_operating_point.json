@@ -1,0 +1,816 @@
+{
+  "weights": "models/yolov8n_joint/weights/best.pt",
+  "weights_sha256": "198e9b4bec5b480950a9bb9c7a8126cf58697d66b692b7205a47136aa553e03e",
+  "split_dir": "data/joint_xdsafe/val",
+  "imgsz": 256,
+  "iou": 0.45,
+  "cache_conf": 0.01,
+  "population": {
+    "frames": 494,
+    "labelled": 334,
+    "clean_severstal": 160,
+    "neu": 180,
+    "severstal": 314
+  },
+  "sweep": [
+    {
+      "threshold": 0.01,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.9041916167664671,
+      "defect_detection_rate_neu": 0.9555555555555556,
+      "defect_detection_rate_severstal": 0.8441558441558441,
+      "defect_flag_rate": 0.9850299401197605,
+      "defect_flag_rate_neu": 1.0,
+      "defect_flag_rate_severstal": 0.9675324675324676,
+      "clean_frame_false_alarm_rate": 0.28125,
+      "boxes_per_clean_frame": 0.70625
+    },
+    {
+      "threshold": 0.02,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.8922155688622755,
+      "defect_detection_rate_neu": 0.95,
+      "defect_detection_rate_severstal": 0.8246753246753247,
+      "defect_flag_rate": 0.9790419161676647,
+      "defect_flag_rate_neu": 1.0,
+      "defect_flag_rate_severstal": 0.9545454545454546,
+      "clean_frame_false_alarm_rate": 0.225,
+      "boxes_per_clean_frame": 0.45625
+    },
+    {
+      "threshold": 0.03,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.8862275449101796,
+      "defect_detection_rate_neu": 0.9444444444444444,
+      "defect_detection_rate_severstal": 0.8181818181818182,
+      "defect_flag_rate": 0.9790419161676647,
+      "defect_flag_rate_neu": 1.0,
+      "defect_flag_rate_severstal": 0.9545454545454546,
+      "clean_frame_false_alarm_rate": 0.2,
+      "boxes_per_clean_frame": 0.375
+    },
+    {
+      "threshold": 0.05,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.8532934131736527,
+      "defect_detection_rate_neu": 0.9111111111111111,
+      "defect_detection_rate_severstal": 0.7857142857142857,
+      "defect_flag_rate": 0.9700598802395209,
+      "defect_flag_rate_neu": 1.0,
+      "defect_flag_rate_severstal": 0.935064935064935,
+      "clean_frame_false_alarm_rate": 0.15625,
+      "boxes_per_clean_frame": 0.25625
+    },
+    {
+      "threshold": 0.1,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.8053892215568862,
+      "defect_detection_rate_neu": 0.8833333333333333,
+      "defect_detection_rate_severstal": 0.7142857142857143,
+      "defect_flag_rate": 0.9431137724550899,
+      "defect_flag_rate_neu": 0.9888888888888889,
+      "defect_flag_rate_severstal": 0.8896103896103896,
+      "clean_frame_false_alarm_rate": 0.1125,
+      "boxes_per_clean_frame": 0.1375
+    },
+    {
+      "threshold": 0.15,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.7844311377245509,
+      "defect_detection_rate_neu": 0.8722222222222222,
+      "defect_detection_rate_severstal": 0.6818181818181818,
+      "defect_flag_rate": 0.9311377245508982,
+      "defect_flag_rate_neu": 0.9833333333333333,
+      "defect_flag_rate_severstal": 0.8701298701298701,
+      "clean_frame_false_alarm_rate": 0.08125,
+      "boxes_per_clean_frame": 0.1
+    },
+    {
+      "threshold": 0.2,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.7694610778443114,
+      "defect_detection_rate_neu": 0.8555555555555555,
+      "defect_detection_rate_severstal": 0.6688311688311688,
+      "defect_flag_rate": 0.9101796407185628,
+      "defect_flag_rate_neu": 0.9722222222222222,
+      "defect_flag_rate_severstal": 0.8376623376623377,
+      "clean_frame_false_alarm_rate": 0.06875,
+      "boxes_per_clean_frame": 0.08125
+    },
+    {
+      "threshold": 0.25,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.7485029940119761,
+      "defect_detection_rate_neu": 0.8333333333333334,
+      "defect_detection_rate_severstal": 0.6493506493506493,
+      "defect_flag_rate": 0.8952095808383234,
+      "defect_flag_rate_neu": 0.95,
+      "defect_flag_rate_severstal": 0.8311688311688312,
+      "clean_frame_false_alarm_rate": 0.06875,
+      "boxes_per_clean_frame": 0.075
+    },
+    {
+      "threshold": 0.3,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.7095808383233533,
+      "defect_detection_rate_neu": 0.7944444444444444,
+      "defect_detection_rate_severstal": 0.6103896103896104,
+      "defect_flag_rate": 0.8383233532934131,
+      "defect_flag_rate_neu": 0.8888888888888888,
+      "defect_flag_rate_severstal": 0.7792207792207793,
+      "clean_frame_false_alarm_rate": 0.05625,
+      "boxes_per_clean_frame": 0.0625
+    },
+    {
+      "threshold": 0.35,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.688622754491018,
+      "defect_detection_rate_neu": 0.7722222222222223,
+      "defect_detection_rate_severstal": 0.5909090909090909,
+      "defect_flag_rate": 0.8023952095808383,
+      "defect_flag_rate_neu": 0.85,
+      "defect_flag_rate_severstal": 0.7467532467532467,
+      "clean_frame_false_alarm_rate": 0.05,
+      "boxes_per_clean_frame": 0.05
+    },
+    {
+      "threshold": 0.4,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.6676646706586826,
+      "defect_detection_rate_neu": 0.7555555555555555,
+      "defect_detection_rate_severstal": 0.564935064935065,
+      "defect_flag_rate": 0.7604790419161677,
+      "defect_flag_rate_neu": 0.8222222222222222,
+      "defect_flag_rate_severstal": 0.6883116883116883,
+      "clean_frame_false_alarm_rate": 0.03125,
+      "boxes_per_clean_frame": 0.03125
+    },
+    {
+      "threshold": 0.45,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.6317365269461078,
+      "defect_detection_rate_neu": 0.7277777777777777,
+      "defect_detection_rate_severstal": 0.5194805194805194,
+      "defect_flag_rate": 0.718562874251497,
+      "defect_flag_rate_neu": 0.7888888888888889,
+      "defect_flag_rate_severstal": 0.6363636363636364,
+      "clean_frame_false_alarm_rate": 0.025,
+      "boxes_per_clean_frame": 0.025
+    },
+    {
+      "threshold": 0.5,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.6047904191616766,
+      "defect_detection_rate_neu": 0.7055555555555556,
+      "defect_detection_rate_severstal": 0.487012987012987,
+      "defect_flag_rate": 0.6766467065868264,
+      "defect_flag_rate_neu": 0.75,
+      "defect_flag_rate_severstal": 0.5909090909090909,
+      "clean_frame_false_alarm_rate": 0.025,
+      "boxes_per_clean_frame": 0.025
+    },
+    {
+      "threshold": 0.55,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.5688622754491018,
+      "defect_detection_rate_neu": 0.6666666666666666,
+      "defect_detection_rate_severstal": 0.45454545454545453,
+      "defect_flag_rate": 0.6287425149700598,
+      "defect_flag_rate_neu": 0.7055555555555556,
+      "defect_flag_rate_severstal": 0.538961038961039,
+      "clean_frame_false_alarm_rate": 0.025,
+      "boxes_per_clean_frame": 0.025
+    },
+    {
+      "threshold": 0.6,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.5029940119760479,
+      "defect_detection_rate_neu": 0.6,
+      "defect_detection_rate_severstal": 0.38961038961038963,
+      "defect_flag_rate": 0.5538922155688623,
+      "defect_flag_rate_neu": 0.6166666666666667,
+      "defect_flag_rate_severstal": 0.4805194805194805,
+      "clean_frame_false_alarm_rate": 0.0125,
+      "boxes_per_clean_frame": 0.0125
+    },
+    {
+      "threshold": 0.65,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.46107784431137727,
+      "defect_detection_rate_neu": 0.5666666666666667,
+      "defect_detection_rate_severstal": 0.33766233766233766,
+      "defect_flag_rate": 0.5,
+      "defect_flag_rate_neu": 0.5833333333333334,
+      "defect_flag_rate_severstal": 0.4025974025974026,
+      "clean_frame_false_alarm_rate": 0.0125,
+      "boxes_per_clean_frame": 0.0125
+    },
+    {
+      "threshold": 0.7,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.41916167664670656,
+      "defect_detection_rate_neu": 0.5388888888888889,
+      "defect_detection_rate_severstal": 0.2792207792207792,
+      "defect_flag_rate": 0.4550898203592814,
+      "defect_flag_rate_neu": 0.55,
+      "defect_flag_rate_severstal": 0.34415584415584416,
+      "clean_frame_false_alarm_rate": 0.0,
+      "boxes_per_clean_frame": 0.0
+    },
+    {
+      "threshold": 0.75,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.3413173652694611,
+      "defect_detection_rate_neu": 0.45,
+      "defect_detection_rate_severstal": 0.21428571428571427,
+      "defect_flag_rate": 0.3652694610778443,
+      "defect_flag_rate_neu": 0.46111111111111114,
+      "defect_flag_rate_severstal": 0.2532467532467532,
+      "clean_frame_false_alarm_rate": 0.0,
+      "boxes_per_clean_frame": 0.0
+    },
+    {
+      "threshold": 0.8,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.24550898203592814,
+      "defect_detection_rate_neu": 0.3388888888888889,
+      "defect_detection_rate_severstal": 0.13636363636363635,
+      "defect_flag_rate": 0.24850299401197604,
+      "defect_flag_rate_neu": 0.3388888888888889,
+      "defect_flag_rate_severstal": 0.14285714285714285,
+      "clean_frame_false_alarm_rate": 0.0,
+      "boxes_per_clean_frame": 0.0
+    },
+    {
+      "threshold": 0.85,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.15868263473053892,
+      "defect_detection_rate_neu": 0.25,
+      "defect_detection_rate_severstal": 0.05194805194805195,
+      "defect_flag_rate": 0.16167664670658682,
+      "defect_flag_rate_neu": 0.25,
+      "defect_flag_rate_severstal": 0.05844155844155844,
+      "clean_frame_false_alarm_rate": 0.0,
+      "boxes_per_clean_frame": 0.0
+    },
+    {
+      "threshold": 0.9,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.04790419161676647,
+      "defect_detection_rate_neu": 0.08333333333333333,
+      "defect_detection_rate_severstal": 0.006493506493506494,
+      "defect_flag_rate": 0.05089820359281437,
+      "defect_flag_rate_neu": 0.08333333333333333,
+      "defect_flag_rate_severstal": 0.012987012987012988,
+      "clean_frame_false_alarm_rate": 0.0,
+      "boxes_per_clean_frame": 0.0
+    },
+    {
+      "threshold": 0.95,
+      "n_labelled": 334,
+      "n_clean": 160,
+      "defect_detection_rate": 0.0,
+      "defect_detection_rate_neu": 0.0,
+      "defect_detection_rate_severstal": 0.0,
+      "defect_flag_rate": 0.0,
+      "defect_flag_rate_neu": 0.0,
+      "defect_flag_rate_severstal": 0.0,
+      "clean_frame_false_alarm_rate": 0.0,
+      "boxes_per_clean_frame": 0.0
+    }
+  ],
+  "operating_point": {
+    "cost_model": {
+      "miss_cost_ratio": 12.0,
+      "sensitivity_ratios": [
+        3.0,
+        10.0,
+        12.0,
+        30.0
+      ],
+      "defect_frame_prevalence": 0.05,
+      "min_detection_rate": 0.9
+    },
+    "detection_key": "defect_detection_rate",
+    "effective_lambda": 0.63158,
+    "chosen": {
+      "threshold": 0.01,
+      "defect_detection_rate": 0.9042,
+      "clean_frame_false_alarm_rate": 0.2812,
+      "clean_patch_false_alarm_rate": 0.2812,
+      "legacy_spurious_box_rate": NaN,
+      "expected_cost_frame_basis": 0.32467,
+      "expected_cost_patch_basis": 0.32467
+    },
+    "detection_floor_met": true,
+    "chosen_at_sweep_edge": true,
+    "unconstrained": {
+      "threshold": 0.2,
+      "defect_detection_rate": 0.7695,
+      "clean_frame_false_alarm_rate": 0.0688,
+      "clean_patch_false_alarm_rate": 0.0688,
+      "legacy_spurious_box_rate": NaN,
+      "expected_cost_frame_basis": 0.20364,
+      "expected_cost_patch_basis": 0.20364
+    },
+    "sensitivity": [
+      {
+        "miss_cost_ratio": 3.0,
+        "effective_lambda": 0.15789,
+        "constrained_threshold": 0.01,
+        "constrained_detection_rate": 0.9042,
+        "constrained_clean_fa": 0.2812,
+        "unconstrained_threshold": 0.45,
+        "floor_reachable": true
+      },
+      {
+        "miss_cost_ratio": 10.0,
+        "effective_lambda": 0.52632,
+        "constrained_threshold": 0.01,
+        "constrained_detection_rate": 0.9042,
+        "constrained_clean_fa": 0.2812,
+        "unconstrained_threshold": 0.2,
+        "floor_reachable": true
+      },
+      {
+        "miss_cost_ratio": 12.0,
+        "effective_lambda": 0.63158,
+        "constrained_threshold": 0.01,
+        "constrained_detection_rate": 0.9042,
+        "constrained_clean_fa": 0.2812,
+        "unconstrained_threshold": 0.2,
+        "floor_reachable": true
+      },
+      {
+        "miss_cost_ratio": 30.0,
+        "effective_lambda": 1.57895,
+        "constrained_threshold": 0.01,
+        "constrained_detection_rate": 0.9042,
+        "constrained_clean_fa": 0.2812,
+        "unconstrained_threshold": 0.03,
+        "floor_reachable": true
+      }
+    ]
+  },
+  "operating_points_by_population": {
+    "defect_detection_rate": {
+      "cost_model": {
+        "miss_cost_ratio": 12.0,
+        "sensitivity_ratios": [
+          3.0,
+          10.0,
+          12.0,
+          30.0
+        ],
+        "defect_frame_prevalence": 0.05,
+        "min_detection_rate": 0.9
+      },
+      "detection_key": "defect_detection_rate",
+      "effective_lambda": 0.63158,
+      "chosen": {
+        "threshold": 0.01,
+        "defect_detection_rate": 0.9042,
+        "clean_frame_false_alarm_rate": 0.2812,
+        "clean_patch_false_alarm_rate": 0.2812,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.32467,
+        "expected_cost_patch_basis": 0.32467
+      },
+      "detection_floor_met": true,
+      "chosen_at_sweep_edge": true,
+      "unconstrained": {
+        "threshold": 0.2,
+        "defect_detection_rate": 0.7695,
+        "clean_frame_false_alarm_rate": 0.0688,
+        "clean_patch_false_alarm_rate": 0.0688,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.20364,
+        "expected_cost_patch_basis": 0.20364
+      },
+      "sensitivity": [
+        {
+          "miss_cost_ratio": 3.0,
+          "effective_lambda": 0.15789,
+          "constrained_threshold": 0.01,
+          "constrained_detection_rate": 0.9042,
+          "constrained_clean_fa": 0.2812,
+          "unconstrained_threshold": 0.45,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 10.0,
+          "effective_lambda": 0.52632,
+          "constrained_threshold": 0.01,
+          "constrained_detection_rate": 0.9042,
+          "constrained_clean_fa": 0.2812,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 12.0,
+          "effective_lambda": 0.63158,
+          "constrained_threshold": 0.01,
+          "constrained_detection_rate": 0.9042,
+          "constrained_clean_fa": 0.2812,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 30.0,
+          "effective_lambda": 1.57895,
+          "constrained_threshold": 0.01,
+          "constrained_detection_rate": 0.9042,
+          "constrained_clean_fa": 0.2812,
+          "unconstrained_threshold": 0.03,
+          "floor_reachable": true
+        }
+      ]
+    },
+    "defect_detection_rate_neu": {
+      "cost_model": {
+        "miss_cost_ratio": 12.0,
+        "sensitivity_ratios": [
+          3.0,
+          10.0,
+          12.0,
+          30.0
+        ],
+        "defect_frame_prevalence": 0.05,
+        "min_detection_rate": 0.9
+      },
+      "detection_key": "defect_detection_rate_neu",
+      "effective_lambda": 0.63158,
+      "chosen": {
+        "threshold": 0.05,
+        "defect_detection_rate": 0.9111,
+        "clean_frame_false_alarm_rate": 0.1562,
+        "clean_patch_false_alarm_rate": 0.1562,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.20177,
+        "expected_cost_patch_basis": 0.20177
+      },
+      "detection_floor_met": true,
+      "chosen_at_sweep_edge": false,
+      "unconstrained": {
+        "threshold": 0.2,
+        "defect_detection_rate": 0.8556,
+        "clean_frame_false_alarm_rate": 0.0688,
+        "clean_patch_false_alarm_rate": 0.0688,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.15198,
+        "expected_cost_patch_basis": 0.15198
+      },
+      "sensitivity": [
+        {
+          "miss_cost_ratio": 3.0,
+          "effective_lambda": 0.15789,
+          "constrained_threshold": 0.05,
+          "constrained_detection_rate": 0.9111,
+          "constrained_clean_fa": 0.1562,
+          "unconstrained_threshold": 0.45,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 10.0,
+          "effective_lambda": 0.52632,
+          "constrained_threshold": 0.05,
+          "constrained_detection_rate": 0.9111,
+          "constrained_clean_fa": 0.1562,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 12.0,
+          "effective_lambda": 0.63158,
+          "constrained_threshold": 0.05,
+          "constrained_detection_rate": 0.9111,
+          "constrained_clean_fa": 0.1562,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 30.0,
+          "effective_lambda": 1.57895,
+          "constrained_threshold": 0.03,
+          "constrained_detection_rate": 0.9444,
+          "constrained_clean_fa": 0.2,
+          "unconstrained_threshold": 0.15,
+          "floor_reachable": true
+        }
+      ]
+    },
+    "defect_detection_rate_severstal": {
+      "cost_model": {
+        "miss_cost_ratio": 12.0,
+        "sensitivity_ratios": [
+          3.0,
+          10.0,
+          12.0,
+          30.0
+        ],
+        "defect_frame_prevalence": 0.05,
+        "min_detection_rate": 0.9
+      },
+      "detection_key": "defect_detection_rate_severstal",
+      "effective_lambda": 0.63158,
+      "chosen": {
+        "threshold": 0.2,
+        "defect_detection_rate": 0.6688,
+        "clean_frame_false_alarm_rate": 0.0688,
+        "clean_patch_false_alarm_rate": 0.0688,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.26401,
+        "expected_cost_patch_basis": 0.26401
+      },
+      "detection_floor_met": false,
+      "chosen_at_sweep_edge": false,
+      "unconstrained": {
+        "threshold": 0.2,
+        "defect_detection_rate": 0.6688,
+        "clean_frame_false_alarm_rate": 0.0688,
+        "clean_patch_false_alarm_rate": 0.0688,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.26401,
+        "expected_cost_patch_basis": 0.26401
+      },
+      "sensitivity": [
+        {
+          "miss_cost_ratio": 3.0,
+          "effective_lambda": 0.15789,
+          "constrained_threshold": 0.4,
+          "constrained_detection_rate": 0.5649,
+          "constrained_clean_fa": 0.0312,
+          "unconstrained_threshold": 0.4,
+          "floor_reachable": false
+        },
+        {
+          "miss_cost_ratio": 10.0,
+          "effective_lambda": 0.52632,
+          "constrained_threshold": 0.2,
+          "constrained_detection_rate": 0.6688,
+          "constrained_clean_fa": 0.0688,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": false
+        },
+        {
+          "miss_cost_ratio": 12.0,
+          "effective_lambda": 0.63158,
+          "constrained_threshold": 0.2,
+          "constrained_detection_rate": 0.6688,
+          "constrained_clean_fa": 0.0688,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": false
+        },
+        {
+          "miss_cost_ratio": 30.0,
+          "effective_lambda": 1.57895,
+          "constrained_threshold": 0.03,
+          "constrained_detection_rate": 0.8182,
+          "constrained_clean_fa": 0.2,
+          "unconstrained_threshold": 0.03,
+          "floor_reachable": false
+        }
+      ]
+    },
+    "defect_flag_rate": {
+      "cost_model": {
+        "miss_cost_ratio": 12.0,
+        "sensitivity_ratios": [
+          3.0,
+          10.0,
+          12.0,
+          30.0
+        ],
+        "defect_frame_prevalence": 0.05,
+        "min_detection_rate": 0.9
+      },
+      "detection_key": "defect_flag_rate",
+      "effective_lambda": 0.63158,
+      "chosen": {
+        "threshold": 0.15,
+        "defect_detection_rate": 0.9311,
+        "clean_frame_false_alarm_rate": 0.0813,
+        "clean_patch_false_alarm_rate": 0.0813,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.1185,
+        "expected_cost_patch_basis": 0.1185
+      },
+      "detection_floor_met": true,
+      "chosen_at_sweep_edge": false,
+      "unconstrained": {
+        "threshold": 0.15,
+        "defect_detection_rate": 0.9311,
+        "clean_frame_false_alarm_rate": 0.0813,
+        "clean_patch_false_alarm_rate": 0.0813,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.1185,
+        "expected_cost_patch_basis": 0.1185
+      },
+      "sensitivity": [
+        {
+          "miss_cost_ratio": 3.0,
+          "effective_lambda": 0.15789,
+          "constrained_threshold": 0.2,
+          "constrained_detection_rate": 0.9102,
+          "constrained_clean_fa": 0.0688,
+          "unconstrained_threshold": 0.4,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 10.0,
+          "effective_lambda": 0.52632,
+          "constrained_threshold": 0.2,
+          "constrained_detection_rate": 0.9102,
+          "constrained_clean_fa": 0.0688,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 12.0,
+          "effective_lambda": 0.63158,
+          "constrained_threshold": 0.15,
+          "constrained_detection_rate": 0.9311,
+          "constrained_clean_fa": 0.0813,
+          "unconstrained_threshold": 0.15,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 30.0,
+          "effective_lambda": 1.57895,
+          "constrained_threshold": 0.15,
+          "constrained_detection_rate": 0.9311,
+          "constrained_clean_fa": 0.0813,
+          "unconstrained_threshold": 0.15,
+          "floor_reachable": true
+        }
+      ]
+    },
+    "defect_flag_rate_neu": {
+      "cost_model": {
+        "miss_cost_ratio": 12.0,
+        "sensitivity_ratios": [
+          3.0,
+          10.0,
+          12.0,
+          30.0
+        ],
+        "defect_frame_prevalence": 0.05,
+        "min_detection_rate": 0.9
+      },
+      "detection_key": "defect_flag_rate_neu",
+      "effective_lambda": 0.63158,
+      "chosen": {
+        "threshold": 0.2,
+        "defect_detection_rate": 0.9722,
+        "clean_frame_false_alarm_rate": 0.0688,
+        "clean_patch_false_alarm_rate": 0.0688,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.08198,
+        "expected_cost_patch_basis": 0.08198
+      },
+      "detection_floor_met": true,
+      "chosen_at_sweep_edge": false,
+      "unconstrained": {
+        "threshold": 0.2,
+        "defect_detection_rate": 0.9722,
+        "clean_frame_false_alarm_rate": 0.0688,
+        "clean_patch_false_alarm_rate": 0.0688,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.08198,
+        "expected_cost_patch_basis": 0.08198
+      },
+      "sensitivity": [
+        {
+          "miss_cost_ratio": 3.0,
+          "effective_lambda": 0.15789,
+          "constrained_threshold": 0.2,
+          "constrained_detection_rate": 0.9722,
+          "constrained_clean_fa": 0.0688,
+          "unconstrained_threshold": 0.45,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 10.0,
+          "effective_lambda": 0.52632,
+          "constrained_threshold": 0.2,
+          "constrained_detection_rate": 0.9722,
+          "constrained_clean_fa": 0.0688,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 12.0,
+          "effective_lambda": 0.63158,
+          "constrained_threshold": 0.2,
+          "constrained_detection_rate": 0.9722,
+          "constrained_clean_fa": 0.0688,
+          "unconstrained_threshold": 0.2,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 30.0,
+          "effective_lambda": 1.57895,
+          "constrained_threshold": 0.15,
+          "constrained_detection_rate": 0.9833,
+          "constrained_clean_fa": 0.0813,
+          "unconstrained_threshold": 0.15,
+          "floor_reachable": true
+        }
+      ]
+    },
+    "defect_flag_rate_severstal": {
+      "cost_model": {
+        "miss_cost_ratio": 12.0,
+        "sensitivity_ratios": [
+          3.0,
+          10.0,
+          12.0,
+          30.0
+        ],
+        "defect_frame_prevalence": 0.05,
+        "min_detection_rate": 0.9
+      },
+      "detection_key": "defect_flag_rate_severstal",
+      "effective_lambda": 0.63158,
+      "chosen": {
+        "threshold": 0.05,
+        "defect_detection_rate": 0.9351,
+        "clean_frame_false_alarm_rate": 0.1562,
+        "clean_patch_false_alarm_rate": 0.1562,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.1874,
+        "expected_cost_patch_basis": 0.1874
+      },
+      "detection_floor_met": true,
+      "chosen_at_sweep_edge": false,
+      "unconstrained": {
+        "threshold": 0.15,
+        "defect_detection_rate": 0.8701,
+        "clean_frame_false_alarm_rate": 0.0813,
+        "clean_patch_false_alarm_rate": 0.0813,
+        "legacy_spurious_box_rate": NaN,
+        "expected_cost_frame_basis": 0.15511,
+        "expected_cost_patch_basis": 0.15511
+      },
+      "sensitivity": [
+        {
+          "miss_cost_ratio": 3.0,
+          "effective_lambda": 0.15789,
+          "constrained_threshold": 0.05,
+          "constrained_detection_rate": 0.9351,
+          "constrained_clean_fa": 0.1562,
+          "unconstrained_threshold": 0.4,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 10.0,
+          "effective_lambda": 0.52632,
+          "constrained_threshold": 0.05,
+          "constrained_detection_rate": 0.9351,
+          "constrained_clean_fa": 0.1562,
+          "unconstrained_threshold": 0.15,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 12.0,
+          "effective_lambda": 0.63158,
+          "constrained_threshold": 0.05,
+          "constrained_detection_rate": 0.9351,
+          "constrained_clean_fa": 0.1562,
+          "unconstrained_threshold": 0.15,
+          "floor_reachable": true
+        },
+        {
+          "miss_cost_ratio": 30.0,
+          "effective_lambda": 1.57895,
+          "constrained_threshold": 0.05,
+          "constrained_detection_rate": 0.9351,
+          "constrained_clean_fa": 0.1562,
+          "unconstrained_threshold": 0.05,
+          "floor_reachable": true
+        }
+      ]
+    }
+  }
+}

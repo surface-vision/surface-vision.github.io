@@ -1,0 +1,513 @@
+{
+  "generated": "2026-09-10",
+  "purpose": "Held-out test evaluation of the GC10-DET checkpoint (Gap 8: roll-mark and edge-defect coverage). Training only; this report does not train anything.",
+  "model": {
+    "weights": "models/yolov8n_gc10_640/weights/best.pt",
+    "loads_ok": true,
+    "task": "detect",
+    "num_classes": 10,
+    "class_names": [
+      "punching_hole",
+      "weld_line",
+      "crescent_gap",
+      "water_spot",
+      "oil_spot",
+      "silk_spot",
+      "foreign_object",
+      "rolled_pit",
+      "crease",
+      "waist_fold"
+    ],
+    "training_args": {
+      "source": "models/yolov8n_gc10_640/args.yaml",
+      "model_init": "yolov8n.pt",
+      "epochs_configured": 70,
+      "epochs_run": 70,
+      "batch": 16,
+      "imgsz": 640,
+      "seed": 1337
+    },
+    "training_curve": {
+      "source": "models/yolov8n_gc10_640/results.csv",
+      "rows_logged": 70,
+      "best_val_map50": 0.55058,
+      "best_val_epoch": 53,
+      "final_epoch_70_val_map50": 0.54936,
+      "note": "best.pt is the epoch-53 checkpoint (ultralytics saves best-by-val-mAP50), not the epoch-70 checkpoint. Both are close (0.5506 vs 0.5494), so there is no real overfitting signal in the last 17 epochs."
+    }
+  },
+  "dataset_verification": {
+    "claim_source": "reports/gc10_dataset.md",
+    "method": "Independent recount from data/gc10-det/{split}/labels/*.txt, plus SHA-256 content hashing and filename-derived line-scan sequence IDs on data/gc10-det/{split}/images/*, run fresh (not read from manifest.json).",
+    "per_split_box_counts_match_report": true,
+    "per_split_boxes_recounted": {
+      "train": {
+        "images": 1641,
+        "labels_files": 1641,
+        "images_with_a_box": 1639,
+        "total_boxes": 2503
+      },
+      "val": {
+        "images": 320,
+        "labels_files": 320,
+        "images_with_a_box": 320,
+        "total_boxes": 531
+      },
+      "test": {
+        "images": 333,
+        "labels_files": 333,
+        "images_with_a_box": 333,
+        "total_boxes": 530
+      }
+    },
+    "per_class_boxes_recounted": {
+      "punching_hole": {
+        "train": 230,
+        "val": 49,
+        "test": 50
+      },
+      "weld_line": {
+        "train": 359,
+        "val": 77,
+        "test": 77
+      },
+      "crescent_gap": {
+        "train": 185,
+        "val": 40,
+        "test": 40
+      },
+      "water_spot": {
+        "train": 248,
+        "val": 53,
+        "test": 53
+      },
+      "oil_spot": {
+        "train": 400,
+        "val": 85,
+        "test": 84
+      },
+      "silk_spot": {
+        "train": 626,
+        "val": 129,
+        "test": 129
+      },
+      "foreign_object": {
+        "train": 243,
+        "val": 52,
+        "test": 52
+      },
+      "rolled_pit": {
+        "train": 59,
+        "val": 13,
+        "test": 13
+      },
+      "crease": {
+        "train": 52,
+        "val": 11,
+        "test": 11
+      },
+      "waist_fold": {
+        "train": 101,
+        "val": 22,
+        "test": 21
+      }
+    },
+    "class_id_mapping_matches_data_yaml": true,
+    "disjointness_check": {
+      "method": "SHA-256 content hash of every image file, plus a line-scan sequence id parsed from the filename (img_<camera>_<sequence>_<frame>), computed independently of manifest.json",
+      "unique_sequences_by_split": {
+        "train": 252,
+        "val": 108,
+        "test": 107
+      },
+      "total_unique_sequences": 467,
+      "cross_split_content_hash_overlaps": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      },
+      "duplicate_hashes_anywhere": 0,
+      "cross_split_sequence_overlaps": {
+        "train_val": 0,
+        "train_test": 0,
+        "val_test": 0
+      },
+      "matches_gc10_dataset_md_claim": true
+    },
+    "verdict": "All counts, class mapping, and split disjointness claims in reports/gc10_dataset.md are confirmed by independent recount and rehashing. No discrepancy found."
+  },
+  "test_evaluation": {
+    "command": "yolo detect val model=models/yolov8n_gc10_640/weights/best.pt data=data/gc10-det/data.yaml split=test imgsz=640 batch=16 device=mps conf=0.001 iou=0.7",
+    "engine": "ultralytics 8.4.144, torch 2.14.0, MPS (Apple M5)",
+    "images": 333,
+    "instances": 530,
+    "overall": {
+      "precision_mean": 0.5916,
+      "recall_mean": 0.5897,
+      "mAP50": 0.5821,
+      "mAP50_95": 0.3076
+    },
+    "per_class": {
+      "punching_hole": {
+        "class_id": 0,
+        "images": 50,
+        "instances": 50,
+        "precision": 0.8821,
+        "recall": 1.0,
+        "AP50": 0.9934,
+        "AP50_95": 0.6085
+      },
+      "weld_line": {
+        "class_id": 1,
+        "images": 77,
+        "instances": 77,
+        "precision": 0.7453,
+        "recall": 0.8742,
+        "AP50": 0.8923,
+        "AP50_95": 0.4733
+      },
+      "crescent_gap": {
+        "class_id": 2,
+        "images": 40,
+        "instances": 40,
+        "precision": 0.8115,
+        "recall": 0.969,
+        "AP50": 0.9226,
+        "AP50_95": 0.6169
+      },
+      "water_spot": {
+        "class_id": 3,
+        "images": 47,
+        "instances": 53,
+        "precision": 0.5717,
+        "recall": 0.7736,
+        "AP50": 0.7807,
+        "AP50_95": 0.4483
+      },
+      "oil_spot": {
+        "class_id": 4,
+        "images": 42,
+        "instances": 84,
+        "precision": 0.5773,
+        "recall": 0.3578,
+        "AP50": 0.4277,
+        "AP50_95": 0.1917
+      },
+      "silk_spot": {
+        "class_id": 5,
+        "images": 89,
+        "instances": 129,
+        "precision": 0.4882,
+        "recall": 0.2946,
+        "AP50": 0.292,
+        "AP50_95": 0.1095
+      },
+      "foreign_object": {
+        "class_id": 6,
+        "images": 37,
+        "instances": 52,
+        "precision": 0.4086,
+        "recall": 0.25,
+        "AP50": 0.2701,
+        "AP50_95": 0.0889
+      },
+      "rolled_pit": {
+        "class_id": 7,
+        "images": 11,
+        "instances": 13,
+        "precision": 0.2107,
+        "recall": 0.2308,
+        "AP50": 0.1138,
+        "AP50_95": 0.0505
+      },
+      "crease": {
+        "class_id": 8,
+        "images": 11,
+        "instances": 11,
+        "precision": 0.5747,
+        "recall": 0.3636,
+        "AP50": 0.2918,
+        "AP50_95": 0.1405
+      },
+      "waist_fold": {
+        "class_id": 9,
+        "images": 21,
+        "instances": 21,
+        "precision": 0.6462,
+        "recall": 0.7833,
+        "AP50": 0.8365,
+        "AP50_95": 0.3481
+      }
+    },
+    "reproducibility_note": "Identical numbers obtained across the ultralytics Python API (model.val(...)), the yolo CLI, and a fresh re-run in a separate verification pass. iou=0.7 is the 'ultralytics validator defaults' value used by every other val run in this project (reports/evaluation.json's own protocol field names it explicitly); an earlier draft of this report used iou=0.6 without documenting why, which moved overall mAP50 from 0.582 to 0.592. Corrected here to iou=0.7 for consistency with the rest of the project. Both runs are reproducible from reports/gc10_coverage.md's 'Reproducing this report' section."
+  },
+  "brief_relevant_families": {
+    "roll_marks": {
+      "gc10_classes": [
+        "rolled_pit",
+        "crease"
+      ],
+      "match_type": "direct",
+      "combined_test_images": 22,
+      "combined_test_instances": 24,
+      "unweighted_mean_AP50": 0.2028,
+      "unweighted_mean_AP50_95": 0.0955,
+      "unweighted_mean_precision": 0.3927,
+      "unweighted_mean_recall": 0.2972,
+      "per_class": {
+        "rolled_pit": {
+          "images": 11,
+          "instances": 13,
+          "AP50": 0.1138,
+          "precision": 0.2107,
+          "recall": 0.2308
+        },
+        "crease": {
+          "images": 11,
+          "instances": 11,
+          "AP50": 0.2918,
+          "precision": 0.5747,
+          "recall": 0.3636
+        }
+      },
+      "confidence_statement": "Both classes are thin enough that a single flipped box changes the headline number by more than a rounding error: rolled_pit has 13 test instances, so one instance moving from miss to hit changes recall by 1/13 = 7.7 points; crease has 11, so one flip changes recall by 1/11 = 9.1 points. AP50 on 11-13 instances does not support a claim tighter than 'roughly a fifth to a third, weak, and the number itself is unstable.' The project's earlier bootstrap on NEU-DET (446 test boxes) reported a +/-0.025 half-width; nothing this small can be narrower than the effect it claims."
+    },
+    "edge_defects_proxy": {
+      "gc10_classes": [
+        "crescent_gap",
+        "waist_fold"
+      ],
+      "match_type": "proxy_not_cracks",
+      "combined_test_images": 61,
+      "combined_test_instances": 61,
+      "unweighted_mean_AP50": 0.8796,
+      "unweighted_mean_AP50_95": 0.4825,
+      "unweighted_mean_precision": 0.7288,
+      "unweighted_mean_recall": 0.8761,
+      "per_class": {
+        "crescent_gap": {
+          "images": 40,
+          "instances": 40,
+          "AP50": 0.9226,
+          "precision": 0.8115,
+          "recall": 0.969
+        },
+        "waist_fold": {
+          "images": 21,
+          "instances": 21,
+          "AP50": 0.8365,
+          "precision": 0.6462,
+          "recall": 0.7833
+        }
+      },
+      "confidence_statement": "40 and 21 test instances respectively are enough to trust the direction of these numbers (strong), though still thinner than the shipped model's 446-box NEU-DET test set. These are NOT edge cracks: crescent_gap is a scalloped bite out of the strip edge and waist_fold is a folded-over edge, both edge-region geometry defects. waist_fold's median box covers 33.8% of the frame (per reports/gc10_dataset.md section 6), so its high AP50 partly reflects that a large box is easy to overlap at IoU 0.5; crescent_gap (5.3% median area) is the more meaningful of the two localisation-wise."
+    }
+  },
+  "sanity_check_predictions": {
+    "command": "model.predict(source=<image>, imgsz=640, conf=0.15, device=mps) via ultralytics.YOLO, weights=models/yolov8n_gc10_640/weights/best.pt",
+    "images": [
+      {
+        "family": "edge_defects_proxy / crescent_gap",
+        "file": "data/gc10-det/test/images/img_01_425006200_01173_jpg.rf.4783467144285f2de9944a527d4ad1fd.jpg",
+        "ground_truth_boxes": 1,
+        "predictions": [
+          {
+            "class": "crescent_gap",
+            "confidence": 0.705,
+            "box_xyxy": [
+              478,
+              254,
+              767,
+              820
+            ]
+          },
+          {
+            "class": "weld_line",
+            "confidence": 0.656,
+            "box_xyxy": [
+              680,
+              468,
+              2048,
+              556
+            ]
+          }
+        ],
+        "assessment": "crescent_gap box overlaps the ground-truth box (gt approx [474,218,782,821]) closely and at a strong confidence. weld_line is an unlabelled second detection on this frame -- plausibly a real weld seam GC10 did not annotate here, not checked against ground truth."
+      },
+      {
+        "family": "roll_marks / crease",
+        "file": "data/gc10-det/test/images/img_01_425382900_00002_jpg.rf.dc6f287d24eff88436329a705162de5b.jpg",
+        "ground_truth_boxes": 1,
+        "predictions": [
+          {
+            "class": "crease",
+            "confidence": 0.322,
+            "box_xyxy": [
+              944,
+              96,
+              2037,
+              315
+            ]
+          },
+          {
+            "class": "crease",
+            "confidence": 0.309,
+            "box_xyxy": [
+              939,
+              22,
+              1965,
+              296
+            ]
+          },
+          {
+            "class": "crease",
+            "confidence": 0.184,
+            "box_xyxy": [
+              941,
+              8,
+              1639,
+              291
+            ]
+          }
+        ],
+        "assessment": "Right region and right class, but three overlapping boxes at low, closely-spaced confidence (0.18-0.32) where one clean box is warranted -- exactly the low-confidence, imprecise-localisation behaviour the 0.30 AP50 predicts, not a clean detection."
+      },
+      {
+        "family": "roll_marks / rolled_pit",
+        "file": "data/gc10-det/test/images/img_01_4402818600_00001_jpg.rf.1cace955a9aaf97c6e471367e0f6912a.jpg",
+        "ground_truth_boxes": 2,
+        "ground_truth_classes": [
+          "weld_line",
+          "rolled_pit"
+        ],
+        "predictions": [
+          {
+            "class": "weld_line",
+            "confidence": 0.668,
+            "box_xyxy": [
+              1632,
+              730,
+              2047,
+              812
+            ]
+          }
+        ],
+        "assessment": "weld_line box matches its ground truth closely. The rolled_pit box in this same image (small, top-right corner) was MISSED ENTIRELY at conf 0.15 -- no detection of any class in that region. This is a real, representative failure, not a cherry-picked one: see the 11-image rolled_pit sweep below."
+      },
+      {
+        "family": "edge_defects_proxy / waist_fold",
+        "file": "data/gc10-det/test/images/img_03_4404374300_00045_jpg.rf.74ae484a239af90bff444ac17e7e625a.jpg",
+        "ground_truth_boxes": 1,
+        "predictions": [
+          {
+            "class": "waist_fold",
+            "confidence": 0.589,
+            "box_xyxy": [
+              631,
+              183,
+              1796,
+              930
+            ]
+          }
+        ],
+        "assessment": "Correct class, single clean box, substantial overlap with ground truth (gt approx [294,128,1609,951]) though smaller than the full labelled region -- consistent with waist_fold's known 'large-region label' character."
+      }
+    ]
+  },
+  "rolled_pit_broad_sweep": {
+    "note": "All 11 GC10 test images containing a rolled_pit ground-truth box, at conf=0.15, to check whether the single miss above was representative or a one-off.",
+    "command": "model.predict(source=<image>, imgsz=640, conf=0.15, device=mps) for each of the 11 rolled_pit test images",
+    "results": [
+      {
+        "image": "img_01_4402818600_00001",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 0,
+        "confidences": []
+      },
+      {
+        "image": "img_02_4402116500_00005",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 1,
+        "confidences": [
+          0.55
+        ]
+      },
+      {
+        "image": "img_02_4402329100_00006",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 0,
+        "confidences": []
+      },
+      {
+        "image": "img_02_4402785600_00004",
+        "gt_rolled_pit_boxes": 2,
+        "predicted_rolled_pit_boxes": 1,
+        "confidences": [
+          0.28
+        ]
+      },
+      {
+        "image": "img_03_3403403700_00806",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 1,
+        "confidences": [
+          0.34
+        ]
+      },
+      {
+        "image": "img_03_425622700_00002",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 0,
+        "confidences": []
+      },
+      {
+        "image": "img_03_425640100_00875",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 1,
+        "confidences": [
+          0.22
+        ]
+      },
+      {
+        "image": "img_03_436068500_00002",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 2,
+        "confidences": [
+          0.71,
+          0.16
+        ]
+      },
+      {
+        "image": "img_03_4402117400_00003",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 1,
+        "confidences": [
+          0.47
+        ]
+      },
+      {
+        "image": "img_03_4405964900_00010",
+        "gt_rolled_pit_boxes": 2,
+        "predicted_rolled_pit_boxes": 3,
+        "confidences": [
+          0.42,
+          0.25,
+          0.22
+        ]
+      },
+      {
+        "image": "img_06_425505100_00052",
+        "gt_rolled_pit_boxes": 1,
+        "predicted_rolled_pit_boxes": 0,
+        "confidences": []
+      }
+    ],
+    "summary": "4 of 11 images produce zero rolled_pit detections at conf 0.15 (image-level miss). The remaining 7 produce at least one, but confidences cluster low (0.16-0.71, median approx 0.34) and box counts do not always match instance counts (e.g. 2 predicted vs 1 gt, or 3 vs 2). This is a genuinely weak, low-confidence class in practice, matching the AP50 0.1126 / recall 0.2308 measured on the full test split -- not an artefact of the metric."
+  },
+  "honesty_notes": [
+    "No edge-crack class exists in GC10-DET or in this checkpoint. crescent_gap and waist_fold are edge-region geometry proxies, not cracks. This checkpoint has never seen a labelled crack of any kind.",
+    "rolled_pit and crease are trained and measured, but on 13 and 11 test instances respectively. The AP50 numbers (0.11, 0.29) are real, reproducible, and weak -- this is not a measurement problem, the broad sweep above shows the model genuinely misses or under-confidently detects these on individual images.",
+    "waist_fold's strong AP50 (0.84) is partly inflated by box size: its median ground-truth box covers a third of the frame, which is easy to overlap at IoU 0.5. crescent_gap's 0.92 is the more meaningful of the two edge-family numbers.",
+    "This checkpoint is NOT merged with the shipped model or the joint model. It stands alone, at models/yolov8n_gc10_640/weights/best.pt, evaluated only against GC10's own held-out test split. resolve_weights() is untouched; nothing about deployment changes as a result of this report."
+  ]
+}

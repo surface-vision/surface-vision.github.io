@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-09-10T06:40:33Z",
+  "generated_at": "2026-09-10T07:40:50Z",
   "python": {
     "ultralytics": "8.4.144",
-    "weights": "/Users/prathmeshwalimbe/Downloads/JSW-PS1/models/yolov8n_neudet/weights/best.pt",
+    "weights": "models/yolov8n_neudet/weights/best.pt",
     "conf": 0.15,
     "iou": 0.45,
     "imgsz": 256
@@ -28,7 +28,7 @@
     "mean_preprocess_pixel_delta": 0.001068115234375,
     "max_jpegjs_vs_libjpeg": 1,
     "mean_jpegjs_vs_libjpeg": 0.07525,
-    "median_session_run_ms": 7.563833000000045,
+    "median_session_run_ms": 7.70900000000006,
     "timed_runs_per_image": 20,
     "warmup_runs": 3,
     "discrepancies": 0,

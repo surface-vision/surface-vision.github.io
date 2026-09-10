@@ -1,0 +1,72 @@
+# Jindal Stainless surface inspection console -- Hugging Face Spaces runtime.
+#
+# Python 3.11 (pinned in README.md front-matter as `python_version: "3.11"`, which
+# is what the +cpu wheel tags below are built for). Free CPU tier: 2 vCPU, 16 GB.
+#
+# Only packages this Space's own code imports are listed, so this file is the
+# dependency surface a reviewer has to trust; everything else arrives
+# transitively. Versions are the ones the system was built and measured against.
+#
+# ---------------------------------------------------------------------------
+# THE ONE LINE THAT MATTERS: torch must resolve to the CPU build.
+#
+# `torch==2.14.0` from PyPI carries, for `platform_system == "Linux"`, hard
+# requirements on cuda-toolkit 13.0.3, cuda-bindings, nvidia-cudnn-cu13,
+# nvidia-cusparselt-cu13, nvidia-nccl-cu13, nvidia-nvshmem-cu13 and triton. That
+# is several gigabytes of CUDA payload on a host with no GPU, and on Spaces it is
+# a build that exceeds its time and image budget rather than one that merely
+# wastes space. The CPU-only wheel is a separate distribution with a `+cpu` local
+# version, published on PyTorch's own index and nowhere else:
+#
+#     torch-2.14.0+cpu-cp311-cp311-manylinux_2_28_x86_64.whl        196 MB
+#     torchvision-0.29.0+cpu-cp311-cp311-manylinux_2_28_x86_64.whl
+#
+# so the index below is required for the pins to resolve at all. It is an
+# --extra-index-url rather than an --index-url deliberately: every other package
+# here must still come from PyPI.
+#
+# The markers keep this file installable on macOS too -- the project's
+# development host, where `pip install -r requirements.txt` is how it is verified
+# before a push. PyTorch publishes no `+cpu` wheel for macOS, where the ordinary
+# PyPI wheel is already accelerator-free of CUDA and carries Metal instead, so
+# the plain pin is the right one off Linux.
+# ---------------------------------------------------------------------------
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+torch==2.14.0+cpu; sys_platform == "linux"
+torchvision==0.29.0+cpu; sys_platform == "linux"
+torch==2.14.0; sys_platform != "linux"
+torchvision==0.29.0; sys_platform != "linux"
+
+# --- detector ---------------------------------------------------------------
+# YOLOv8 inference only. No training, no export, so none of ultralytics' export
+# extras (onnx, onnxruntime, onnxslim, coremltools, openvino) is installed; the
+# repository's requirements.txt carries them and this one deliberately does not.
+ultralytics==8.4.144
+
+# --- imaging and numerics ---------------------------------------------------
+numpy==2.3.5
+# headless, not opencv-python: a Spaces container has no X11 and no libGL, and the
+# GUI build fails at `import cv2` with an ImportError on libGL.so.1. ultralytics
+# declares `opencv-python`, so pip installs both wheels; they provide the same
+# `cv2` module and the headless one is the one that has to be present. Pinning it
+# explicitly is what guarantees it is.
+opencv-python-headless==5.0.0.93
+pillow==12.3.0
+
+# --- console ----------------------------------------------------------------
+# streamlit is pinned here as well as declared as `sdk_version` in the front
+# matter. The front matter selects the Space's prebuilt image; this pin is what
+# the environment actually ends up with, and the two are kept identical.
+streamlit==1.63.0
+pandas==3.0.5
+plotly==7.0.0
+
+# --- calibration and explainability -----------------------------------------
+# matplotlib: imported at module scope by vendor/calibrate.py (Agg backend).
+# Arrives transitively through ultralytics as well; pinned because it is imported
+# by name.
+matplotlib==3.11.1
+# grad-cam is imported as `pytorch_grad_cam` by vendor/explain.py, lazily, inside
+# the Explain button. It pulls ttach, scikit-learn and scipy of its own accord.
+grad-cam==1.5.7

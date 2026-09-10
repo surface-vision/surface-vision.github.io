@@ -1,0 +1,167 @@
+{
+  "generated_at": "2026-09-09T10:50:26+0530",
+  "source_checkpoint": "models/yolov8n_neudet/weights/best.pt",
+  "staged_checkpoint": "export/yolov8n_neudet_best.pt",
+  "staged_checkpoint_sha256": "6661c7a09037137aa5a2fac73cb9588d4906118f4880b4e2902b39aea9f5f985",
+  "verification_image": "data/neu-det/test/images/pitted_surface_271.jpg",
+  "config": {
+    "imgsz": 256,
+    "opset": 17,
+    "dynamic": false,
+    "simplify": true,
+    "conf": 0.25,
+    "iou": 0.45
+  },
+  "parameters": 3012018,
+  "sizes_mb": {
+    "checkpoint_pt_mb": 6.22,
+    "inference_weights_fp32_mb": 12.05,
+    "onnx_mb": 12.13,
+    "coreml_mb": 12.16
+  },
+  "artefacts": [
+    {
+      "format": "onnx",
+      "ok": true,
+      "path": "export/yolov8n_neudet_best.onnx",
+      "size_mb": 12.13,
+      "seconds": 0.35,
+      "error": null,
+      "detail": {
+        "kwargs": {
+          "format": "onnx",
+          "imgsz": 256,
+          "device": "cpu",
+          "opset": 17,
+          "dynamic": false,
+          "simplify": true
+        }
+      }
+    },
+    {
+      "format": "coreml",
+      "ok": true,
+      "path": "export/yolov8n_neudet_best.mlpackage",
+      "size_mb": 12.16,
+      "seconds": 2.56,
+      "error": null,
+      "detail": {
+        "kwargs": {
+          "format": "coreml",
+          "imgsz": 256,
+          "device": "cpu",
+          "nms": false
+        }
+      }
+    }
+  ],
+  "verification": {
+    "graph": {
+      "checker": "pass",
+      "ir_version": 8,
+      "opset": [
+        {
+          "domain": "ai.onnx",
+          "version": 17
+        }
+      ],
+      "producer": "pytorch 2.14.0",
+      "inputs": [
+        {
+          "name": "images",
+          "shape": [
+            1,
+            3,
+            256,
+            256
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output0",
+          "shape": [
+            1,
+            10,
+            1344
+          ]
+        }
+      ],
+      "nodes": 233
+    },
+    "raw_tensor": {
+      "match": true,
+      "output_shape": [
+        1,
+        10,
+        1344
+      ],
+      "max_abs_diff": 0.00070953369140625,
+      "mean_abs_diff": 1.3801232189370699e-05,
+      "max_rel_diff_vs_peak": 2.4981347260712e-06,
+      "cosine_similarity": 0.9999999999998809,
+      "allclose_atol_1e-3": true,
+      "allclose_atol_1e-4": false,
+      "provider": "CPUExecutionProvider"
+    },
+    "detections": {
+      "image": "pitted_surface_271.jpg",
+      "letterbox": "square, rect=False on both backends",
+      "conf_requested": 0.25,
+      "conf_used": 0.25,
+      "iou": 0.45,
+      "pytorch_detections": 2,
+      "onnx_detections": 2,
+      "matched_iou_ge_0.9_same_class": 2,
+      "max_box_delta_px": 2.288818359375e-05,
+      "max_confidence_delta": 5.364418029785156e-07,
+      "min_matched_iou": 0.9999997142134436,
+      "top_class_pytorch": "pitted_surface",
+      "top_confidence_pytorch": 0.7972,
+      "top_class_onnx": "pitted_surface",
+      "top_confidence_onnx": 0.7972,
+      "verdict": "identical detections"
+    },
+    "latency": {
+      "iterations": 20,
+      "thread_grid": [
+        1,
+        5,
+        10
+      ],
+      "measures": "forward pass only",
+      "excludes": [
+        "image decode",
+        "letterbox / normalise",
+        "host-to-device copy",
+        "box decode and NMS",
+        "Detection record building"
+      ],
+      "median_ms_by_threads": {
+        "1": {
+          "pytorch_cpu_ms": 7.706,
+          "onnxruntime_cpu_ms": 3.335
+        },
+        "5": {
+          "pytorch_cpu_ms": 5.866,
+          "onnxruntime_cpu_ms": 3.899
+        },
+        "10": {
+          "pytorch_cpu_ms": 8.633,
+          "onnxruntime_cpu_ms": 5.497
+        }
+      },
+      "pytorch_fused": true,
+      "pytorch_cpu": {
+        "median_ms": 5.866,
+        "best_threads": 5
+      },
+      "onnxruntime_cpu": {
+        "median_ms": 3.335,
+        "best_threads": 1
+      },
+      "speedup_onnx_vs_pytorch": 1.76,
+      "note": "This is the FORWARD PASS ONLY on one pre-letterboxed tensor: no image decode, no letterbox, no box decode, no NMS, no record building. It is not a frame rate and must not be quoted as one -- the same checkpoint through the full shipping path (src/benchmark.py, which times DefectDetector.predict end to end) is roughly 2-3x slower per frame on the same CPU. What this number is for is comparing two backends on identical work. Each backend is quoted at its own best thread count from thread_grid, both running a Conv+BN-fused graph; equalising neither would make the ratio an artefact of the harness rather than a property of the exported model. Absolute milliseconds depend on what else the host is running; the ratio is the result."
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "conf_threshold": 0.15,
+  "iou_threshold": 0.45,
+  "tuned_on_split": "val",
+  "selection_rule": "cheapest threshold that still clears the detection floor, with the false alarm term measured on crops carrying no annotated defect rather than on spurious boxes over already-defective frames",
+  "floor_binding": true,
+  "chosen_by": "the detection floor (the cost minimum on economics alone sits elsewhere)",
+  "false_alarm_basis": "clean-steel patch proxy, measured per crop with no area extrapolation (spatial independence was tested on four crop scales and rejected); an upper bound, because a crop with no annotated box is not guaranteed defect-free",
+  "detection_floor": 0.9,
+  "detection_floor_met": true,
+  "at_sweep_edge": false,
+  "miss_cost_ratio": 12.0,
+  "defect_frame_prevalence": 0.05,
+  "effective_lambda": 0.6315789473684211,
+  "f1_optimal_threshold": 0.35,
+  "expected_at_threshold": {
+    "threshold": 0.15,
+    "defect_detection_rate": 0.9056,
+    "false_alarm_rate": 0.2374,
+    "clean_frame_false_alarm_rate": 0.8714,
+    "legacy_spurious_box_rate": 0.5944,
+    "expected_cost": 0.28215,
+    "cost_basis": "patch",
+    "cost_units_caveat": "comparable across thresholds only; the miss term is per frame and the false alarm term is per crop, so this is not re-inspections per frame",
+    "clean_patch_cluster95": [
+      0.1772,
+      0.3008
+    ],
+    "clean_patch_effective_n": 179.4
+  },
+  "rationale": "At conf=0.15 the detector finds the real defect on 90.6% of defective frames while raising a box on 23.7% of steel crops carrying no annotated defect (95% image-clustered CI 17.7%-30.1%) (0.27 boxes per clean patch; an area extrapolation the data rejects would put this at 87.1% of full frames, but the measured rate is flat in crop area, so 23.7% is the better frame-level estimate). Pricing one escaped defect at 12 unnecessary re-inspections and assuming 5% of inspected frames are defective scores it at 0.2822 on the patch basis -- the lowest of every threshold clearing the 90% detection floor. On this basis the miss term is per frame and the false alarm term is per crop, so that score orders thresholds and is not a count of re-inspections per frame. For contrast, the legacy false alarm definition (a spurious box on an already-defective frame) reads 59.4% at the same threshold, which is higher than the clean-steel rate and measures a different event entirely. That pooled figure is a mixture: across the source defect classes with at least 20 clean crops it ranges from 5.8% to 48.8%, and the mixture weights are set by how much frame area each defect class leaves unannotated, not by anything about a mill. 78% of the boxes raised on clean crops carry the source image's own defect class (chance would be 17%), so an unknown share of them are unlabelled continuations of the real defect rather than hallucinations on sound metal: read 23.7% as an upper bound.",
+  "weights": "models/yolov8n_neudet/weights/best.pt",
+  "model_name": "yolov8n_neudet/best.pt",
+  "source": "src/false_alarm.py",
+  "supersedes": "src/evaluate.py operating point (kept at reports/operating_point.evaluate.json)",
+  "demo_slider_note": "demo/app.py snaps the default onto a 0.05-step slider whose minimum is 0.05; a recommendation below that is clamped to 0.05 in the UI.",
+  "generated_at": "2026-09-09T03:54:48+00:00"
+}

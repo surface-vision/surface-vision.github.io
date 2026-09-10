@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T06:42:09Z",
+  "generated_at": "2026-09-10T07:43:36Z",
   "chrome": "Chrome/148.0.7778.167",
   "url": "http://127.0.0.1:8777/",
   "python": {
@@ -20,21 +20,21 @@
     "max_box_delta_px": 0.14238786697387695,
     "max_conf_delta": 0.0015681982040405273,
     "session_run_ms": {
-      "min": 26.80000001192093,
-      "median": 27.80000001192093,
-      "max": 29.700000017881393
+      "min": 26.400000005960464,
+      "median": 31.69999998807907,
+      "max": 32.19999998807907
     },
     "preprocess_ms": {
-      "min": 1.199999988079071,
-      "median": 1.300000011920929,
-      "max": 14.900000005960464
+      "min": 2.4000000059604645,
+      "median": 2.5,
+      "max": 10.300000011920929
     },
     "decode_nms_ms": {
       "min": 0,
       "median": 0.09999999403953552,
-      "max": 0.29999998211860657
+      "max": 0.30000001192092896
     },
-    "warmup_ms": 42.69999998807907,
+    "warmup_ms": 37,
     "page_errors": [],
     "console_errors": [],
     "bad_requests": [],
@@ -925,52 +925,83 @@
   ],
   "out_of_domain": [
     {
+      "tiles": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 1000,
+          "h": 1000
+        },
+        {
+          "x": 524,
+          "y": 0,
+          "w": 1000,
+          "h": 1000
+        },
+        {
+          "x": 1048,
+          "y": 0,
+          "w": 1000,
+          "h": 1000
+        }
+      ],
       "image": "strip_rollmark.jpg",
       "width": 2048,
       "height": 1000,
       "detections": [
         {
-          "className": "inclusion",
-          "raw": 0.41834333539009094,
-          "calibrated": 0.4999999183433354
+          "className": "rolled-in_scale",
+          "raw": 0.35514694452285767,
+          "calibrated": 0.3571428551469445
         },
         {
           "className": "inclusion",
-          "raw": 0.3737644553184509,
-          "calibrated": 0.4687499050144553
-        },
-        {
-          "className": "inclusion",
-          "raw": 0.28737473487854004,
-          "calibrated": 0.329787191630054
-        },
-        {
-          "className": "inclusion",
-          "raw": 0.20078179240226746,
-          "calibrated": 0.2674417938050482
-        },
-        {
-          "className": "inclusion",
-          "raw": 0.19739839434623718,
-          "calibrated": 0.2674417904216501
-        },
-        {
-          "className": "inclusion",
-          "raw": 0.17958849668502808,
-          "calibrated": 0.26744177261175245
-        },
-        {
-          "className": "inclusion",
-          "raw": 0.15513363480567932,
-          "calibrated": 0.25510194084792054
+          "raw": 0.26989632844924927,
+          "calibrated": 0.32978717415164754
         }
       ]
     },
     {
+      "tiles": [
+        {
+          "x": 0,
+          "y": 0,
+          "w": 1000,
+          "h": 1000
+        },
+        {
+          "x": 524,
+          "y": 0,
+          "w": 1000,
+          "h": 1000
+        },
+        {
+          "x": 1048,
+          "y": 0,
+          "w": 1000,
+          "h": 1000
+        }
+      ],
       "image": "strip_weldline.jpg",
       "width": 2048,
       "height": 1000,
-      "detections": []
+      "detections": [
+        {
+          "className": "patches",
+          "raw": 0.5261354446411133,
+          "calibrated": 0.7051280261354447
+        },
+        {
+          "className": "scratches",
+          "raw": 0.36909276247024536,
+          "calibrated": 0.4687499003427624
+        },
+        {
+          "className": "patches",
+          "raw": 0.30782845616340637,
+          "calibrated": 0.32978721208377526
+        }
+      ]
     }
   ]
 }

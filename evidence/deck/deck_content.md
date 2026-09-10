@@ -1,0 +1,512 @@
+# JSW / Jindal Stainless -- AI surface defect detection
+## Submission deck: slide-by-slide content, speaker notes and sources
+
+Built by `deck/build/build_deck.py`. Figures by `deck/build/make_figures.py`.
+Artefact: `deck/JSW_Surface_Defect_Detection.pptx` (16:9, five slides).
+
+Every number on a slide is listed in the audit table at the end, with the file it
+came from. Nothing in this deck is asserted that is not in a report artefact in this
+repository or in `docs/research_notes.md` with its confidence tag carried across.
+
+---
+
+## Slide 1 -- Defects are found after the value has already been added
+
+**Section:** Problem understanding and objectives
+
+**Standfirst:** Surface defect detection on stainless strip, at line speed, on the rolling and finishing lines
+
+### On the slide
+
+**Why this is worth solving**
+
+- A defect born upstream travels the whole route -- crazing at reheat or coiling, inclusions at the caster, rolled-in scale at the descaler. By the time it is graded, melting, rolling, annealing and pickling have all been paid for.
+- On stainless the loss is heavier. Nickel is 8-10% of 304 by mass at INR 1,500-2,000/kg, so a downgraded tonne of 304 destroys several times the value of a downgraded tonne of carbon steel.
+- Manual inspection samples. It cannot cover the whole surface of a moving strip, and two inspectors do not grade the same coil the same way.
+- Cost of poor quality in manufacturing averages about 15% of sales, range 5-35% (IISE). Up to 60% of quality-relevant surface defects start in the slab (ISRA, vendor claim) -- so inspect early, and classify rather than merely alarm.
+
+> "The steel strip passes in front of the quality inspector at 300 metres per minute, so it is impossible for the human eye to inspect the whole surface."
+>
+> -- AMETEK Surface Vision, Ternium Pesqueria PLTCM case study, 2020
+
+**Objectives, and how we will know**
+
+| Success indicator | Target | Measured, NEU-DET |
+|---|---|---|
+| Detection quality on a split never tuned on | mAP50 >= 0.70 | 0.7524 |
+| Defective frames flagged at the operating point | >= 90% | 92.2% |
+| Defect-free steel raising a box | <= 25% | <= 23.7% |
+| Wrong-class detections among missed labels | 0 | 0 of 168 |
+| Model small enough to sit at the line | < 10 MB | 6.22 MB |
+| Per-line recalibration inside one shift | < 8 h | 0.6 h |
+
+Measured on NEU-DET, a public hot-rolled carbon-steel benchmark. These are the indicators the same protocol would report on Jindal strip; they are not a prediction of the value it would read there.
+
+**Figure:** `figures/fig1_defect_families.png` -- six held-out test images with ground-truth boxes, captioned with the upstream owner of each defect family.
+
+### Speaker notes
+
+Open on the mill, not the model.
+
+The one sourced sentence that carries this slide is the Ternium quote: a vendor and a mill both
+saying, in public, that human inspection cannot cover a strip moving at 300 m/min. That is the
+Pickling Line Tandem Cold Mill at Ternium Pesqueria, five stands, six-high, 6,000 tonnes a day,
+four cameras installed just after pickling. Their business case was not cosmetics -- it was strip
+breakages damaging mill equipment, and the system was wired to the PLC to slow the mill before the
+first bite. That is the shape of the system we are proposing.
+
+On the stainless angle: nickel at 8-10% of 304 by mass at INR 1,500-2,000/kg is the reason yield
+loss hurts more here than on commodity carbon steel. The input prices are sourced (trade listings,
+[SECONDARY] in research_notes s4a); the multiple versus HRC is my own estimate and is flagged as
+such -- do not quote a number for it.
+
+The COPQ range 5-35%, average about 15%, is IISE and is directly sourced. The commonly quoted
+"ASQ says 15-20% of sales" is everywhere but I could not verify it on asq.org, so it is not on the
+slide. The "up to 60% of defects originate in the slab" line is ISRA VISION's own marketing and is
+labelled a vendor claim on the slide. Do not upgrade it in the room.
+
+The objectives table: every "measured" column is a number from a report file in this repository, and
+each was reproduced from a clean run. The one to be careful about is the false-alarm row -- it is
+"<= 23.7%", not "23.7%", and slide 3 explains why. If someone asks why the targets look modest:
+0.70 mAP50 is the bottom of the credible published band for this dataset, and a 90% detection floor
+is what a line would actually accept. Setting a target of 0.95 would tell a reader who knows
+NEU-DET that we do not.
+
+The six images are real held-out test frames with their ground-truth boxes. The point of the caption
+row is that each family points at a different upstream owner: crazing at reheat and coiling
+temperature, inclusion at the caster, rolled-in scale at descaler pressure. That is why we detect
+and classify rather than just alarm -- a classified detection is a work order. The metallurgical
+attributions for crazing and patches are reasoned rather than sourced (research_notes s5 flags
+both) and need a Jindal metallurgist's sign-off before they go in front of operators.
+
+---
+
+## Slide 2 -- Detect at the tile, decide at the coil, close the loop
+
+**Section:** Proposed solution
+
+**Standfirst:** Architecture, methodology, and the arithmetic that decides the bill: at 250 m/min, full optical resolution costs about 3,064 inferences/s -- roughly 18 accelerators
+
+### On the slide
+
+**Figure:** `figures/fig2_architecture.png` -- the serving pipeline: acquisition, tiling, detector, severity roll-up, plant integration, with the proposed anomaly channel and closed loop drawn as proposed.
+
+**Methodology, in the order the decisions were made**
+
+1. Split first. 1,800 NEU-DET images to 1,440 / 180 / 180, verified content-hash disjoint: 0 duplicate images across splits.
+2. Train two capacities on one recipe. YOLOv8n and YOLOv8s, same seed and split, 150 epochs at 320 px, batch 32.
+3. Choose inference size and test-time augmentation on validation only. 256 px won; TTA lost 0.0061 mAP50 for 2.39x the latency, so it is off.
+4. Choose the alarm threshold on validation against a cost model with a 90% detection floor. That floor, not the economics, sets conf 0.15.
+5. Score the held-out test split once, at the end. Nothing in the configuration was chosen on it.
+
+Ships today: the checkpoint plus its cross-domain-fix twin, calibrated confidence, an OOD gate, a verified ONNX/CoreML export, a Streamlit console, a coil report, and 540 passing tests.
+
+**Figure:** `figures/fig3_throughput.png` -- inferences per second required at five line speeds, at full optical resolution and downscaled, against one accelerator's measured sustained throughput.
+
+Read this as: at 250 m/min a skin-pass line needs about 3,064 inferences/s to see every square millimetre -- roughly 18 accelerators -- or one accelerator serving 15 cameras if you accept 1.28 mm/px. The model is the cheap part.
+
+### Speaker notes
+
+The architecture diagram is drawn from measured configuration, not from a whiteboard. The camera
+geometry, the 64 tiles per frame at 320 px and the 20% tile overlap all come out of
+reports/benchmark.json mill.geometry. The model line comes from model_study.json, the operating
+point from operating_point.json, the export claim from export_summary.json.
+
+Two boxes are labelled "proposed" and must be read that way: the unsupervised anomaly channel and
+the closed loop. Neither is built. They are on the diagram because a real installation runs an
+unclassified-defect bucket -- the Ternium case study says so explicitly -- and because a detector
+that is never retrained will drift. The one number inside the closed-loop box that IS measured is
+the 0.6 h per-line fine-tune: 15.24 s/epoch median at 320 px over 135 epochs, from
+models/yolov8n_neudet/results.csv.
+
+The methodology list is the part a technical judge will probe. The order matters. Split first, so
+nothing downstream can leak. Two capacities on one recipe, so the comparison is the one a
+deployment actually faces. Inference size and TTA chosen on validation only. Threshold chosen on
+validation. Test scored once. If asked "did you ever look at test before the end" -- the honest
+answer is that the nano-versus-small ordering was visible in train_summary before the bootstrap was
+designed, so that comparison is not pre-registered. That caveat is in reports/model_study.md and I
+will give it if asked.
+
+The throughput chart is the strongest engineering argument in the deck. Read the two dots as the
+same line inspected two ways. Full optical resolution at 0.2 mm/px means 64 tiles per camera frame;
+downscaling to one frame per camera costs one inference but throws away 6.4x the linear resolution,
+which changes the smallest detectable defect. At 250 m/min that is 3,064 inferences/s against 48.
+Divide by the measured sustained throughput of one M5 GPU and you get about 18 accelerators tiled
+against one accelerator serving 15 cameras downscaled.
+
+Be careful with the accelerator count. It is ceil(3064 / 179.6) = 18 using the stored sustainable
+figure. Across the full observed throughput band, 234-283 f/s peak times a 70% utilisation ceiling,
+the honest range is 16 to 19. Say "about 18" and give the band if pressed. Never quote a single FPS
+number for this machine -- the same measurement moved by more than a factor of two between sessions.
+
+If asked why 320 px is the tiling reference when we ship at 256: 320 was chosen on validation as a
+size within 95% of the best, and it is what the capacity model uses. And the accuracy curve behind
+it was measured on 200x200 crops; a 320 px tile at 0.2 mm/px covers 64 mm of strip, and nothing in
+this project measures whether accuracy transfers across that change of magnification. That caveat
+is in benchmark.json accuracy_note.
+
+---
+
+## Slide 3 -- 0.752 to 0.764 mAP50 -- false alarms fixed on real clean steel
+
+**Section:** Validation and feasibility
+
+**Standfirst:** Two checkpoints, held out once, against published baselines -- GC10 thin classes and the 640px finding shown honestly
+
+### On the slide
+
+**Figure:** `figures/fig4_validation.png` -- (A) per-class AP50 on the held-out test split, (B) our result against seven published NEU-DET results and the 0.70-0.80 credible band, (C) the clean-crop false-alarm rate decomposed by source defect class.
+
+**Two checkpoints, one split, scored once**
+
+- Shipped yolov8n at 256 px, held-out test: mAP50 0.7524, mAP50-95 0.3967, precision 0.696, recall 0.687 -- the model in production today.
+- Joint yolov8n at 256 px, same split, ships alongside (not replacing) the shipped model: mAP50 0.7642, mAP50-95 0.4008, precision 0.695, recall 0.706 -- in-domain accuracy rose, it did not fall.
+- 640 px was tested, not skipped on a bad number: yolov8n_640 scores 0.7338 at its own best size, inside the +/-0.0254 noise band. Real cost is 65 s/epoch (~2.7 h for 150 epochs), correcting an earlier false '11 min/epoch' claim.
+- Input pipeline: lossless padding (no resampling) was tested against scaling to 256 px and lost by 0.024-0.052 mAP50 on every checkpoint and split -- scaling stays.
+
+**The cross-domain fix -- the headline result**
+
+- The shipped model has never seen clean steel: on 505 held-out Severstal frames it flags 93.7% as defective, AUC just 0.608 -- backbone features do not transfer on their own.
+- Joint training on real Severstal positives and negatives fixes it: false alarms 93.7% -> 32.5%, cross-domain AUC 0.608 -> 0.958, defect recall 72.0% -> 86.6% -- with no cost in-domain (left column).
+- A verified-clean coil the shipped model HOLDs (55.2% defect rate, 101 'inclusion' frames) is DOWNGRADEd by the joint model (4.8%, 0 triggers) at the same threshold -- not yet ACCEPT.
+- Not yet the default: severity tiers for the four new Severstal classes are unset, so it ships alongside resolve_weights()'s pick, not in place of it.
+
+**GC10 coverage, and what stays a proxy**
+
+- Roll marks (rolled_pit, crease) now have a trained detector: mean AP50 0.203 on 24 held-out instances -- weak and thin: one flip moves recall 8-9 points, and 4 of 11 live rolled_pit images produce zero detections.
+- Edge family (crescent_gap, waist_fold): mean AP50 0.880 on 61 instances -- strong, but a proxy for edge geometry, not for cracks. No crack class exists in any dataset used here.
+- The <=23.7% clean-crop figure on slide 1 is a ceiling on a NEU-DET proxy population, not a rate on real clean coil -- the middle column is the real measurement; this proxy is superseded, not wrong.
+- No absolute frame rate reproduces on this host between sessions (234-283 f/s for the same model). Bands and ratios only.
+
+
+### Speaker notes
+
+This slide carries two numbers, not one, and the room needs to know which is which. 0.7524 is the
+shipped yolov8n checkpoint, at 256 px, held-out test, in production today -- reproduces to four
+decimals from a single ultralytics val call, I have run it:
+.venv/bin/python -c "from ultralytics import YOLO; YOLO('models/yolov8n_neudet/weights/best.pt')
+.val(data='data/neu-det/data.yaml', split='test', imgsz=256, device='mps')". 0.7642 is a
+second checkpoint, yolov8n_joint, jointly trained on NEU-DET plus real Severstal steel, scored on
+the identical 180-image split through a data yaml proven metric-identical to the canonical one
+(the warm-started, untrained transplant reproduces the shipped model's metrics to eight significant
+figures, so the comparison is apples to apples). Reproduce it with
+.venv/bin/python -m src.train_joint crossdomain -- --weights models/yolov8n_joint/weights/best.pt.
+It ships ALONGSIDE the shipped model, not in place of it -- resolve_weights() and DEFAULT_IMGSZ are
+untouched.
+
+Panel A is the one to spend the most time on, because it corrects a claim the previous version of
+this deck got wrong: that backbone features transfer unchanged across domains. They do not. On 505
+held-out, certified defect-free Severstal frames and 191 masked-defective ones, the shipped model's
+cross-domain ROC AUC is 0.608 -- indistinguishable from a coin -- and it flags 93.7% of clean frames
+as defective. Joint training on real Severstal positives AND negatives together (not negatives
+alone -- section 2 of the report shows that trap: negatives-only collapses defect recall to 0.057
+and never moves the AUC, because the model just learns "not NEU-DET" rather than "not defective")
+takes cross-domain AUC to 0.958, clean-frame false alarms to 32.5%, and Severstal defect recall to
+86.6%. In-domain AUC gives back a little (0.968 -> 0.940) but the confidence intervals overlap
+substantially, so that cost is not established. This is the strongest result in the deck.
+
+Panel B shows there is no trade-off to explain away: four classes lose 2-4 points of AP50, but the
+two weakest classes -- crazing and rolled-in scale -- both improve, and overall mAP50 rises
+0.7524 -> 0.7642. The mechanism: 1,190 certified-clean training crops teach the model to stop
+carpeting low-contrast texture with boxes, which is exactly crazing's failure mode.
+
+Panel C: both checkpoints sit inside the 0.70-0.80 credible band for well-run NEU-DET baselines,
+75.2 and 76.4 respectively, against seven published results, all [HARD] in research_notes s1b.
+
+If asked about the disposition chain: a verified-clean Severstal coil that the shipped model HOLDs
+today (55.2% defect rate, 101 zero-tolerance "inclusion" frames -- an obvious, expensive false
+alarm) is DOWNGRADEd by the joint model at the same threshold (4.8% defect rate, zero
+zero-tolerance triggers). Not yet ACCEPT -- at conf 0.40 the defect rate clears the 2% limit but one
+frame sits in the high-severity band, and four of the five surviving detections are Severstal
+classes whose severity tier is genuinely unknown (the competition never published semantic names
+for them, and DEFECT_INFO does not invent one). That is why this ships alongside the default and
+not in place of it -- section 10 of the report lists the remaining blockers.
+
+640 px (bottom of the left column): tested properly this time, not waved off on a false number. The
+project's own README used to say 640 px training costs ">11 minutes per epoch" -- that was a
+batch-32 memory cliff on this machine, not arithmetic. At batch 16 it trains fine: 65 s/epoch
+median, 2.7 h for 150 epochs. The resulting model scores 0.7338 mAP50 at its own best test size,
+against the shipped 0.7524 -- a gap of -0.0186, entirely inside the +/-0.0254 bootstrap noise band
+computed on model_study.json's own resamples. Skipping 640 px as the shipped size was still the
+right call (4.3x the training time, 4x the inference pixels, no measured benefit) -- but not for
+the reason originally given.
+
+Input pipeline, one line: lossless padding (the source pixels, verbatim, in a grey border) was
+tested head-to-head against the shipped bilinear scaling to 256 px, at the same tensor size, on
+both checkpoints and both splits. Scaling wins every time, by 0.024 to 0.052 mAP50. A
+nearest-neighbour arm proved this is not about fidelity -- it is byte-exact and lossless too, and it
+is the WORST arm of all five tested. Magnification and kernel smoothness matter; raw pixel
+preservation does not. Nothing about DEFAULT_IMGSZ changes.
+
+GC10 (right column): the brief's roll-marks and edge-cracks gap is now half-closed, honestly. Roll
+marks (rolled_pit, crease) are a direct match but thin and weak -- 24 test instances, mean AP50
+0.203, and a live sweep shows 4 of 11 rolled_pit images produce nothing at conf 0.15. The edge
+family (crescent_gap, waist_fold) scores a strong 0.880 on 61 instances, but it is edge GEOMETRY --
+a scalloped bite, a folded edge -- not a crack, and no crack class exists anywhere in this project's
+data. Report both numbers with their instance counts attached or not at all; do not average them
+into one "edge/roll coverage" headline.
+
+The old clean-crop false-alarm proxy (<=23.7%, slide 1) is not wrong, but it is now superseded as
+the best available false-alarm evidence: it was always a ceiling on a NEU-DET population that
+cannot contain a genuinely clean frame, and the cross-domain numbers in the middle column are a
+real measurement on certified clean and defective steel from a different dataset entirely.
+
+No absolute frame rate anywhere on this slide: GPU throughput on this host moved between 234 and
+283 f/s across sessions for the same model. Bands and ratios only, same discipline as before.
+
+---
+
+## Slide 4 -- What is different here is the discipline, not the architecture
+
+**Section:** Innovation, differentiation, assumptions and limits
+
+**Standfirst:** Everyone benchmarks on NEU-DET. Almost nobody reports what happens when the numbers are held out
+
+### On the slide
+
+**Figure:** `figures/fig5_capacity.png` -- (A) paired bootstrap on the nano-minus-small mAP50 difference at the training size and at the deployed size, (B) test mAP50 against network input size for both models.
+
+**Innovation and differentiation**
+
+1. Held-out discipline, not validation scores. Most published NEU-DET figures are validation numbers. The size of that gap is visible in our own run: at 320 px yolov8s reads 0.7237 on val and 0.6598 on test.
+2. Capacity matched to the data. At each model's own best input size, the 3.7x larger model is not better: +0.0181 mAP50 to nano, 95% CI [-0.0084, +0.0424]. The honest claim is 'not worse, and 3.5x cheaper in FLOPs' -- and that is enough to decide a deployment.
+3. Cross-domain robustness, measured AND fixed. Shipped AUC 0.608 (chance) on real clean Severstal steel; joint training takes it to 0.958 and lifts in-domain mAP50 to 0.7642.
+4. Input size pinned as an accuracy parameter. The same weights lose 54% of mAP50 at 640 px, silently -- and a proper 640 px retrain, now tested, only ties within noise.
+5. Explainable, calibrated, and gated. EigenCAM shows what fired; calibration cuts ECE 0.142 -> 0.046; an OOD gate withholds verdicts on non-steel input, 0 false rejections on 3,200 frames.
+6. YOLO by argument, not by default. On this dataset the published out-of-the-box transformer numbers are DETR 25.2 and RT-DETR 55.0 mAP50 against YOLOv11's 71.6.
+
+**Assumptions and limitations**
+
+- **Dataset.** NEU-DET is 1,800 grayscale 200x200 hot-rolled carbon-steel images under one lighting rig. Nothing here is measured on stainless, your cameras, or your illumination -- a capability demonstration, not a prediction.
+- **Domain shift.** Confirmed and partly fixed. Cross-domain AUC was 0.608 (chance); joint training fixed it to 0.958 (slide 3) but ships alongside the default -- severity tiers for the four new classes remain unset.
+- **False alarms.** Three different measurements, not one. The NEU-DET clean-crop proxy (<=23.7%) is a ceiling: effective n 179 of 771, a 5.8%-48.8% mixture by class. The legacy definition reads 59.4%. Slide 3 real clean-steel numbers are the ones to trust.
+- **GC10 thin classes.** Roll marks (rolled_pit, crease) score mean AP50 0.203 on 24 test instances -- one flip moves recall 8-9 points, and 4 of 11 live rolled_pit images produce zero detections. The edge family (AP50 0.880, 61 instances) is a strong proxy for edge geometry, not cracks.
+- **Cost model.** Defect prevalence (5% of frames) and the miss-to-false-alarm price (12:1) are assumptions, not measurements, and only their combination is identifiable. conf 0.15 is set by the 90% detection floor, not by the economics.
+- **Timing.** No absolute latency on this host is reproducible between sessions. Every speed statement here is a band or a ratio.
+- **Not measured.** Training-seed variance. Three seeds per architecture is about 6.5 h on this machine and would upgrade the nano-versus-small claim from 'these weights' to 'this architecture'.
+- **Mill geometry.** Line speed, strip width and pixel pitch are a sourced proxy (Ternium at 300 m/min; ISRA at 170 um/px), not Jindal's own figures.
+- **Magnification.** The accuracy curve was measured on 200x200 crops; a 320 px tile at 0.2 mm/px covers 64 mm of strip, and transfer across that scale change is unmeasured. Phase 0 measures it.
+- **Not built.** The unsupervised anomaly channel and closed loop (slide 2) are proposed, not built. Severity tiers for the joint model's four Severstal classes are also unset -- none is invented.
+- **Money.** Every rupee figure on slide 5 is arithmetic on a swept assumption, with the inputs printed beside it. Read it as a shape, not as a forecast.
+
+### Speaker notes
+
+The framing sentence is the title. Nothing in the architecture is novel -- it is a stock YOLOv8n.
+What is different is that every number has been held out, bounded, or refused, and that now
+extends past NEU-DET itself: cross-domain robustness, confidence, and out-of-scope input are all
+measured, not assumed.
+
+Panel A is the finding I would spend the most time on. Train two capacities on one recipe and the
+3.7x larger model does not win. At the training size the gap is +0.0688 mAP50 to nano with a 95%
+interval of [+0.0309, +0.0990] that excludes zero, and nano wins 99.95% of 2,000 paired resamples.
+But that is not the comparison a deployment faces, because each model has its own best inference
+size. At each model's own best size -- both 256 px, both chosen on validation -- the gap collapses
+to +0.0181 with an interval of [-0.0084, +0.0424] that contains zero. So the honest claim is not
+"nano is the better detector". It is "nano is not worse, and it is 3.7x smaller and 3.5x cheaper in
+FLOPs", which is more than enough to decide what ships.
+
+Be ready for the strongest counter-argument, and give it before it is given to you: on
+ultralytics' own fitness metric, the criterion that selected both checkpoints, yolov8s at 256
+actually wins, 0.4389 against 0.4323. No accuracy metric picks nano. The recommendation rests on
+cost, and it says so.
+
+The mechanism is visible in the loss curves rather than the mAP. At the end of training yolov8s
+sits at train classification loss 0.823 against validation 1.090, a generalisation gap of +0.267.
+yolov8n's gap is -0.061. 1,440 training images do not support the larger model's capacity. That is
+the transferable lesson for any small industrial dataset, including Jindal's first labelled batch.
+
+Panel B is the deployment discipline point and it is not academic. The same weights lose 54% of
+mAP50 between 256 px and 640 px -- 0.7524 to 0.3438 -- because a detector can only regress boxes at
+the scale it was trained on. Innovation item 4 now carries a second half: a proper 640 px model was
+also trained from scratch (150 epochs, 65 s/epoch, not the ">11 min/epoch" the README used to
+claim) and it ties the shipped model within noise (0.7338 vs 0.7524, inside +/-0.0254). Two
+different findings, both now measured: the shipped weights collapse if you change imgsz at
+inference; a from-scratch 640 px model does not collapse, it just does not help either.
+
+Innovation item 3 replaces the deck's previous, wrong claim that backbone features transfer
+unchanged across domains. They do not: cross-domain ROC AUC was 0.608, indistinguishable from
+chance, on 505 held-out certified-clean Severstal frames. Joint training on real target-domain
+positives and negatives together (not negatives alone -- that traps into a domain classifier with
+defect recall 0.057) fixes it to AUC 0.958, cuts clean-frame false alarms 93.7% -> 32.5%, and raises
+in-domain mAP50 0.7524 -> 0.7642 at the same time. Full detail and the remaining ship blockers are
+on slide 3 and in reports/gap1_cross_domain_fix.md section 10.
+
+Innovation item 5's two additions are both measured, not aspirational. Calibration: isotonic
+regression, fit on val only, evaluated once on test, cuts ECE 0.1418 -> 0.0461 while leaving mAP50
+provably unchanged (rank-invariant by construction; verified numerically at 0.707986 before and
+after under this module's own AP50 implementation). The OOD gate: 0 false rejections across 3,200
+genuine NEU-DET and Severstal frames, correctly withholds a verdict on logo, white-frame and
+cartoon input, and scores 13/15 on a held-out synthetic-negative suite (the two misses are
+wood_grain and a radial gradient, both textures that resemble a real surface).
+
+On limitations, do not soften any of them. NEU-DET is hot-rolled carbon steel under one lighting
+rig -- still true, still the first thing to say. Domain shift is now "confirmed and partly fixed"
+rather than purely a warning: the fix is real and measured, but it ships as a second checkpoint,
+not a replacement, because severity tiers for the four new Severstal classes are genuinely unset
+(the competition never published names for them) and inference.py's dual-checkpoint path is not
+yet unified. GC10 is the newest limitation: roll marks are real but thin (24 test instances, one
+flip moves recall 8-9 points) and the edge family, while strong at 0.880 AP50, is a geometry proxy,
+not a crack detector -- no crack class exists in any dataset used anywhere in this project.
+
+Also worth having ready: the transformer point in innovation item 6 is not a swipe. On a dataset
+this small with objects this small, published out-of-the-box DETR scores 25.2 and RT-DETR 55.0
+mAP50 against YOLOv11's 71.6, from the same comparative study. Choosing YOLO was an argument, not a
+default -- and the same argument says a mill with 200,000 labelled frames should revisit it.
+
+---
+
+## Slide 5 -- What it changes, what it is worth, and how it scales
+
+**Section:** Expected impact and rollout
+
+**Standfirst:** A phased plan whose first phase exists to measure the things this deck could not
+
+### On the slide
+
+**Figure:** `figures/fig6_roadmap.png` -- five phases from instrumenting one line to a fleet, with a to-scale duration bar.
+
+**Expected impact**
+
+- **Technical.** A 6.22 MB, 3.0 M parameter detector with a verified ONNX and CoreML export (max absolute deviation 7.1e-04, identical detections). ONNX Runtime is 1.66-1.76x faster than PyTorch on the same CPU. At 250 m/min one accelerator serves 15 camera streams downscaled, or a fraction of one stream at full optical resolution -- so the design question is tiling versus resolution.
+- **Operational.** Every square millimetre inspected instead of sampled, with a coil-level HOLD or RELEASE and a p95 severity, and the defect class routed to the owner who can actually fix it. Inspectors move from looking to adjudicating.
+- **Sustainability.** Yield recovered is melting, rolling, annealing and nickel not spent twice. We deliberately do not put a tonne-of-CO2 figure on this slide: it needs Jindal's own specific energy per tonne, which is not public.
+
+**Commercial, illustrative**
+
+Value at risk from surface-driven downgrade, INR crore/year. Columns are the prime-to-secondary discount. Volume 2,565,902 t and realisation INR 167,407/t are Jindal FY26 reported figures; the other two inputs are swept, not known.
+
+| Downgrade rate | 10% | 15% | 20% |
+|---|---|---|---|
+| 0.5% of volume | 21 | 32 | 43 |
+| 1.0% of volume | 43 | 64 | 86 |
+| 2.0% of volume | 86 | 129 | 172 |
+
+**Worked mid case.** 1.0% of volume downgraded at a 10% discount is INR 43 cr/yr at risk. Recovering 30% of it is INR 13 cr/yr, against roughly INR 21 cr for one line's system (USD 2.4M at INR 88/USD, an unsourced order of magnitude). Payback about 1.6 years.
+
+**The ask.** The downgrade rate is not public. It is the one input we need from Jindal's MIS; everything else here is reported or swept.
+
+**Scaling across grades and products**
+
+- **Transfers unchanged:** the tiling and serving architecture, the severity and MES plumbing, and the training recipe -- not the backbone: shipped cross-domain AUC was 0.608 (chance) until joint training fixed it to 0.958.
+- **Needs re-labelling:** each new grade, surface finish and illumination, plus any defect the taxonomy does not yet name.
+- **Active learning:** label only frames the model is unsure about or the operator overrode, not a uniform sample. Proposed practice; no NEU-DET-specific study exists to cite.
+- **Unseen defects:** an unsupervised anomaly channel in parallel with the detector, feeding the unclassified bucket that real installations already run.
+- **Labelling cost:** self-supervised pretraining on the mill's own unlabelled imagery: published SimSiam reached 0.768 mAP50 against 0.773 for ImageNet and 0.280 from random init -- ImageNet-level, with no labels.
+- **Monitoring:** alarm rate per class, score drift and operator override rate; override rate doubles as the ground-truth trickle that triggers a retrain.
+
+### Speaker notes
+
+The roadmap is a proposal, not a measurement, and Phase 0 is the honest centre of it. Every figure
+this deck had to bound rather than state -- the real false-alarm rate, the accuracy on stainless,
+the transfer across magnification -- becomes measurable the moment there is a camera on one line
+capturing prime coils at line speed. Six weeks of instrumentation buys more certainty than any
+amount of further work on NEU-DET.
+
+The only measured number inside the roadmap is the 0.6 h per-line fine-tune: 15.24 s/epoch median
+at 320 px over 135 epochs on this laptop GPU, from models/yolov8n_neudet/results.csv. An overnight
+retrain per line is affordable, which is what makes per-line calibration a plan rather than a wish.
+
+On the commercial column, be explicit that this is arithmetic on a swept assumption, and show the
+inputs. Volume 2,565,902 t and blended realisation INR 167,407/t are derived directly from Jindal's
+own FY26 reported figures -- consolidated net revenue INR 42,955 cr, sales volume 2,565,902 t --
+so those two are unattackable. Reported EBITDA works out at about INR 21,669 per tonne. The
+downgrade rate and the prime-to-secondary discount are not public, so they are swept across a 3x3
+grid and the whole grid is on the slide. The mid case is 1.0% at a 10% discount: 2,565,902 t x 1.0%
+x INR 167,407/t x 10% = INR 43 cr/yr at risk. Recover 30% and that is INR 13 cr/yr.
+
+The capex side is the weakest number on the slide and I will say so unprompted. USD 2.4M for a
+multi-camera, both-surfaces, PLC-integrated surface inspection system on one line traces only to an
+AI-generated SEO content farm. The order of magnitude is plausible and consistent with what such a
+system involves, but it has no attributable source, so it is presented as an order of magnitude and
+nothing more. Payback of about 1.6 years follows: INR 21 cr against INR 13 cr/yr. That is a good
+but not miraculous number, and presenting it that way is deliberate. The upside cases in the grid
+reach payback in under five months, and they rest entirely on the unsourced downgrade rate -- which
+is why the ask is on the slide.
+
+Deliberately not monetised, because there is no defensible source: avoided strip breakage and mill
+damage (which was the actual Ternium business case), reduced customer claims, inspector
+redeployment, and root-cause feedback to the caster and descaler. Name them; do not put rupees on
+them.
+
+On sustainability, the same discipline. Recovered yield is melting, rolling, annealing and nickel
+not spent twice, and on 304 the nickel content makes that materially larger than on carbon steel.
+A tonne-of-CO2 figure would need Jindal's specific energy per tonne, which is not public, so there
+is no CO2 number on this deck.
+
+On scaling: the honest split is that the serving architecture, the severity and MES plumbing and
+the training recipe transfer unchanged, while every new grade, finish and lighting setup needs its
+own labelled frames -- and, per slide 3, the backbone by itself does NOT transfer unchanged: it
+measured chance-level (AUC 0.608) on real clean Severstal steel until joint training on real
+target-domain positives and negatives fixed it to 0.958, while also lifting in-domain mAP50
+0.7524 -> 0.7642. Budget a joint fine-tune with real negatives for every new grade or camera, the
+same way the Severstal fix was done, not a frozen backbone plus new labels alone. Active learning
+is proposed practice -- I searched and found no
+NEU-DET-specific active-learning study to cite, and the slide says "proposed". The
+self-supervised result is properly sourced and is the strongest labelling-cost argument available:
+SimSiam pretraining on 20,272 unlabelled images reached 0.768 mAP50 against 0.773 for ImageNet
+pretraining and 0.280 from random initialisation. A mill's own unlabelled coil imagery is a free
+asset, and that is a genuinely differentiating thing to say in this room.
+
+Close on the ask: give us one line, one camera rig, six weeks, and the downgrade rate from your MIS.
+
+---
+
+## Number audit
+
+Every figure that appears on a slide, and the file a judge can open to check it.
+| # | Number as it appears on a slide | Slide | Source file / command |
+|---|---|---|---|
+| 1 | mAP50 **0.7524** (held-out test, yolov8n @256) | 1, 3 | `reports/model_study.json` -> `runs[]` (model yolov8n, imgsz 256, split test); reproduced by `YOLO(...).val(split='test', imgsz=256)` |
+| 2 | mAP50-95 **0.3967**, precision **0.696**, recall **0.687** | 3 | same row of `reports/model_study.json` -> `runs[]`; same command |
+| 3 | Per-class AP50 **crazing 0.444, inclusion 0.827, patches 0.949, pitted_surface 0.756, rolled-in_scale 0.630, scratches 0.909** | 3 (fig 4A) | `reports/model_study.json` -> `runs[]` -> `per_class_AP50` |
+| 4 | Test box counts **79 / 89 / 99 / 46 / 69 / 64** | 3 (fig 4A) | `reports/model_study.json` -> `dataset.test_instances` |
+| 5 | Defective test frames flagged **92.2%** (166/180) at conf 0.15 | 1, 3 | `reports/false_alarm.json` -> `holdout_detection.detection_rate_at_recommended` |
+| 6 | Clean-crop false alarm **<= 23.7%**, 95% CI **[17.7%, 30.1%]** | 1, 3 (fig 4C) | `reports/false_alarm.json` -> `clean_patch_false_alarm.per_threshold[t=0.15]` -> `clean_patch_false_alarm_rate`, `cluster95_lo/hi` |
+| 7 | **771** crops, **106** source images, design effect **4.30**, effective n **179** | 3, 4 | same row -> `n_patches`, `design_effect`, `effective_n`; `patch_mining.clean_source_images` |
+| 8 | **78.2%** of those boxes carry the source image's own class (165/211; chance 16.7%) | 3, 4 | same row -> `share_of_fp_matching_source_class`, `false_positives_matching_source_class`, `false_positives_total` |
+| 9 | Per-source-class spread **5.8% -> 48.8%** | 3 (fig 4C), 4 | same row -> `per_source_class` |
+| 10 | Positive control flags **98.0%**, localises **90.9%** (197 crops) | 3 | `reports/false_alarm.json` -> `positive_control.per_threshold[t=0.15]` |
+| 11 | Legacy spurious-box rate **59.4%** | 4 | `reports/false_alarm.json` -> `operating_curve[t=0.15].legacy_spurious_box_rate` |
+| 12 | conf **0.15**, NMS IoU **0.45**, floor-binding | 2, 3, 4 | `reports/operating_point.json` -> `conf_threshold`, `iou_threshold`, `floor_binding`, `chosen_by` |
+| 13 | Prevalence **5%**, miss:false-alarm **12:1**, lambda **0.632** | 4 | `reports/operating_point.json` -> `defect_frame_prevalence`, `miss_cost_ratio`, `effective_lambda` |
+| 14 | Nano minus small at 320 px: **+0.0688**, 95% CI **[+0.0309, +0.0990]**, nano wins **99.95%** | 4 (fig 5A) | `reports/model_study.json` -> `bootstrap.at_training_size.mAP50` |
+| 15 | Nano minus small at 256 px: **+0.0181**, 95% CI **[-0.0084, +0.0424]** | 4 (fig 5A) | `reports/model_study.json` -> `bootstrap.at_deployment_size.mAP50` |
+| 16 | **3.012 M** vs **11.138 M** parameters (3.7x); **1.312** vs **4.584** GFLOPs @256 (3.5x); **6.22 MB** | 1, 2, 4, 5 | `reports/model_study.json` -> `checkpoints` |
+| 17 | Generalisation gap: yolov8s **+0.267**, yolov8n **-0.061** (classification loss) | 4 (notes) | `reports/model_study.json` -> `training_history.*.cls_loss_generalisation_gap` |
+| 18 | mAP50 falls **54%** from 256 px to 640 px (0.7524 -> 0.3438) | 4 (fig 5B) | `reports/model_study.json` -> `runs[]` at imgsz 256 and 640, split test |
+| 19 | val vs test at 320 px: yolov8s **0.7237 / 0.6598**, yolov8n **0.7396 / 0.7286** | 3, 4 | `reports/model_study.json` -> `imgsz.rows` |
+| 20 | TTA: **-0.0061** mAP50 on val for **2.39x** latency | 2 | `reports/model_study.json` -> `tta.rows`, `latency.yolov8n.tta_paired.cost_multiple_at_median` |
+| 21 | **0** class confusions across **168** missed labels | 1, 3 | `reports/model_study.json` -> `failures.taxonomy_rows` (class-confusion column), sum of misses at conf 0.25 |
+| 22 | crazing: **53 of 68** misses are blind misses; separability **0.319**; edge ratio **1.014**; labels **23.8%** of frame | 3 (notes) | `reports/model_study.json` -> `failures.taxonomy_rows`, `appearance.crazing` |
+| 23 | AP50 vs separability rank correlation **0.9429**, p **0.0048** | 3 | `reports/model_study.json` -> `difficulty_correlation.separability` |
+| 24 | Ordering vs published, Spearman rho **0.8286** | 3 (notes) | `reports/model_study.json` -> `class_ordering` |
+| 25 | Splits **1,440 / 180 / 180**, **0** cross-split content-hash duplicates | 2 | `reports/model_study.json` -> `dataset.split`; the hash check was re-run for this deck over all 1,800 files: 1,799 distinct SHA-256 digests, 0 hashes appearing in more than one split (the single repeated pair, `train/patches_101.jpg` and `train/patches_105.jpg`, is inside train) |
+| 26 | Camera geometry: **4** cameras, **1.28 m**, **0.2 mm/px**, **2048 px**, 1 frame every **0.348 m** | 2 (fig 2) | `reports/benchmark.json` -> `mill.geometry` |
+| 27 | **64** tiles/frame at 320 px, **20%** tile overlap | 2 (fig 2) | `reports/benchmark.json` -> `mill.deployment.tiles_per_frame_by_input`, `mill.geometry.tile_overlap` |
+| 28 | Required inferences/s: **552 / 1,103 / 3,064 / 6,128 / 11,029** tiled; **9 / 17 / 48 / 96 / 172** downscaled | 2 (fig 3) | `reports/benchmark.json` -> `mill.scenarios` |
+| 29 | One M5 GPU sustains **164-198 inf/s** at 320 px | 2 (fig 3) | `reports/benchmark.json` -> `mill.deployment.peak_by_imgsz['320']` records 256.6 f/s peak (slowest pass 254.1) and `assumptions.utilisation_ceiling` 0.70. The band is that ceiling applied to the 234-283 f/s cross-session spread recorded in the deployment verification; MPS throughput on this host is not reproducible to a point value, so only the band is quoted |
+| 30 | About **18** accelerators tiled at 250 m/min, or **15** cameras per accelerator downscaled | 2 | ceil(3063.7 / 179.62) = 18; `mill.streams_curve.streams_per_accelerator['320'].downscaled_floor` = 15 at 245.7 m/min |
+| 31 | ONNX max absolute deviation **7.095e-04**, identical detections, ONNX Runtime **1.66-1.76x** faster on CPU | 2, 5 | `reports/export_summary.json` -> `verification.raw_tensor`, `verification.detections`, `verification.latency` (256 px, 1.76x); `reports/export_summary_320.json` -> `verification.latency` (320 px, 1.66x) |
+| 32 | Per-line fine-tune **0.6 h** (15.24 s/epoch median at 320 px) | 2, 5 (fig 6) | `models/yolov8n_neudet/results.csv`; `reports/model_study.json` -> `training_history.yolov8n.seconds_per_epoch_median` |
+| 33 | **540 passed, 8 skipped** | 2 | `.venv/bin/python -m pytest tests/ -q` -> `540 passed, 8 skipped in 20.11s`, re-run 2026-09-10 |
+| 34 | Published NEU-DET: DETR **66.6**, YOLOv8n **74.0**, DDN **74.8**, RT-DETR **75.4**, YOLOv11n **77.2**, YOLOv10n-SFDC **85.5**; credible band **0.70-0.80** | 3 (fig 4B) | `docs/research_notes.md` s1a-1b, all tagged [HARD] |
+| 35 | Out-of-the-box DETR **25.2**, RT-DETR **55.0**, YOLOv11 **71.6** mAP50 | 4 | `docs/research_notes.md` s1c (Maity & Ghosh, arXiv:2510.21811 Table 1) [HARD] |
+| 36 | SimSiam self-supervised **0.768** vs ImageNet **0.773** vs random init **0.280** | 5 | `docs/research_notes.md` s6b (J. Mater. Inf. 2025) [HARD] |
+| 37 | Ternium quote, **300 m/min** | 1 | `docs/research_notes.md` s2a (AMETEK Surface Vision case study, 2020) [HARD] |
+| 38 | "Up to **60%** of quality-relevant surface defects originate in the slab" | 1 | `docs/research_notes.md` s2b (ISRA VISION) [VENDOR] -- labelled as a vendor claim on the slide |
+| 39 | COPQ averages **~15%** of sales, range **5-35%** | 1 | `docs/research_notes.md` s4a (IISE) [HARD] |
+| 40 | Nickel **8-10%** of 304 by mass at **INR 1,500-2,000/kg** | 1 | `docs/research_notes.md` s4a [SECONDARY] |
+| 41 | FY26 volume **2,565,902 t**, realisation **INR 167,407/t** | 5 | `docs/research_notes.md` s3a [HARD reported] / s4c [DERIVED] |
+| 42 | Value-at-risk grid **21 / 32 / 43 / 43 / 64 / 86 / 86 / 129 / 172** INR cr/yr | 5 | `docs/research_notes.md` s4c [DERIVED]; arithmetic: volume x downgrade rate x realisation x discount |
+| 43 | Capex **~INR 21 cr** per line (USD 2.4M at INR 88/USD), payback **~1.6 yr** | 5 | `docs/research_notes.md` s4c -- the USD figure is [SUSPECT], order of magnitude only, and the slide says so |
+| 44 | Joint model, held-out NEU-DET test @256: mAP50 **0.7642**, mAP50-95 **0.4008**, precision **0.695**, recall **0.706** | 1, 3, 4 | `reports/gap1_detection_metrics.json` -> `neu_det["256"]` (mAP50, mAP50_95, precision, recall); reproduced by `.venv/bin/python -m src.train_joint eval --weights models/yolov8n_joint/weights/best.pt` |
+| 45 | Cross-domain fix @conf 0.15: clean-frame FA **93.7% -> 32.5%**, clean-crop FA **55.1% -> 5.9%**, defect-crop recall **72.0% -> 86.6%**, cross-domain AUC **0.608 -> 0.958** (95% CI [0.576,0.640] -> [0.948,0.968]), in-domain AUC **0.968 -> 0.940** (CIs overlap) | 3, 4 | `reports/gap1_cross_domain.json` -> `runs[tag=baseline/joint].sweep[conf=0.15]` (`clean_frame_fa`, `clean_crop_fa`, `defect_crop_recall`) and `.separation_cross_domain.auc` / `.separation_in_domain.auc`; narrative in `reports/gap1_cross_domain_fix.md` section 7; population is 505 held-out clean Severstal frames (4,040 tiles) + 191 masked-defective frames (546 tiles), same for both models |
+| 46 | Clean-coil disposition @conf 0.15: shipped **HOLD**, defect rate **55.2%** (265/480), **101** zero-tolerance 'inclusion' frames, **62** critical-band frames vs joint **DOWNGRADE**, defect rate **4.8%** (23/480), **0** critical-band frames | 3 | `reports/cross_domain_clean_coil_baseline.json` -> `disposition`, `stats.defect_rate`, `stats.class_frame_counts.inclusion`, `stats.band_counts.critical`; `reports/cross_domain_clean_coil_joint.json` -> same keys; both on the identical 480 tiles, `reports/gap1_cross_domain_fix.md` section 8 |
+| 47 | 640 px experiment: test mAP50 **0.7338** @512px (own best) vs shipped **0.7524**, delta **-0.0186** inside the **+/-0.0254** bootstrap band; training cost **64.9 s/epoch** median (quiet stretch), **~2.7 h** for 150 epochs, correcting an earlier **">11 min/epoch" (~27 h)** claim | 3, 4 | `reports/resolution_study.json` (per-epoch segment table, section 3 head-to-head table); `models/yolov8n_640/results.csv`; reproduced by `.venv/bin/python src/train_detector.py --model yolov8n.pt --imgsz 640 --batch 16 --epochs 150 --name yolov8n_640` |
+| 48 | Input pipeline: lossless padding loses **0.024-0.052 mAP50** to ordinary bilinear scaling at the same tensor size, on every (checkpoint, split) tested; nearest-neighbour (also lossless) is the **worst** of 5 arms | 3 | `reports/input_pipeline_probe.json` -> `runs`/`contrasts` (`pad - scale`, `nearest - bilinear` rows); table in `reports/input_pipeline_decision.md` section 3 |
+| 49 | GC10-DET overall held-out test: mAP50 **0.5821**, mAP50-95 **0.3076**, precision **0.592**, recall **0.590** (333 images, 530 boxes) | 3, 4 | `reports/gc10_coverage.json` -> `test_evaluation.overall`; reproduced by `.venv/bin/yolo detect val model=models/yolov8n_gc10_640/weights/best.pt data=data/gc10-det/data.yaml split=test imgsz=640` |
+| 50 | GC10 roll marks (rolled_pit, crease): mean AP50 **0.203** on **24** test instances; **4 of 11** live rolled_pit images produce zero detections at conf 0.15 | 3, 4 | `reports/gc10_coverage.json` -> `brief_relevant_families.roll_marks` (`unweighted_mean_AP50`, `combined_test_instances`, per_class); `rolled_pit_broad_sweep` for the 4/11 live-image count |
+| 51 | GC10 edge family (crescent_gap, waist_fold), geometry proxy not cracks: mean AP50 **0.880** on **61** test instances | 3, 4 | `reports/gc10_coverage.json` -> `brief_relevant_families.edge_defects_proxy` (`unweighted_mean_AP50`, `combined_test_instances`) |
+| 52 | Calibration: ECE **0.1418 -> 0.0461** (67.5% reduction); mAP50 numerically unchanged at **0.707986** before and after | 4 | `reports/calibration.json` -> `metrics.ece` (before/after), `map50` (both entries); `reports/calibration.md` sections 1 and 3 |
+| 53 | OOD gate: **0** false rejections on **3,200** genuine steel frames (1,440+180+180 NEU-DET, 1,400 Severstal); **13/15** correct on the held-out synthetic-negative suite | 4 | `reports/ood_guard.json` -> `ood_guard.real_steel.*` (all `rejected_names` empty), `ood_guard.negatives_heldout.cases`; `reports/ood_guard.md` "Measured -- the confusion table" and "held-out negatives" tables |
+| 54 | Regression: shipped model still reproduces mAP50 **0.7524** exactly after all of the above; `resolve_weights()` and `DEFAULT_IMGSZ=256` unchanged; full suite **540 passed, 8 skipped, 0 failed** | 2, 3, 4 | `reports/gap1_cross_domain_fix.md` section 5 (8-significant-figure reproduction) and section 10 (`resolve_weights()` untouched); `.venv/bin/python -m pytest tests/ -q` run 2026-09-10 |

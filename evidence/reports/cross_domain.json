@@ -1,0 +1,1408 @@
+{
+  "schema": "cross_domain/1",
+  "runs": [
+    {
+      "tag": "baseline",
+      "generated_at": "2026-09-09T16:10:54+05:30",
+      "elapsed_s": 33.20494883299398,
+      "model": {
+        "weights": "models/yolov8n_neudet/weights/best.pt",
+        "weights_sha256": "6661c7a09037137aa5a2fac73cb9588d4906118f4880b4e2902b39aea9f5f985",
+        "model_name": "yolov8n_neudet/best.pt",
+        "class_names": [
+          "crazing",
+          "inclusion",
+          "patches",
+          "pitted_surface",
+          "rolled-in_scale",
+          "scratches"
+        ],
+        "device": "mps",
+        "imgsz": 256,
+        "iou": 0.45,
+        "cache_conf": 0.01
+      },
+      "protocol": {
+        "crop_px": 200,
+        "magnification": 1.28,
+        "magnification_note": "Each 200 px tile is run at imgsz 256, i.e. 1.28x. At the defaults this is exactly how the shipped system presents a 200x200 NEU-DET frame, so the texture reaches the network at the pixels-per-millimetre it was trained on.",
+        "min_defect_px": 64,
+        "deploy_conf": 0.15,
+        "holdout_frac": 0.5,
+        "holdout_seed": "jsw-ps1-cross-domain-holdout-v1"
+      },
+      "dataset": {
+        "root": "/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/severstal",
+        "note": "Severstal steel defect dataset (Voxel51/severstal_steel_defects), 1600x256 line-scan strip. The clean arm is the subset the dataset itself verifies as defect-free; the defective arm carries pixel masks.",
+        "clean_frames_scored": 505,
+        "clean_frames_withheld": 495,
+        "clean_manifest_sha256": "1688fe2263c1df0cb135c077c366fde9c6f03b7dacf89a1c7a450e2ea4f63770",
+        "defect_frames_scored": 191,
+        "defect_frames_withheld": 209,
+        "defect_manifest_sha256": "5011fd23e4547163da52b517ffd269f48709909ab39dbdd9e6c1c3b9560048a3",
+        "clean_crops": 4040,
+        "defect_crops": 546,
+        "unlabelled_region_crops": 982,
+        "explicitly_excluded_clean_frames": 0
+      },
+      "sweep": [
+        {
+          "conf": 0.05,
+          "clean_crop_fa": 0.6824257425742575,
+          "clean_crop_fa_ci": [
+            0.6554455445544555,
+            0.7079207920792079
+          ],
+          "clean_crop_design_effect": 3.235703922707401,
+          "clean_crops_flagged": 2757,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.9801980198019802,
+          "clean_frame_fa_ci": [
+            0.9663366336633663,
+            0.9920792079207921
+          ],
+          "clean_frames_flagged": 495,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 4.35470297029703,
+          "boxes_total": 17593,
+          "false_positive_classes": {
+            "inclusion": 7833,
+            "patches": 5917,
+            "scratches": 1558,
+            "rolled-in_scale": 1230,
+            "pitted_surface": 910,
+            "crazing": 145
+          },
+          "false_positive_class_fracs": {
+            "inclusion": 0.4452338998465299,
+            "patches": 0.33632694821804127,
+            "scratches": 0.08855794918433468,
+            "rolled-in_scale": 0.06991417040868528,
+            "pitted_surface": 0.05172511794463707,
+            "crazing": 0.008241914397771841
+          },
+          "defect_crop_recall": 0.8772893772893773,
+          "defect_crop_recall_ci": [
+            0.8440512200040331,
+            0.9084157426233149
+          ],
+          "defect_crop_design_effect": 1.3741091695800622,
+          "defect_crops_hit": 479,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.9842931937172775,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.6140529531568228,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.1,
+          "clean_crop_fa": 0.6044554455445544,
+          "clean_crop_fa_ci": [
+            0.575983910891089,
+            0.6321782178217822
+          ],
+          "clean_crop_design_effect": 3.3208867971070726,
+          "clean_crops_flagged": 2442,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.9603960396039604,
+          "clean_frame_fa_ci": [
+            0.9425742574257425,
+            0.9762376237623762
+          ],
+          "clean_frames_flagged": 485,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 2.7764851485148516,
+          "boxes_total": 11217,
+          "false_positive_classes": {
+            "inclusion": 4995,
+            "patches": 3772,
+            "scratches": 1071,
+            "pitted_surface": 665,
+            "rolled-in_scale": 656,
+            "crazing": 58
+          },
+          "false_positive_class_fracs": {
+            "inclusion": 0.4453062316127307,
+            "patches": 0.3362752964250691,
+            "scratches": 0.09548007488633324,
+            "pitted_surface": 0.05928501381831149,
+            "rolled-in_scale": 0.0584826602478381,
+            "crazing": 0.005170723009717393
+          },
+          "defect_crop_recall": 0.8058608058608059,
+          "defect_crop_recall_ci": [
+            0.766036701045152,
+            0.8432480207480209
+          ],
+          "defect_crop_design_effect": 1.3370781932400602,
+          "defect_crops_hit": 440,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.93717277486911,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.5427698574338086,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.15,
+          "clean_crop_fa": 0.5507425742574258,
+          "clean_crop_fa_ci": [
+            0.5222772277227723,
+            0.5799504950495049
+          ],
+          "clean_crop_design_effect": 3.411908078302358,
+          "clean_crops_flagged": 2225,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.9366336633663367,
+          "clean_frame_fa_ci": [
+            0.9148514851485149,
+            0.9564356435643564
+          ],
+          "clean_frames_flagged": 473,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 2.023762376237624,
+          "boxes_total": 8176,
+          "false_positive_classes": {
+            "inclusion": 3556,
+            "patches": 2807,
+            "scratches": 849,
+            "pitted_surface": 524,
+            "rolled-in_scale": 414,
+            "crazing": 26
+          },
+          "false_positive_class_fracs": {
+            "inclusion": 0.4349315068493151,
+            "patches": 0.3433219178082192,
+            "scratches": 0.10384050880626224,
+            "pitted_surface": 0.06409001956947162,
+            "rolled-in_scale": 0.05063600782778865,
+            "crazing": 0.0031800391389432484
+          },
+          "defect_crop_recall": 0.7197802197802198,
+          "defect_crop_recall_ci": [
+            0.6728255755335237,
+            0.7641681901279708
+          ],
+          "defect_crop_design_effect": 1.441341102171107,
+          "defect_crops_hit": 393,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.8900523560209425,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.47963340122199594,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.2,
+          "clean_crop_fa": 0.500990099009901,
+          "clean_crop_fa_ci": [
+            0.4725247524752475,
+            0.5306930693069307
+          ],
+          "clean_crop_design_effect": 3.434505845139257,
+          "clean_crops_flagged": 2024,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.9108910891089109,
+          "clean_frame_fa_ci": [
+            0.8851485148514852,
+            0.9346534653465347
+          ],
+          "clean_frames_flagged": 460,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 1.570049504950495,
+          "boxes_total": 6343,
+          "false_positive_classes": {
+            "inclusion": 2663,
+            "patches": 2220,
+            "scratches": 738,
+            "pitted_surface": 413,
+            "rolled-in_scale": 292,
+            "crazing": 17
+          },
+          "false_positive_class_fracs": {
+            "inclusion": 0.41983288664669716,
+            "patches": 0.3499921172946555,
+            "scratches": 0.11634873088443953,
+            "pitted_surface": 0.06511114614535708,
+            "rolled-in_scale": 0.04603499921172947,
+            "crazing": 0.002680119817121236
+          },
+          "defect_crop_recall": 0.6391941391941391,
+          "defect_crop_recall_ci": [
+            0.5904914090274358,
+            0.6896567837576539
+          ],
+          "defect_crop_design_effect": 1.5430493074917393,
+          "defect_crops_hit": 349,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.8115183246073299,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.4185336048879837,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.25,
+          "clean_crop_fa": 0.44356435643564357,
+          "clean_crop_fa_ci": [
+            0.4146039603960396,
+            0.47277227722772275
+          ],
+          "clean_crop_design_effect": 3.5120662732582657,
+          "clean_crops_flagged": 1792,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.8673267326732673,
+          "clean_frame_fa_ci": [
+            0.8356435643564356,
+            0.8950495049504951
+          ],
+          "clean_frames_flagged": 438,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 1.235891089108911,
+          "boxes_total": 4993,
+          "false_positive_classes": {
+            "inclusion": 2031,
+            "patches": 1823,
+            "scratches": 632,
+            "pitted_surface": 296,
+            "rolled-in_scale": 204,
+            "crazing": 7
+          },
+          "false_positive_class_fracs": {
+            "inclusion": 0.40676947726817547,
+            "patches": 0.365111155617865,
+            "scratches": 0.12657720809132786,
+            "pitted_surface": 0.05928299619467254,
+            "rolled-in_scale": 0.040857200080112156,
+            "crazing": 0.0014019627478469858
+          },
+          "defect_crop_recall": 0.5695970695970696,
+          "defect_crop_recall_ci": [
+            0.5175413096695227,
+            0.6245366871838626
+          ],
+          "defect_crop_design_effect": 1.6739307172473312,
+          "defect_crops_hit": 311,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.7486910994764397,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.33706720977596744,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.3,
+          "clean_crop_fa": 0.3821782178217822,
+          "clean_crop_fa_ci": [
+            0.35544554455445543,
+            0.40915841584158413
+          ],
+          "clean_crop_design_effect": 3.1420662071568812,
+          "clean_crops_flagged": 1544,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.8514851485148515,
+          "clean_frame_fa_ci": [
+            0.8178217821782178,
+            0.8811881188118812
+          ],
+          "clean_frames_flagged": 430,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 0.9754950495049505,
+          "boxes_total": 3941,
+          "false_positive_classes": {
+            "inclusion": 1569,
+            "patches": 1510,
+            "scratches": 555,
+            "rolled-in_scale": 156,
+            "pitted_surface": 146,
+            "crazing": 5
+          },
+          "false_positive_class_fracs": {
+            "inclusion": 0.3981223039837605,
+            "patches": 0.38315148439482366,
+            "scratches": 0.140827201217965,
+            "rolled-in_scale": 0.039583861963968535,
+            "pitted_surface": 0.03704643491499619,
+            "crazing": 0.001268713524486171
+          },
+          "defect_crop_recall": 0.5183150183150184,
+          "defect_crop_recall_ci": [
+            0.46534077826387293,
+            0.5721487725657682
+          ],
+          "defect_crop_design_effect": 1.6342202243387474,
+          "defect_crops_hit": 283,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.7015706806282722,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.21384928716904278,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.4,
+          "clean_crop_fa": 0.2938118811881188,
+          "clean_crop_fa_ci": [
+            0.26881188118811883,
+            0.31955445544554456
+          ],
+          "clean_crop_design_effect": 3.149663333091056,
+          "clean_crops_flagged": 1187,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.7742574257425743,
+          "clean_frame_fa_ci": [
+            0.7386138613861386,
+            0.80990099009901
+          ],
+          "clean_frames_flagged": 391,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 0.6123762376237624,
+          "boxes_total": 2474,
+          "false_positive_classes": {
+            "patches": 1081,
+            "inclusion": 861,
+            "scratches": 425,
+            "rolled-in_scale": 77,
+            "pitted_surface": 30
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.43694421988682297,
+            "inclusion": 0.3480194017784964,
+            "scratches": 0.17178658043654002,
+            "rolled-in_scale": 0.03112368633791431,
+            "pitted_surface": 0.012126111560226353
+          },
+          "defect_crop_recall": 0.4175824175824176,
+          "defect_crop_recall_ci": [
+            0.3682170542635659,
+            0.467146115073883
+          ],
+          "defect_crop_design_effect": 1.429716622164226,
+          "defect_crops_hit": 228,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.6335078534031413,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.1354378818737271,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.5,
+          "clean_crop_fa": 0.23539603960396038,
+          "clean_crop_fa_ci": [
+            0.2131188118811881,
+            0.2584158415841584
+          ],
+          "clean_crop_design_effect": 2.9903699200573324,
+          "clean_crops_flagged": 951,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.7168316831683168,
+          "clean_frame_fa_ci": [
+            0.6772277227722773,
+            0.7564356435643564
+          ],
+          "clean_frames_flagged": 362,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 0.3977722772277228,
+          "boxes_total": 1607,
+          "false_positive_classes": {
+            "patches": 766,
+            "inclusion": 486,
+            "scratches": 302,
+            "rolled-in_scale": 38,
+            "pitted_surface": 15
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.47666459240821407,
+            "inclusion": 0.30242688238954574,
+            "scratches": 0.1879278158058494,
+            "rolled-in_scale": 0.023646546359676415,
+            "pitted_surface": 0.009334163036714374
+          },
+          "defect_crop_recall": 0.3021978021978022,
+          "defect_crop_recall_ci": [
+            0.2573518661850705,
+            0.3480604808177688
+          ],
+          "defect_crop_design_effect": 1.3701871191386321,
+          "defect_crops_hit": 165,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.5078534031413613,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.09368635437881874,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.6,
+          "clean_crop_fa": 0.16262376237623763,
+          "clean_crop_fa_ci": [
+            0.1438118811881188,
+            0.18193069306930693
+          ],
+          "clean_crop_design_effect": 2.6995796980288334,
+          "clean_crops_flagged": 657,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.5782178217821782,
+          "clean_frame_fa_ci": [
+            0.5346534653465347,
+            0.6217821782178218
+          ],
+          "clean_frames_flagged": 292,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 0.23094059405940595,
+          "boxes_total": 933,
+          "false_positive_classes": {
+            "patches": 488,
+            "inclusion": 245,
+            "scratches": 182,
+            "rolled-in_scale": 13,
+            "pitted_surface": 5
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.5230439442658092,
+            "inclusion": 0.26259378349410506,
+            "scratches": 0.19506966773847803,
+            "rolled-in_scale": 0.013933547695605574,
+            "pitted_surface": 0.0053590568060021436
+          },
+          "defect_crop_recall": 0.18315018315018314,
+          "defect_crop_recall_ci": [
+            0.14738404654547532,
+            0.22125509111027403
+          ],
+          "defect_crop_design_effect": 1.319809354362104,
+          "defect_crops_hit": 100,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.36649214659685864,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.048879837067209775,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.7,
+          "clean_crop_fa": 0.08935643564356435,
+          "clean_crop_fa_ci": [
+            0.07623762376237624,
+            0.10248143564356438
+          ],
+          "clean_crop_design_effect": 2.1547005427666726,
+          "clean_crops_flagged": 361,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.39801980198019804,
+          "clean_frame_fa_ci": [
+            0.35247524752475246,
+            0.44356435643564357
+          ],
+          "clean_frames_flagged": 201,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 0.10965346534653465,
+          "boxes_total": 443,
+          "false_positive_classes": {
+            "patches": 279,
+            "scratches": 85,
+            "inclusion": 73,
+            "rolled-in_scale": 5,
+            "pitted_surface": 1
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.6297968397291196,
+            "scratches": 0.19187358916478556,
+            "inclusion": 0.16478555304740405,
+            "rolled-in_scale": 0.011286681715575621,
+            "pitted_surface": 0.002257336343115124
+          },
+          "defect_crop_recall": 0.08241758241758242,
+          "defect_crop_recall_ci": [
+            0.05858106613581066,
+            0.10822186541758216
+          ],
+          "defect_crop_design_effect": 1.1342797574313488,
+          "defect_crops_hit": 45,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.18324607329842932,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.021384928716904276,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.8,
+          "clean_crop_fa": 0.0297029702970297,
+          "clean_crop_fa_ci": [
+            0.023514851485148515,
+            0.036138613861386136
+          ],
+          "clean_crop_design_effect": 1.475711316272541,
+          "clean_crops_flagged": 120,
+          "clean_crops": 4040,
+          "clean_frame_fa": 0.17425742574257425,
+          "clean_frame_fa_ci": [
+            0.1405940594059406,
+            0.20594059405940593
+          ],
+          "clean_frames_flagged": 88,
+          "clean_frames": 505,
+          "boxes_per_clean_crop": 0.03242574257425743,
+          "boxes_total": 131,
+          "false_positive_classes": {
+            "patches": 92,
+            "scratches": 19,
+            "inclusion": 18,
+            "rolled-in_scale": 2
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.7022900763358778,
+            "scratches": 0.1450381679389313,
+            "inclusion": 0.13740458015267176,
+            "rolled-in_scale": 0.015267175572519083
+          },
+          "defect_crop_recall": 0.027472527472527472,
+          "defect_crop_recall_ci": [
+            0.014083799988687144,
+            0.041894613583138174
+          ],
+          "defect_crop_design_effect": 1.008733241186408,
+          "defect_crops_hit": 15,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.07329842931937172,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.0010183299389002036,
+          "unlabelled_region_crops": 982
+        }
+      ],
+      "separation_cross_domain": {
+        "auc": 0.6079869800166829,
+        "auc_ci": [
+          0.576101135970327,
+          0.6397583105032058
+        ],
+        "n_positive_crops": 546,
+        "n_negative_crops": 4040,
+        "n_positive_frames": 191,
+        "n_negative_frames": 505,
+        "bootstrap_draws": 4000,
+        "bootstrap_unit": "source frame (both arms resampled independently)"
+      },
+      "separation_in_domain": {
+        "auc": 0.9679103544082114,
+        "auc_ci": [
+          0.9476190572438508,
+          0.9841299919296053
+        ],
+        "auc_scale_stratified": 0.9596002611929705,
+        "per_scale": [
+          {
+            "crop_px": 60,
+            "n_positive": 40,
+            "n_negative": 448,
+            "auc": 0.9544084821428571
+          },
+          {
+            "crop_px": 80,
+            "n_positive": 52,
+            "n_negative": 212,
+            "auc": 0.9677068214804064
+          },
+          {
+            "crop_px": 100,
+            "n_positive": 63,
+            "n_negative": 77,
+            "auc": 0.9618635332921047
+          },
+          {
+            "crop_px": 120,
+            "n_positive": 42,
+            "n_negative": 34,
+            "auc": 0.9544817927170869
+          }
+        ],
+        "n_positive_crops": 197,
+        "n_negative_crops": 771,
+        "n_positive_frames": 59,
+        "n_negative_frames": 106,
+        "split": "test",
+        "magnification": 1.28,
+        "crop_sizes_px": [
+          60,
+          80,
+          100,
+          120
+        ],
+        "clearance_px": 6,
+        "negatives_are": "mined crops of NEU-DET images that clear every labelled box by 6 px; NEU-DET has no defect-free image, so this is a proxy and an optimistic one",
+        "bootstrap_draws": 4000
+      },
+      "clean_coil_disposition": {
+        "rules": {
+          "accept_max_defect_rate": 0.02,
+          "accept_max_severity_p95": 30.0,
+          "accept_forbid_bands": [
+            "high",
+            "critical"
+          ],
+          "hold_min_defect_rate": 0.25,
+          "hold_min_severity_p95": 70.0,
+          "hold_min_critical_frames": 1,
+          "hold_classes": [
+            "inclusion"
+          ],
+          "hold_class_frame_limit": 0
+        },
+        "source_frames": 60,
+        "tiles": {
+          "coil_id": "SEVERSTAL-CLEAN-HOLDOUT-BASELINE",
+          "disposition": "HOLD",
+          "reasons": [
+            "Defect rate 55.2% exceeds the hold limit of 25.0%.",
+            "95th-percentile severity 89.0 reaches the hold limit of 70.0.",
+            "62 frame(s) in the critical severity band (limit 0).",
+            "101 frame(s) contain 'inclusion', a zero-tolerance defect (limit 0) - it cannot be removed downstream."
+          ],
+          "total_frames": 480,
+          "defect_frames": 265,
+          "defect_rate": 0.5520833333333334,
+          "total_detections": 960,
+          "p95_severity": 88.99851424276596,
+          "max_severity": 95.67458601052554,
+          "band_counts": {
+            "clean": 215,
+            "low": 9,
+            "medium": 47,
+            "high": 147,
+            "critical": 62
+          },
+          "class_frame_counts": {
+            "crazing": 5,
+            "inclusion": 101,
+            "patches": 102,
+            "pitted_surface": 76,
+            "rolled-in_scale": 15,
+            "scratches": 65
+          },
+          "class_counts": {
+            "crazing": 5,
+            "inclusion": 440,
+            "patches": 327,
+            "pitted_surface": 76,
+            "rolled-in_scale": 17,
+            "scratches": 95
+          }
+        },
+        "whole_frames": {
+          "coil_id": "SEVERSTAL-CLEAN-HOLDOUT-BASELINE-WHOLEFRAME",
+          "disposition": "HOLD",
+          "reasons": [
+            "Defect rate 50.0% exceeds the hold limit of 25.0%.",
+            "95th-percentile severity 72.0 reaches the hold limit of 70.0.",
+            "3 frame(s) in the critical severity band (limit 0).",
+            "7 frame(s) contain 'inclusion', a zero-tolerance defect (limit 0) - it cannot be removed downstream."
+          ],
+          "total_frames": 60,
+          "defect_frames": 30,
+          "defect_rate": 0.5,
+          "total_detections": 53,
+          "p95_severity": 71.98074642836882,
+          "max_severity": 88.08809290956418,
+          "band_counts": {
+            "clean": 30,
+            "low": 2,
+            "medium": 19,
+            "high": 6,
+            "critical": 3
+          },
+          "class_frame_counts": {
+            "crazing": 0,
+            "inclusion": 7,
+            "patches": 9,
+            "pitted_surface": 0,
+            "rolled-in_scale": 0,
+            "scratches": 20
+          },
+          "class_counts": {
+            "crazing": 0,
+            "inclusion": 7,
+            "patches": 12,
+            "pitted_surface": 0,
+            "rolled-in_scale": 0,
+            "scratches": 34
+          }
+        },
+        "artifacts": {
+          "html": "reports/cross_domain_clean_coil_baseline.html",
+          "json": "reports/cross_domain_clean_coil_baseline.json"
+        },
+        "tile_dir": "reports/cross_domain_coil/baseline"
+      }
+    },
+    {
+      "tag": "audit_negatives_only",
+      "generated_at": "2026-09-09T16:12:22+05:30",
+      "elapsed_s": 21.329703499999596,
+      "model": {
+        "weights": "/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/audit_runs/v8n_neg/weights/best.pt",
+        "weights_sha256": "f1836bcc0f36ede6cd6fc701508084241780bd7d3d7ce7376de502a639e69ea4",
+        "model_name": "v8n_neg/best.pt",
+        "class_names": [
+          "crazing",
+          "inclusion",
+          "patches",
+          "pitted_surface",
+          "rolled-in_scale",
+          "scratches"
+        ],
+        "device": "mps",
+        "imgsz": 256,
+        "iou": 0.45,
+        "cache_conf": 0.01
+      },
+      "protocol": {
+        "crop_px": 200,
+        "magnification": 1.28,
+        "magnification_note": "Each 200 px tile is run at imgsz 256, i.e. 1.28x. At the defaults this is exactly how the shipped system presents a 200x200 NEU-DET frame, so the texture reaches the network at the pixels-per-millimetre it was trained on.",
+        "min_defect_px": 64,
+        "deploy_conf": 0.15,
+        "holdout_frac": 0.5,
+        "holdout_seed": "jsw-ps1-cross-domain-holdout-v1"
+      },
+      "dataset": {
+        "root": "/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/severstal",
+        "note": "Held-out arm of the same Severstal pull, with the 180 source frames the audit's negatives-only warm-start actually trained on removed by explicit manifest (--exclude-list). This checkpoint lives in the audit scratchpad, not in models/; it is scored here to show the harness discriminates between checkpoints and to record the negatives-only trap.",
+        "clean_frames_scored": 417,
+        "clean_frames_withheld": 583,
+        "clean_manifest_sha256": "3311712120c6b19e1d6b1ea39d2774407583f434a79ad0ea799895bb0f870d89",
+        "defect_frames_scored": 191,
+        "defect_frames_withheld": 209,
+        "defect_manifest_sha256": "5011fd23e4547163da52b517ffd269f48709909ab39dbdd9e6c1c3b9560048a3",
+        "clean_crops": 3336,
+        "defect_crops": 546,
+        "unlabelled_region_crops": 982,
+        "explicitly_excluded_clean_frames": 180
+      },
+      "sweep": [
+        {
+          "conf": 0.05,
+          "clean_crop_fa": 0.018884892086330936,
+          "clean_crop_fa_ci": [
+            0.013189448441247002,
+            0.025179856115107913
+          ],
+          "clean_crop_design_effect": 1.6457781448615545,
+          "clean_crops_flagged": 63,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.1079136690647482,
+          "clean_frame_fa_ci": [
+            0.07913669064748201,
+            0.13908872901678657
+          ],
+          "clean_frames_flagged": 45,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.026079136690647483,
+          "boxes_total": 87,
+          "false_positive_classes": {
+            "patches": 43,
+            "rolled-in_scale": 13,
+            "scratches": 12,
+            "inclusion": 7,
+            "pitted_surface": 6,
+            "crazing": 6
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.4942528735632184,
+            "rolled-in_scale": 0.14942528735632185,
+            "scratches": 0.13793103448275862,
+            "inclusion": 0.08045977011494253,
+            "pitted_surface": 0.06896551724137931,
+            "crazing": 0.06896551724137931
+          },
+          "defect_crop_recall": 0.08424908424908426,
+          "defect_crop_recall_ci": [
+            0.051624643617781345,
+            0.12260962490285107
+          ],
+          "defect_crop_design_effect": 2.366074078172018,
+          "defect_crops_hit": 46,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.16753926701570682,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.0274949083503055,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.1,
+          "clean_crop_fa": 0.013788968824940047,
+          "clean_crop_fa_ci": [
+            0.009292565947242206,
+            0.01858513189448441
+          ],
+          "clean_crop_design_effect": 1.3904097752386375,
+          "clean_crops_flagged": 46,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.08633093525179857,
+          "clean_frame_fa_ci": [
+            0.05995203836930456,
+            0.11270983213429256
+          ],
+          "clean_frames_flagged": 36,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.015587529976019185,
+          "boxes_total": 52,
+          "false_positive_classes": {
+            "patches": 27,
+            "scratches": 8,
+            "rolled-in_scale": 7,
+            "pitted_surface": 5,
+            "inclusion": 4,
+            "crazing": 1
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.5192307692307693,
+            "scratches": 0.15384615384615385,
+            "rolled-in_scale": 0.1346153846153846,
+            "pitted_surface": 0.09615384615384616,
+            "inclusion": 0.07692307692307693,
+            "crazing": 0.019230769230769232
+          },
+          "defect_crop_recall": 0.05311355311355311,
+          "defect_crop_recall_ci": [
+            0.02821745286534019,
+            0.08348134991119005
+          ],
+          "defect_crop_design_effect": 2.192093328406414,
+          "defect_crops_hit": 29,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.10471204188481675,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.015274949083503055,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.15,
+          "clean_crop_fa": 0.009592326139088728,
+          "clean_crop_fa_ci": [
+            0.005995203836930456,
+            0.013489208633093525
+          ],
+          "clean_crop_design_effect": 1.313986397606631,
+          "clean_crops_flagged": 32,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.06235011990407674,
+          "clean_frame_fa_ci": [
+            0.0407673860911271,
+            0.08633093525179857
+          ],
+          "clean_frames_flagged": 26,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.010191846522781775,
+          "boxes_total": 34,
+          "false_positive_classes": {
+            "patches": 19,
+            "scratches": 6,
+            "rolled-in_scale": 4,
+            "pitted_surface": 4,
+            "inclusion": 1
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.5588235294117647,
+            "scratches": 0.17647058823529413,
+            "rolled-in_scale": 0.11764705882352941,
+            "pitted_surface": 0.11764705882352941,
+            "inclusion": 0.029411764705882353
+          },
+          "defect_crop_recall": 0.03663003663003663,
+          "defect_crop_recall_ci": [
+            0.014925373134328358,
+            0.06495899238429995
+          ],
+          "defect_crop_design_effect": 2.627655882907034,
+          "defect_crops_hit": 20,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.06806282722513089,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.009164969450101833,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.2,
+          "clean_crop_fa": 0.0077937649880095924,
+          "clean_crop_fa_ci": [
+            0.0044964028776978415,
+            0.011690647482014389
+          ],
+          "clean_crop_design_effect": 1.335855127907184,
+          "clean_crops_flagged": 26,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.050359712230215826,
+          "clean_frame_fa_ci": [
+            0.03117505995203837,
+            0.07194244604316546
+          ],
+          "clean_frames_flagged": 21,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.008093525179856115,
+          "boxes_total": 27,
+          "false_positive_classes": {
+            "patches": 15,
+            "scratches": 4,
+            "pitted_surface": 4,
+            "rolled-in_scale": 3,
+            "inclusion": 1
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.5555555555555556,
+            "scratches": 0.14814814814814814,
+            "pitted_surface": 0.14814814814814814,
+            "rolled-in_scale": 0.1111111111111111,
+            "inclusion": 0.037037037037037035
+          },
+          "defect_crop_recall": 0.03663003663003663,
+          "defect_crop_recall_ci": [
+            0.014925373134328358,
+            0.06495899238429995
+          ],
+          "defect_crop_design_effect": 2.627655882907034,
+          "defect_crops_hit": 20,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.06806282722513089,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.006109979633401222,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.25,
+          "clean_crop_fa": 0.005695443645083933,
+          "clean_crop_fa_ci": [
+            0.002997601918465228,
+            0.008992805755395683
+          ],
+          "clean_crop_design_effect": 1.2805727823419775,
+          "clean_crops_flagged": 19,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.03836930455635491,
+          "clean_frame_fa_ci": [
+            0.02158273381294964,
+            0.05755395683453238
+          ],
+          "clean_frames_flagged": 16,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.005995203836930456,
+          "boxes_total": 20,
+          "false_positive_classes": {
+            "patches": 12,
+            "pitted_surface": 3,
+            "scratches": 3,
+            "rolled-in_scale": 2
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.6,
+            "pitted_surface": 0.15,
+            "scratches": 0.15,
+            "rolled-in_scale": 0.1
+          },
+          "defect_crop_recall": 0.031135531135531136,
+          "defect_crop_recall_ci": [
+            0.012453862627153341,
+            0.05502846299810247
+          ],
+          "defect_crop_design_effect": 2.213654586988817,
+          "defect_crops_hit": 17,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.06282722513089005,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.0050916496945010185,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.3,
+          "clean_crop_fa": 0.004196642685851319,
+          "clean_crop_fa_ci": [
+            0.0020983213429256594,
+            0.006894484412470024
+          ],
+          "clean_crop_design_effect": 1.1166366745836942,
+          "clean_crops_flagged": 14,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.03117505995203837,
+          "clean_frame_fa_ci": [
+            0.014388489208633094,
+            0.050359712230215826
+          ],
+          "clean_frames_flagged": 13,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.004196642685851319,
+          "boxes_total": 14,
+          "false_positive_classes": {
+            "patches": 7,
+            "pitted_surface": 3,
+            "scratches": 3,
+            "rolled-in_scale": 1
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.5,
+            "pitted_surface": 0.21428571428571427,
+            "scratches": 0.21428571428571427,
+            "rolled-in_scale": 0.07142857142857142
+          },
+          "defect_crop_recall": 0.016483516483516484,
+          "defect_crop_recall_ci": [
+            0.005607476635514018,
+            0.02862272316545394
+          ],
+          "defect_crop_design_effect": 1.1729064460319973,
+          "defect_crops_hit": 9,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.041884816753926704,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.004073319755600814,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.4,
+          "clean_crop_fa": 0.002398081534772182,
+          "clean_crop_fa_ci": [
+            0.0008992805755395684,
+            0.004196642685851319
+          ],
+          "clean_crop_design_effect": 0.9855364737426036,
+          "clean_crops_flagged": 8,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.019184652278177457,
+          "clean_frame_fa_ci": [
+            0.007194244604316547,
+            0.03357314148681055
+          ],
+          "clean_frames_flagged": 8,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.002398081534772182,
+          "boxes_total": 8,
+          "false_positive_classes": {
+            "patches": 5,
+            "pitted_surface": 2,
+            "scratches": 1
+          },
+          "false_positive_class_fracs": {
+            "patches": 0.625,
+            "pitted_surface": 0.25,
+            "scratches": 0.125
+          },
+          "defect_crop_recall": 0.009157509157509158,
+          "defect_crop_recall_ci": [
+            0.0017512369416922832,
+            0.01949317738791423
+          ],
+          "defect_crop_design_effect": 1.3658899915792608,
+          "defect_crops_hit": 5,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.020942408376963352,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.0,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.5,
+          "clean_crop_fa": 0.0008992805755395684,
+          "clean_crop_fa_ci": [
+            0.0,
+            0.0020983213429256594
+          ],
+          "clean_crop_design_effect": 0.9960880703454958,
+          "clean_crops_flagged": 3,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.007194244604316547,
+          "clean_frame_fa_ci": [
+            0.0,
+            0.016786570743405275
+          ],
+          "clean_frames_flagged": 3,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.0008992805755395684,
+          "boxes_total": 3,
+          "false_positive_classes": {
+            "pitted_surface": 1,
+            "patches": 1,
+            "scratches": 1
+          },
+          "false_positive_class_fracs": {
+            "pitted_surface": 0.3333333333333333,
+            "patches": 0.3333333333333333,
+            "scratches": 0.3333333333333333
+          },
+          "defect_crop_recall": 0.0018315018315018315,
+          "defect_crop_recall_ci": [
+            0.0,
+            0.005758157389635317
+          ],
+          "defect_crop_design_effect": 0.9999795890573294,
+          "defect_crops_hit": 1,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.005235602094240838,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.0,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.6,
+          "clean_crop_fa": 0.0005995203836930455,
+          "clean_crop_fa_ci": [
+            0.0,
+            0.001498800959232614
+          ],
+          "clean_crop_design_effect": 0.9981945918508607,
+          "clean_crops_flagged": 2,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.004796163069544364,
+          "clean_frame_fa_ci": [
+            0.0,
+            0.011990407673860911
+          ],
+          "clean_frames_flagged": 2,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.0005995203836930455,
+          "boxes_total": 2,
+          "false_positive_classes": {
+            "pitted_surface": 1,
+            "scratches": 1
+          },
+          "false_positive_class_fracs": {
+            "pitted_surface": 0.5,
+            "scratches": 0.5
+          },
+          "defect_crop_recall": 0.0,
+          "defect_crop_recall_ci": [
+            0.0,
+            0.0
+          ],
+          "defect_crop_design_effect": 1.0,
+          "defect_crops_hit": 0,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.0,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.0,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.7,
+          "clean_crop_fa": 0.0,
+          "clean_crop_fa_ci": [
+            0.0,
+            0.0
+          ],
+          "clean_crop_design_effect": 1.0,
+          "clean_crops_flagged": 0,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.0,
+          "clean_frame_fa_ci": [
+            0.0,
+            0.0
+          ],
+          "clean_frames_flagged": 0,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.0,
+          "boxes_total": 0,
+          "false_positive_classes": {},
+          "false_positive_class_fracs": {},
+          "defect_crop_recall": 0.0,
+          "defect_crop_recall_ci": [
+            0.0,
+            0.0
+          ],
+          "defect_crop_design_effect": 1.0,
+          "defect_crops_hit": 0,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.0,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.0,
+          "unlabelled_region_crops": 982
+        },
+        {
+          "conf": 0.8,
+          "clean_crop_fa": 0.0,
+          "clean_crop_fa_ci": [
+            0.0,
+            0.0
+          ],
+          "clean_crop_design_effect": 1.0,
+          "clean_crops_flagged": 0,
+          "clean_crops": 3336,
+          "clean_frame_fa": 0.0,
+          "clean_frame_fa_ci": [
+            0.0,
+            0.0
+          ],
+          "clean_frames_flagged": 0,
+          "clean_frames": 417,
+          "boxes_per_clean_crop": 0.0,
+          "boxes_total": 0,
+          "false_positive_classes": {},
+          "false_positive_class_fracs": {},
+          "defect_crop_recall": 0.0,
+          "defect_crop_recall_ci": [
+            0.0,
+            0.0
+          ],
+          "defect_crop_design_effect": 1.0,
+          "defect_crops_hit": 0,
+          "defect_crops": 546,
+          "defect_frame_recall": 0.0,
+          "defect_frames": 191,
+          "unlabelled_region_flag_rate": 0.0,
+          "unlabelled_region_crops": 982
+        }
+      ],
+      "separation_cross_domain": {
+        "auc": 0.5673752207025589,
+        "auc_ci": [
+          0.5448563592183416,
+          0.5934063758950165
+        ],
+        "n_positive_crops": 546,
+        "n_negative_crops": 3336,
+        "n_positive_frames": 191,
+        "n_negative_frames": 417,
+        "bootstrap_draws": 4000,
+        "bootstrap_unit": "source frame (both arms resampled independently)"
+      },
+      "separation_in_domain": {
+        "auc": 0.9639995522987485,
+        "auc_ci": [
+          0.9411651265197309,
+          0.9834603968548256
+        ],
+        "auc_scale_stratified": 0.9425375464895097,
+        "per_scale": [
+          {
+            "crop_px": 60,
+            "n_positive": 40,
+            "n_negative": 448,
+            "auc": 0.9317522321428572
+          },
+          {
+            "crop_px": 80,
+            "n_positive": 52,
+            "n_negative": 212,
+            "auc": 0.9479317851959361
+          },
+          {
+            "crop_px": 100,
+            "n_positive": 63,
+            "n_negative": 77,
+            "auc": 0.9653679653679653
+          },
+          {
+            "crop_px": 120,
+            "n_positive": 42,
+            "n_negative": 34,
+            "auc": 0.9586834733893558
+          }
+        ],
+        "n_positive_crops": 197,
+        "n_negative_crops": 771,
+        "n_positive_frames": 59,
+        "n_negative_frames": 106,
+        "split": "test",
+        "magnification": 1.28,
+        "crop_sizes_px": [
+          60,
+          80,
+          100,
+          120
+        ],
+        "clearance_px": 6,
+        "negatives_are": "mined crops of NEU-DET images that clear every labelled box by 6 px; NEU-DET has no defect-free image, so this is a proxy and an optimistic one",
+        "bootstrap_draws": 4000
+      },
+      "clean_coil_disposition": {
+        "rules": {
+          "accept_max_defect_rate": 0.02,
+          "accept_max_severity_p95": 30.0,
+          "accept_forbid_bands": [
+            "high",
+            "critical"
+          ],
+          "hold_min_defect_rate": 0.25,
+          "hold_min_severity_p95": 70.0,
+          "hold_min_critical_frames": 1,
+          "hold_classes": [
+            "inclusion"
+          ],
+          "hold_class_frame_limit": 0
+        },
+        "source_frames": 60,
+        "tiles": {
+          "coil_id": "SEVERSTAL-CLEAN-HOLDOUT-AUDIT_NEGATIVES_ONLY",
+          "disposition": "ACCEPT",
+          "reasons": [
+            "Defect rate 0.4% within the accept limit of 2.0%.",
+            "95th-percentile severity 0.0 within the accept limit of 30.0.",
+            "No frames in the high or critical severity band(s)."
+          ],
+          "total_frames": 480,
+          "defect_frames": 2,
+          "defect_rate": 0.004166666666666667,
+          "total_detections": 3,
+          "p95_severity": 0.0,
+          "max_severity": 41.44658747546828,
+          "band_counts": {
+            "clean": 478,
+            "low": 1,
+            "medium": 1,
+            "high": 0,
+            "critical": 0
+          },
+          "class_frame_counts": {
+            "crazing": 0,
+            "inclusion": 0,
+            "patches": 1,
+            "pitted_surface": 0,
+            "rolled-in_scale": 0,
+            "scratches": 1
+          },
+          "class_counts": {
+            "crazing": 0,
+            "inclusion": 0,
+            "patches": 2,
+            "pitted_surface": 0,
+            "rolled-in_scale": 0,
+            "scratches": 1
+          }
+        },
+        "whole_frames": {
+          "coil_id": "SEVERSTAL-CLEAN-HOLDOUT-AUDIT_NEGATIVES_ONLY-WHOLEFRAME",
+          "disposition": "ACCEPT",
+          "reasons": [
+            "Defect rate 1.7% within the accept limit of 2.0%.",
+            "95th-percentile severity 0.0 within the accept limit of 30.0.",
+            "No frames in the high or critical severity band(s)."
+          ],
+          "total_frames": 60,
+          "defect_frames": 1,
+          "defect_rate": 0.016666666666666666,
+          "total_detections": 1,
+          "p95_severity": 0.0,
+          "max_severity": 49.15220858247946,
+          "band_counts": {
+            "clean": 59,
+            "low": 0,
+            "medium": 1,
+            "high": 0,
+            "critical": 0
+          },
+          "class_frame_counts": {
+            "crazing": 0,
+            "inclusion": 0,
+            "patches": 1,
+            "pitted_surface": 0,
+            "rolled-in_scale": 0,
+            "scratches": 0
+          },
+          "class_counts": {
+            "crazing": 0,
+            "inclusion": 0,
+            "patches": 1,
+            "pitted_surface": 0,
+            "rolled-in_scale": 0,
+            "scratches": 0
+          }
+        },
+        "artifacts": {
+          "html": "reports/cross_domain_clean_coil_audit_negatives_only.html",
+          "json": "reports/cross_domain_clean_coil_audit_negatives_only.json"
+        },
+        "tile_dir": "reports/cross_domain_coil/audit_negatives_only"
+      }
+    }
+  ],
+  "updated_at": "2026-09-09T16:12:22+05:30"
+}

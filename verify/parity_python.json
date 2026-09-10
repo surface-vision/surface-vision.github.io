@@ -1,5 +1,5 @@
 {
-  "weights": "/Users/prathmeshwalimbe/Downloads/JSW-PS1/models/yolov8n_neudet/weights/best.pt",
+  "weights": "models/yolov8n_neudet/weights/best.pt",
   "conf": 0.15,
   "iou": 0.45,
   "imgsz": 256,

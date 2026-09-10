@@ -1,0 +1,33 @@
+{
+  "conf_threshold": 0.05,
+  "iou_threshold": 0.45,
+  "tuned_on_split": "val",
+  "selection_rule": "minimum expected mill cost among thresholds meeting the image-level detection floor",
+  "detection_floor": 0.9,
+  "detection_floor_met": true,
+  "at_sweep_edge": true,
+  "miss_cost_ratio": 12.0,
+  "f1_optimal_threshold": 0.3,
+  "expected_at_threshold": {
+    "threshold": 0.05,
+    "tp": 333,
+    "fp": 372,
+    "fn": 75,
+    "precision": 0.4723,
+    "recall": 0.8162,
+    "f1": 0.5984,
+    "fp_per_image": 2.0667,
+    "false_alarm_rate": 0.8167,
+    "defect_detection_rate": 0.95,
+    "class_accuracy": 0.9889,
+    "images_flagged_rate": 1.0,
+    "expected_cost_per_image": 1.4167
+  },
+  "rationale": "At conf=0.05 the detector finds the real defect on 95.0% of defective images while raising a spurious box on 81.7% of them (2.07 false boxes per image). Pricing one escaped defect at 12 unnecessary re-inspections, that is an expected 1.417 re-inspection-equivalents per inspected coil, the minimum over every threshold meeting the 90% detection floor the line will accept. The F1-optimal threshold 0.30 would lift box precision from 0.47 to 0.78 and cut false alarms from 81.7% to 32.8%, but its detection rate falls from 95.0% to 77.8% -- 4.4x as many coils shipping with an undetected defect. That is the trade F1 hides by weighting a miss and a false alarm equally. The optimum sits at the bottom edge of the swept 0.05-0.95 range, so the true minimum may lie outside it; read this as 'as far as the sweep allows', not as an interior optimum.",
+  "weights": "models/yolov8n_neudet/weights/best.pt",
+  "model_name": "yolov8n_neudet/best.pt",
+  "source": "src/evaluate.py",
+  "false_alarm_basis": "a spurious extra box on a frame that already carried a defect -- NOT the clean-steel rate. src/false_alarm.py measures the latter and is the source of the shipped operating point.",
+  "superseded_by": "src/false_alarm.py (reports/operating_point.json)",
+  "generated_at": "2026-09-09T23:50:10+00:00"
+}

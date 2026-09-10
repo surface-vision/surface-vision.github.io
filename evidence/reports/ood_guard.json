@@ -1,0 +1,1786 @@
+{
+  "generated_utc": "2026-09-09",
+  "weights": "models/yolov8n_neudet/weights/best.pt",
+  "imgsz": 256,
+  "headline_test_map50_reproduced": {
+    "mAP50": 0.7524,
+    "mAP50_95": 0.3967,
+    "precision": 0.696,
+    "recall": 0.6867,
+    "note": "ultralytics val defaults, split=test, imgsz=256, device=mps -- unchanged by either module"
+  },
+  "domain_shift": {
+    "reference": {
+      "path": "models/domain_reference.json",
+      "describe": "NEU-DET train split, 1440 frames, grey mean 129.2 sigma 54.3 pooled / sigma 30.1 per typical frame",
+      "n_images": 1440,
+      "n_pixels": 57600000,
+      "pooled_mean": 129.1542,
+      "pooled_std": 54.2647,
+      "frame_mean": 129.1104,
+      "frame_std": 30.0784,
+      "std_of_frame_means": 44.6158,
+      "mean_of_frame_stds": 26.7549
+    },
+    "severstal_pooled_grey": {
+      "mean": 87.3,
+      "std": 49.4,
+      "n_frames": 1400
+    },
+    "audit_reproduction": {
+      "audit_claim": "clean-crop FA 44.1% -> 33.6% at conf 0.25 (histogram matching)",
+      "measured": "44.3% -> 34.1% (histogram, frame scope, pooled target, strength 1.0)",
+      "verdict": "reproduced",
+      "but": "defect-crop recall fell 58.3% -> 43.1% at the same time; at matched recall that recipe gives 45.8% FA against a 44.3% baseline and AUC 0.615 -> 0.593"
+    },
+    "severstal_sweep": {
+      "baseline": {
+        "config": {
+          "scope": "none",
+          "method": "none"
+        },
+        "n_clean_crop": 3200,
+        "n_clean_frame": 400,
+        "n_defect_crop": 1079,
+        "sweep": [
+          {
+            "conf": 0.15,
+            "clean_crop_FA": 0.5465625,
+            "clean_frame_FA": 0.9575,
+            "defect_crop_recall": 0.7238183503243745
+          },
+          {
+            "conf": 0.25,
+            "clean_crop_FA": 0.4434375,
+            "clean_frame_FA": 0.895,
+            "defect_crop_recall": 0.5829471733086191
+          },
+          {
+            "conf": 0.4,
+            "clean_crop_FA": 0.2834375,
+            "clean_frame_FA": 0.7975,
+            "defect_crop_recall": 0.4151992585727525
+          }
+        ],
+        "clean_boxes_at_0.25": 3818,
+        "class_hist_at_0.25": {
+          "rolled-in_scale": 185,
+          "patches": 1379,
+          "inclusion": 1510,
+          "pitted_surface": 268,
+          "crazing": 4,
+          "scratches": 472
+        },
+        "seconds": 18.3
+      },
+      "hist_crop": {
+        "config": {
+          "scope": "crop",
+          "method": "histogram"
+        },
+        "n_clean_crop": 3200,
+        "n_clean_frame": 400,
+        "n_defect_crop": 1079,
+        "sweep": [
+          {
+            "conf": 0.15,
+            "clean_crop_FA": 0.51875,
+            "clean_frame_FA": 0.9775,
+            "defect_crop_recall": 0.6200185356811863
+          },
+          {
+            "conf": 0.25,
+            "clean_crop_FA": 0.3640625,
+            "clean_frame_FA": 0.91,
+            "defect_crop_recall": 0.43836886005560705
+          },
+          {
+            "conf": 0.4,
+            "clean_crop_FA": 0.249375,
+            "clean_frame_FA": 0.76,
+            "defect_crop_recall": 0.2567191844300278
+          }
+        ],
+        "clean_boxes_at_0.25": 3238,
+        "class_hist_at_0.25": {
+          "patches": 2134,
+          "rolled-in_scale": 217,
+          "inclusion": 559,
+          "scratches": 210,
+          "crazing": 82,
+          "pitted_surface": 36
+        },
+        "seconds": 17.5
+      },
+      "affine_crop": {
+        "config": {
+          "scope": "crop",
+          "method": "affine"
+        },
+        "n_clean_crop": 3200,
+        "n_clean_frame": 400,
+        "n_defect_crop": 1079,
+        "sweep": [
+          {
+            "conf": 0.15,
+            "clean_crop_FA": 0.5453125,
+            "clean_frame_FA": 0.9875,
+            "defect_crop_recall": 0.6367006487488415
+          },
+          {
+            "conf": 0.25,
+            "clean_crop_FA": 0.3959375,
+            "clean_frame_FA": 0.945,
+            "defect_crop_recall": 0.45968489341983315
+          },
+          {
+            "conf": 0.4,
+            "clean_crop_FA": 0.2621875,
+            "clean_frame_FA": 0.7875,
+            "defect_crop_recall": 0.2974976830398517
+          }
+        ],
+        "clean_boxes_at_0.25": 3583,
+        "class_hist_at_0.25": {
+          "patches": 1517,
+          "inclusion": 1401,
+          "scratches": 341,
+          "rolled-in_scale": 233,
+          "pitted_surface": 27,
+          "crazing": 64
+        },
+        "seconds": 15.9
+      },
+      "hist_frame": {
+        "config": {
+          "scope": "frame",
+          "method": "histogram"
+        },
+        "n_clean_crop": 3200,
+        "n_clean_frame": 400,
+        "n_defect_crop": 1079,
+        "sweep": [
+          {
+            "conf": 0.15,
+            "clean_crop_FA": 0.45875,
+            "clean_frame_FA": 0.96,
+            "defect_crop_recall": 0.5885078776645042
+          },
+          {
+            "conf": 0.25,
+            "clean_crop_FA": 0.34125,
+            "clean_frame_FA": 0.8975,
+            "defect_crop_recall": 0.4309545875810936
+          },
+          {
+            "conf": 0.4,
+            "clean_crop_FA": 0.2359375,
+            "clean_frame_FA": 0.725,
+            "defect_crop_recall": 0.2706209453197405
+          }
+        ],
+        "clean_boxes_at_0.25": 2944,
+        "class_hist_at_0.25": {
+          "patches": 1717,
+          "rolled-in_scale": 247,
+          "inclusion": 547,
+          "scratches": 363,
+          "pitted_surface": 36,
+          "crazing": 34
+        },
+        "seconds": 15.9
+      }
+    },
+    "matched_recall": [
+      {
+        "variant": "baseline",
+        "AUC": 0.615105421686747,
+        "conf_at_matched_recall": 0.2501121219161266,
+        "clean_crop_FA_matched": 0.4434375,
+        "defect_crop_recall_matched": 0.5829471733086191,
+        "clean_frame_FA_matched": 0.895,
+        "clean_crop_FA_at_0.25": 0.4434375,
+        "defect_crop_recall_at_0.25": 0.5829471733086191
+      },
+      {
+        "variant": "hist_crop",
+        "AUC": 0.5661167747914736,
+        "conf_at_matched_recall": 0.16396286237063062,
+        "clean_crop_FA_matched": 0.4940625,
+        "defect_crop_recall_matched": 0.5829471733086191,
+        "clean_frame_FA_matched": 0.975,
+        "clean_crop_FA_at_0.25": 0.3640625,
+        "defect_crop_recall_at_0.25": 0.43836886005560705
+      },
+      {
+        "variant": "affine_crop",
+        "AUC": 0.556420875810936,
+        "conf_at_matched_recall": 0.1765582902603839,
+        "clean_crop_FA_matched": 0.5046875,
+        "defect_crop_recall_matched": 0.5829471733086191,
+        "clean_frame_FA_matched": 0.9825,
+        "clean_crop_FA_at_0.25": 0.3959375,
+        "defect_crop_recall_at_0.25": 0.45968489341983315
+      },
+      {
+        "variant": "hist_frame",
+        "AUC": 0.5927241658943466,
+        "conf_at_matched_recall": 0.15235470336161905,
+        "clean_crop_FA_matched": 0.4578125,
+        "defect_crop_recall_matched": 0.5829471733086191,
+        "clean_frame_FA_matched": 0.9575,
+        "clean_crop_FA_at_0.25": 0.34125,
+        "defect_crop_recall_at_0.25": 0.4309545875810936
+      }
+    ],
+    "strength_sweep": [
+      {
+        "target": "population",
+        "strength": 0.0,
+        "mAP50": 0.7532866756373217,
+        "mAP5095": 0.3949706063071125,
+        "AUC": 0.615105421686747,
+        "FA25": 0.4434375,
+        "REC25": 0.5829471733086191,
+        "FA_matched": 0.4434375
+      },
+      {
+        "target": "population",
+        "strength": 0.25,
+        "mAP50": 0.7248901965528765,
+        "mAP5095": 0.3625247408894198,
+        "AUC": 0.6287795412418906,
+        "FA25": 0.3746875,
+        "REC25": 0.5329008341056534,
+        "FA_matched": 0.40125
+      },
+      {
+        "target": "population",
+        "strength": 0.5,
+        "mAP50": 0.6502848194855319,
+        "mAP5095": 0.30891946411731686,
+        "AUC": 0.6140872625115849,
+        "FA25": 0.3628125,
+        "REC25": 0.49675625579240035,
+        "FA_matched": 0.4303125
+      },
+      {
+        "target": "population",
+        "strength": 0.75,
+        "mAP50": 0.5634717478132868,
+        "mAP5095": 0.25244177687689917,
+        "AUC": 0.6040419369786839,
+        "FA25": 0.3584375,
+        "REC25": 0.4717330861909175,
+        "FA_matched": 0.44625
+      },
+      {
+        "target": "population",
+        "strength": 1.0,
+        "mAP50": 0.49116581837422046,
+        "mAP5095": 0.2042656328782762,
+        "AUC": 0.5927241658943466,
+        "FA25": 0.34125,
+        "REC25": 0.4309545875810936,
+        "FA_matched": 0.4578125
+      },
+      {
+        "target": "frame",
+        "strength": 0.25,
+        "mAP50": 0.7242396108547854,
+        "mAP5095": 0.35574023657622705,
+        "AUC": 0.6405333352641335,
+        "FA25": 0.385,
+        "REC25": 0.5922150139017609,
+        "FA_matched": 0.38
+      },
+      {
+        "target": "frame",
+        "strength": 0.5,
+        "mAP50": 0.6483143551352665,
+        "mAP5095": 0.285967384221412,
+        "AUC": 0.6342713160333642,
+        "FA25": 0.388125,
+        "REC25": 0.5801668211306765,
+        "FA_matched": 0.388125
+      },
+      {
+        "target": "frame",
+        "strength": 0.75,
+        "mAP50": 0.5548142504682315,
+        "mAP5095": 0.22629322847779976,
+        "AUC": 0.6311070725208526,
+        "FA25": 0.3871875,
+        "REC25": 0.5848007414272475,
+        "FA_matched": 0.385625
+      },
+      {
+        "target": "frame",
+        "strength": 1.0,
+        "mAP50": 0.44170492618077545,
+        "mAP5095": 0.1676226044494717,
+        "AUC": 0.6243961422613531,
+        "FA25": 0.3659375,
+        "REC25": 0.5384615384615384,
+        "FA_matched": 0.389375
+      }
+    ],
+    "in_domain_cost": {
+      "shipped (no normalisation)": {
+        "mAP50": 0.7524475543783158,
+        "mAP50_95": 0.3967094751925778,
+        "precision": 0.696003746864622,
+        "recall": 0.6867120962219055,
+        "per_class": {
+          "crazing": {
+            "AP50": 0.4443,
+            "AP50_95": 0.187
+          },
+          "inclusion": {
+            "AP50": 0.8272,
+            "AP50_95": 0.4517
+          },
+          "patches": {
+            "AP50": 0.9486,
+            "AP50_95": 0.6223
+          },
+          "pitted_surface": {
+            "AP50": 0.7558,
+            "AP50_95": 0.4273
+          },
+          "rolled-in_scale": {
+            "AP50": 0.6295,
+            "AP50_95": 0.2768
+          },
+          "scratches": {
+            "AP50": 0.9093,
+            "AP50_95": 0.4153
+          }
+        }
+      },
+      "histogram strength 1.0": {
+        "mAP50": 0.49116581837422046,
+        "mAP50_95": 0.2042656328782762,
+        "precision": 0.5075886048006667,
+        "recall": 0.5153722303001489,
+        "per_class": {
+          "crazing": {
+            "AP50": 0.3075,
+            "AP50_95": 0.109
+          },
+          "inclusion": {
+            "AP50": 0.4313,
+            "AP50_95": 0.1916
+          },
+          "patches": {
+            "AP50": 0.7581,
+            "AP50_95": 0.4084
+          },
+          "pitted_surface": {
+            "AP50": 0.6076,
+            "AP50_95": 0.2557
+          },
+          "rolled-in_scale": {
+            "AP50": 0.3322,
+            "AP50_95": 0.0968
+          },
+          "scratches": {
+            "AP50": 0.5103,
+            "AP50_95": 0.1641
+          }
+        }
+      },
+      "histogram strength 0.5": {
+        "mAP50": 0.6502848194855319,
+        "mAP50_95": 0.30891946411731686,
+        "precision": 0.6042155804728097,
+        "recall": 0.6124745091245378,
+        "per_class": {
+          "crazing": {
+            "AP50": 0.4286,
+            "AP50_95": 0.1744
+          },
+          "inclusion": {
+            "AP50": 0.6313,
+            "AP50_95": 0.3205
+          },
+          "patches": {
+            "AP50": 0.91,
+            "AP50_95": 0.5554
+          },
+          "pitted_surface": {
+            "AP50": 0.705,
+            "AP50_95": 0.3316
+          },
+          "rolled-in_scale": {
+            "AP50": 0.5277,
+            "AP50_95": 0.2017
+          },
+          "scratches": {
+            "AP50": 0.6991,
+            "AP50_95": 0.2699
+          }
+        }
+      },
+      "affine strength 1.0": {
+        "mAP50": 0.5662451815658588,
+        "mAP50_95": 0.2725188716980117,
+        "precision": 0.5049425811165483,
+        "recall": 0.5662858524954975,
+        "per_class": {
+          "crazing": {
+            "AP50": 0.3308,
+            "AP50_95": 0.1193
+          },
+          "inclusion": {
+            "AP50": 0.5362,
+            "AP50_95": 0.2371
+          },
+          "patches": {
+            "AP50": 0.853,
+            "AP50_95": 0.5529
+          },
+          "pitted_surface": {
+            "AP50": 0.647,
+            "AP50_95": 0.3265
+          },
+          "rolled-in_scale": {
+            "AP50": 0.2638,
+            "AP50_95": 0.0703
+          },
+          "scratches": {
+            "AP50": 0.7666,
+            "AP50_95": 0.3291
+          }
+        }
+      },
+      "re-encoded, no mapping (control)": {
+        "mAP50": 0.7532866756373217,
+        "mAP50_95": 0.3949706063071125,
+        "precision": 0.700094902173547,
+        "recall": 0.691571930587603,
+        "per_class": {
+          "crazing": {
+            "AP50": 0.4424,
+            "AP50_95": 0.1869
+          },
+          "inclusion": {
+            "AP50": 0.8308,
+            "AP50_95": 0.45
+          },
+          "patches": {
+            "AP50": 0.9491,
+            "AP50_95": 0.6213
+          },
+          "pitted_surface": {
+            "AP50": 0.7543,
+            "AP50_95": 0.4247
+          },
+          "rolled-in_scale": {
+            "AP50": 0.634,
+            "AP50_95": 0.2766
+          },
+          "scratches": {
+            "AP50": 0.909,
+            "AP50_95": 0.4103
+          }
+        }
+      }
+    },
+    "shipped_default": {
+      "enabled_in_pipeline": false,
+      "recommended_target": "frame",
+      "recommended_strength": 0.25,
+      "reason": "any per-frame remapping is train/serve skew for weights fitted on un-normalised frames; it is a per-source commissioning setting"
+    }
+  },
+  "ood_guard": {
+    "thresholds": {
+      "min_side_px": 64.0,
+      "max_aspect": 64.0,
+      "max_saturation": 40.0,
+      "max_edge_density": 0.7,
+      "min_focus": 1.5,
+      "min_tonal_bits": 1.8,
+      "review_hist_distance": 116.5
+    },
+    "real_steel": {
+      "neu_train": {
+        "n": 1440,
+        "pass": 1440,
+        "review": 0,
+        "reject": 0,
+        "per_check_failures": {
+          "resolution": 0,
+          "aspect": 0,
+          "colour": 0,
+          "noise": 0,
+          "focus": 0,
+          "tonal_range": 0
+        },
+        "worst_value": {
+          "resolution": 200.0,
+          "aspect": 1.0,
+          "colour": 0.0,
+          "noise": 0.53755,
+          "focus": 8.778873499374999,
+          "tonal_range": 4.581651706754582
+        },
+        "rejected_names": []
+      },
+      "neu_val": {
+        "n": 180,
+        "pass": 179,
+        "review": 1,
+        "reject": 0,
+        "per_check_failures": {
+          "resolution": 0,
+          "aspect": 0,
+          "colour": 0,
+          "noise": 0,
+          "focus": 0,
+          "tonal_range": 0
+        },
+        "worst_value": {
+          "resolution": 200.0,
+          "aspect": 1.0,
+          "colour": 0.0,
+          "noise": 0.5373,
+          "focus": 9.93334975,
+          "tonal_range": 4.819028466759862
+        },
+        "rejected_names": []
+      },
+      "neu_test": {
+        "n": 180,
+        "pass": 180,
+        "review": 0,
+        "reject": 0,
+        "per_check_failures": {
+          "resolution": 0,
+          "aspect": 0,
+          "colour": 0,
+          "noise": 0,
+          "focus": 0,
+          "tonal_range": 0
+        },
+        "worst_value": {
+          "resolution": 200.0,
+          "aspect": 1.0,
+          "colour": 0.0,
+          "noise": 0.5315,
+          "focus": 10.352167019375,
+          "tonal_range": 4.7546772225013125
+        },
+        "rejected_names": []
+      },
+      "severstal": {
+        "n": 1400,
+        "pass": 1350,
+        "review": 50,
+        "reject": 0,
+        "per_check_failures": {
+          "resolution": 0,
+          "aspect": 0,
+          "colour": 0,
+          "noise": 0,
+          "focus": 0,
+          "tonal_range": 0
+        },
+        "worst_value": {
+          "resolution": 256.0,
+          "aspect": 6.25,
+          "colour": 0.0,
+          "noise": 0.496083984375,
+          "focus": 7.757048525745001,
+          "tonal_range": 2.0820982533248484
+        },
+        "rejected_names": []
+      }
+    },
+    "severstal_crops": {
+      "n": 1200,
+      "pass": 1060,
+      "review": 7,
+      "reject": 133,
+      "rejected_clipped_fraction_min": 0.0146026611328125,
+      "rejected_focus_max": 9887.45893285959,
+      "per_check_failures": {
+        "resolution": 0,
+        "aspect": 0,
+        "colour": 0,
+        "noise": 1,
+        "focus": 97,
+        "tonal_range": 127
+      }
+    },
+    "negatives_tuning": {
+      "cases": [
+        {
+          "case": "blurred_steel_sigma3",
+          "decision": "reject",
+          "failed": [
+            "focus"
+          ],
+          "n_detections": 3,
+          "dominant": "inclusion",
+          "max_conf": 0.547,
+          "severity": 100.0,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 1.06,
+            "tonal_bits": 5.303,
+            "grey_mean": 59.8,
+            "grey_std": 10.7,
+            "clipped_fraction": 0.0,
+            "hist_distance": 69.9
+          }
+        },
+        {
+          "case": "blurred_steel_sigma6",
+          "decision": "reject",
+          "failed": [
+            "focus"
+          ],
+          "n_detections": 2,
+          "dominant": "inclusion",
+          "max_conf": 0.49,
+          "severity": 98.5,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 0.78,
+            "tonal_bits": 5.263,
+            "grey_mean": 59.8,
+            "grey_std": 10.5,
+            "clipped_fraction": 0.0,
+            "hist_distance": 70.0
+          }
+        },
+        {
+          "case": "cartoon_scene",
+          "decision": "reject",
+          "failed": [
+            "colour",
+            "tonal_range"
+          ],
+          "n_detections": 5,
+          "dominant": "patches",
+          "max_conf": 0.894,
+          "severity": 96.2,
+          "band": "critical",
+          "signals": {
+            "height": 320,
+            "width": 320,
+            "min_side": 320,
+            "aspect": 1.0,
+            "saturation": 149.42,
+            "edge_density": 0.0134,
+            "focus": 44.3,
+            "tonal_bits": 1.595,
+            "grey_mean": 154.2,
+            "grey_std": 24.4,
+            "clipped_fraction": 0.0,
+            "hist_distance": 41.1
+          }
+        },
+        {
+          "case": "gauss_noise_colour",
+          "decision": "reject",
+          "failed": [
+            "colour",
+            "noise"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 130.86,
+            "edge_density": 0.8397,
+            "focus": 5027.01,
+            "tonal_bits": 7.192,
+            "grey_mean": 128.5,
+            "grey_std": 35.5,
+            "clipped_fraction": 0.0,
+            "hist_distance": 16.0
+          }
+        },
+        {
+          "case": "gauss_noise_grey",
+          "decision": "reject",
+          "failed": [
+            "noise"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.8937,
+            "focus": 11413.79,
+            "tonal_bits": 7.677,
+            "grey_mean": 128.6,
+            "grey_std": 53.1,
+            "clipped_fraction": 0.0211,
+            "hist_distance": 7.1
+          }
+        },
+        {
+          "case": "linear_gradient",
+          "decision": "reject",
+          "failed": [
+            "focus"
+          ],
+          "n_detections": 1,
+          "dominant": "pitted_surface",
+          "max_conf": 0.274,
+          "severity": 63.2,
+          "band": "high",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 0.91,
+            "tonal_bits": 7.124,
+            "grey_mean": 129.5,
+            "grey_std": 40.5,
+            "clipped_fraction": 0.0,
+            "hist_distance": 12.0
+          }
+        },
+        {
+          "case": "logo_colour",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 2,
+          "dominant": "inclusion",
+          "max_conf": 0.19,
+          "severity": 65.2,
+          "band": "high",
+          "signals": {
+            "height": 260,
+            "width": 520,
+            "min_side": 260,
+            "aspect": 2.0,
+            "saturation": 22.09,
+            "edge_density": 0.0436,
+            "focus": 1565.16,
+            "tonal_bits": 1.606,
+            "grey_mean": 221.3,
+            "grey_std": 72.1,
+            "clipped_fraction": 0.8091,
+            "hist_distance": 95.2
+          }
+        },
+        {
+          "case": "logo_greyscale",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 2,
+          "dominant": "inclusion",
+          "max_conf": 0.396,
+          "severity": 74.1,
+          "band": "high",
+          "signals": {
+            "height": 260,
+            "width": 520,
+            "min_side": 260,
+            "aspect": 2.0,
+            "saturation": 0.0,
+            "edge_density": 0.0436,
+            "focus": 2098.48,
+            "tonal_bits": 1.596,
+            "grey_mean": 214.0,
+            "grey_std": 85.0,
+            "clipped_fraction": 0.8091,
+            "hist_distance": 94.0
+          }
+        },
+        {
+          "case": "screenshot_text",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 1,
+          "dominant": "pitted_surface",
+          "max_conf": 0.397,
+          "severity": 69.3,
+          "band": "high",
+          "signals": {
+            "height": 300,
+            "width": 500,
+            "min_side": 300,
+            "aspect": 1.67,
+            "saturation": 3.41,
+            "edge_density": 0.0382,
+            "focus": 1545.02,
+            "tonal_bits": 0.468,
+            "grey_mean": 237.6,
+            "grey_std": 37.1,
+            "clipped_fraction": 0.0,
+            "hist_distance": 109.2
+          }
+        },
+        {
+          "case": "solid_black",
+          "decision": "reject",
+          "failed": [
+            "focus",
+            "tonal_range"
+          ],
+          "n_detections": 1,
+          "dominant": "pitted_surface",
+          "max_conf": 0.339,
+          "severity": 66.4,
+          "band": "high",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 0.0,
+            "tonal_bits": 0.0,
+            "grey_mean": 0.0,
+            "grey_std": 0.0,
+            "clipped_fraction": 1.0,
+            "hist_distance": 129.2
+          }
+        },
+        {
+          "case": "solid_blue",
+          "decision": "reject",
+          "failed": [
+            "colour",
+            "focus",
+            "tonal_range"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 300,
+            "width": 300,
+            "min_side": 300,
+            "aspect": 1.0,
+            "saturation": 255.0,
+            "edge_density": 0.0,
+            "focus": 0.0,
+            "tonal_bits": -0.0,
+            "grey_mean": 60.0,
+            "grey_std": 0.0,
+            "clipped_fraction": 0.0,
+            "hist_distance": 71.4
+          }
+        },
+        {
+          "case": "solid_grey130",
+          "decision": "reject",
+          "failed": [
+            "focus",
+            "tonal_range"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 0.0,
+            "tonal_bits": -0.0,
+            "grey_mean": 130.0,
+            "grey_std": 0.0,
+            "clipped_fraction": 0.0,
+            "hist_distance": 43.9
+          }
+        },
+        {
+          "case": "solid_red",
+          "decision": "reject",
+          "failed": [
+            "colour",
+            "focus",
+            "tonal_range"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 300,
+            "width": 300,
+            "min_side": 300,
+            "aspect": 1.0,
+            "saturation": 255.0,
+            "edge_density": 0.0,
+            "focus": 0.0,
+            "tonal_bits": -0.0,
+            "grey_mean": 23.0,
+            "grey_std": 0.0,
+            "clipped_fraction": 0.0,
+            "hist_distance": 106.3
+          }
+        },
+        {
+          "case": "solid_white",
+          "decision": "reject",
+          "failed": [
+            "focus",
+            "tonal_range"
+          ],
+          "n_detections": 1,
+          "dominant": "pitted_surface",
+          "max_conf": 0.739,
+          "severity": 86.3,
+          "band": "critical",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 0.0,
+            "tonal_bits": 0.0,
+            "grey_mean": 255.0,
+            "grey_std": 0.0,
+            "clipped_fraction": 1.0,
+            "hist_distance": 125.8
+          }
+        },
+        {
+          "case": "strip_6000x10",
+          "decision": "reject",
+          "failed": [
+            "resolution",
+            "aspect",
+            "focus"
+          ],
+          "n_detections": null,
+          "dominant": null,
+          "max_conf": null,
+          "severity": null,
+          "band": "crashed",
+          "signals": {
+            "height": 10,
+            "width": 6000,
+            "min_side": 10,
+            "aspect": 600.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 0.56,
+            "tonal_bits": 5.39,
+            "grey_mean": 59.8,
+            "grey_std": 10.9,
+            "clipped_fraction": 0.0,
+            "hist_distance": 69.9
+          }
+        },
+        {
+          "case": "synthetic_colour_photo",
+          "decision": "reject",
+          "failed": [
+            "colour",
+            "noise"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 480,
+            "width": 480,
+            "min_side": 480,
+            "aspect": 1.0,
+            "saturation": 117.94,
+            "edge_density": 0.8946,
+            "focus": 6945.96,
+            "tonal_bits": 7.008,
+            "grey_mean": 176.4,
+            "grey_std": 46.8,
+            "clipped_fraction": 0.0815,
+            "hist_distance": 47.3
+          }
+        },
+        {
+          "case": "tiny_40x40",
+          "decision": "reject",
+          "failed": [
+            "resolution"
+          ],
+          "n_detections": 4,
+          "dominant": "inclusion",
+          "max_conf": 0.516,
+          "severity": 99.6,
+          "band": "critical",
+          "signals": {
+            "height": 40,
+            "width": 40,
+            "min_side": 40,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0006,
+            "focus": 58.48,
+            "tonal_bits": 5.391,
+            "grey_mean": 59.8,
+            "grey_std": 10.9,
+            "clipped_fraction": 0.0,
+            "hist_distance": 69.9
+          }
+        },
+        {
+          "case": "tiny_8x8",
+          "decision": "reject",
+          "failed": [
+            "resolution"
+          ],
+          "n_detections": 2,
+          "dominant": "inclusion",
+          "max_conf": 0.346,
+          "severity": 93.5,
+          "band": "critical",
+          "signals": {
+            "height": 8,
+            "width": 8,
+            "min_side": 8,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0469,
+            "focus": 204.09,
+            "tonal_bits": 4.769,
+            "grey_mean": 60.1,
+            "grey_std": 10.2,
+            "clipped_fraction": 0.0,
+            "hist_distance": 69.6
+          }
+        }
+      ],
+      "correct": 18,
+      "n": 18
+    },
+    "negatives_heldout": {
+      "cases": [
+        {
+          "case": "bar_chart",
+          "decision": "reject",
+          "failed": [
+            "colour",
+            "tonal_range"
+          ],
+          "n_detections": 4,
+          "dominant": "scratches",
+          "max_conf": 0.349,
+          "severity": 74.3,
+          "band": "high",
+          "signals": {
+            "height": 400,
+            "width": 560,
+            "min_side": 400,
+            "aspect": 1.4,
+            "saturation": 46.44,
+            "edge_density": 0.0352,
+            "focus": 1299.02,
+            "tonal_bits": 0.888,
+            "grey_mean": 207.7,
+            "grey_std": 69.9,
+            "clipped_fraction": 0.0,
+            "hist_distance": 78.8
+          }
+        },
+        {
+          "case": "barcode",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 5,
+          "dominant": "scratches",
+          "max_conf": 0.775,
+          "severity": 93.8,
+          "band": "critical",
+          "signals": {
+            "height": 220,
+            "width": 520,
+            "min_side": 220,
+            "aspect": 2.36,
+            "saturation": 0.0,
+            "edge_density": 0.097,
+            "focus": 6225.05,
+            "tonal_bits": 0.0,
+            "grey_mean": 170.4,
+            "grey_std": 120.1,
+            "clipped_fraction": 1.0,
+            "hist_distance": 89.8
+          }
+        },
+        {
+          "case": "cartoon_face",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 5,
+          "dominant": "inclusion",
+          "max_conf": 0.813,
+          "severity": 92.9,
+          "band": "critical",
+          "signals": {
+            "height": 360,
+            "width": 360,
+            "min_side": 360,
+            "aspect": 1.0,
+            "saturation": 39.66,
+            "edge_density": 0.0124,
+            "focus": 153.82,
+            "tonal_bits": 1.13,
+            "grey_mean": 220.4,
+            "grey_std": 28.4,
+            "clipped_fraction": 0.0,
+            "hist_distance": 92.7
+          }
+        },
+        {
+          "case": "checkerboard",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 384,
+            "width": 384,
+            "min_side": 384,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.1501,
+            "focus": 17026.2,
+            "tonal_bits": 0.0,
+            "grey_mean": 127.5,
+            "grey_std": 127.5,
+            "clipped_fraction": 1.0,
+            "hist_distance": 84.2
+          }
+        },
+        {
+          "case": "colour_mesh",
+          "decision": "reject",
+          "failed": [
+            "colour"
+          ],
+          "n_detections": 5,
+          "dominant": "inclusion",
+          "max_conf": 0.44,
+          "severity": 86.2,
+          "band": "critical",
+          "signals": {
+            "height": 420,
+            "width": 560,
+            "min_side": 420,
+            "aspect": 1.33,
+            "saturation": 179.82,
+            "edge_density": 0.0,
+            "focus": 2.34,
+            "tonal_bits": 7.601,
+            "grey_mean": 121.4,
+            "grey_std": 50.2,
+            "clipped_fraction": 0.0,
+            "hist_distance": 8.3
+          }
+        },
+        {
+          "case": "defocused_scene",
+          "decision": "reject",
+          "failed": [
+            "colour"
+          ],
+          "n_detections": 1,
+          "dominant": "patches",
+          "max_conf": 0.673,
+          "severity": 38.8,
+          "band": "medium",
+          "signals": {
+            "height": 420,
+            "width": 620,
+            "min_side": 420,
+            "aspect": 1.48,
+            "saturation": 55.96,
+            "edge_density": 0.0,
+            "focus": 1.81,
+            "tonal_bits": 5.28,
+            "grey_mean": 174.2,
+            "grey_std": 10.9,
+            "clipped_fraction": 0.0,
+            "hist_distance": 54.6
+          }
+        },
+        {
+          "case": "landscape_photo",
+          "decision": "reject",
+          "failed": [
+            "colour",
+            "noise"
+          ],
+          "n_detections": 1,
+          "dominant": "patches",
+          "max_conf": 0.857,
+          "severity": 41.6,
+          "band": "medium",
+          "signals": {
+            "height": 420,
+            "width": 620,
+            "min_side": 420,
+            "aspect": 1.48,
+            "saturation": 146.35,
+            "edge_density": 0.8679,
+            "focus": 5197.99,
+            "tonal_bits": 7.034,
+            "grey_mean": 174.1,
+            "grey_std": 49.8,
+            "clipped_fraction": 0.0929,
+            "hist_distance": 45.0
+          }
+        },
+        {
+          "case": "qr_code",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 7,
+          "dominant": "inclusion",
+          "max_conf": 0.457,
+          "severity": 85.8,
+          "band": "critical",
+          "signals": {
+            "height": 406,
+            "width": 406,
+            "min_side": 406,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.1254,
+            "focus": 6766.73,
+            "tonal_bits": 0.0,
+            "grey_mean": 119.8,
+            "grey_std": 127.3,
+            "clipped_fraction": 1.0,
+            "hist_distance": 83.9
+          }
+        },
+        {
+          "case": "radial_gradient",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 1,
+          "dominant": "pitted_surface",
+          "max_conf": 0.392,
+          "severity": 69.0,
+          "band": "high",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 2.09,
+            "tonal_bits": 7.669,
+            "grey_mean": 116.6,
+            "grey_std": 51.3,
+            "clipped_fraction": 0.0003,
+            "hist_distance": 12.6
+          }
+        },
+        {
+          "case": "solid_grey64",
+          "decision": "reject",
+          "failed": [
+            "focus",
+            "tonal_range"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 350,
+            "width": 350,
+            "min_side": 350,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 0.0,
+            "tonal_bits": -0.0,
+            "grey_mean": 64.0,
+            "grey_std": 0.0,
+            "clipped_fraction": 0.0,
+            "hist_distance": 68.0
+          }
+        },
+        {
+          "case": "spreadsheet",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 8,
+          "dominant": "scratches",
+          "max_conf": 0.392,
+          "severity": 68.9,
+          "band": "high",
+          "signals": {
+            "height": 420,
+            "width": 640,
+            "min_side": 420,
+            "aspect": 1.52,
+            "saturation": 13.15,
+            "edge_density": 0.0846,
+            "focus": 617.19,
+            "tonal_bits": 0.773,
+            "grey_mean": 242.8,
+            "grey_std": 34.5,
+            "clipped_fraction": 0.8873,
+            "hist_distance": 113.7
+          }
+        },
+        {
+          "case": "text_document",
+          "decision": "reject",
+          "failed": [
+            "tonal_range"
+          ],
+          "n_detections": 1,
+          "dominant": "pitted_surface",
+          "max_conf": 0.163,
+          "severity": 44.7,
+          "band": "medium",
+          "signals": {
+            "height": 600,
+            "width": 440,
+            "min_side": 440,
+            "aspect": 1.36,
+            "saturation": 0.0,
+            "edge_density": 0.0577,
+            "focus": 2870.1,
+            "tonal_bits": 0.371,
+            "grey_mean": 238.3,
+            "grey_std": 49.5,
+            "clipped_fraction": 0.0,
+            "hist_distance": 109.2
+          }
+        },
+        {
+          "case": "tiny_32x32",
+          "decision": "reject",
+          "failed": [
+            "resolution"
+          ],
+          "n_detections": 4,
+          "dominant": "patches",
+          "max_conf": 0.69,
+          "severity": 89.0,
+          "band": "critical",
+          "signals": {
+            "height": 32,
+            "width": 32,
+            "min_side": 32,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.5752,
+            "focus": 3954.62,
+            "tonal_bits": 7.338,
+            "grey_mean": 116.9,
+            "grey_std": 47.3,
+            "clipped_fraction": 0.0029,
+            "hist_distance": 12.4
+          }
+        },
+        {
+          "case": "uniform_noise",
+          "decision": "reject",
+          "failed": [
+            "noise"
+          ],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.9354,
+            "focus": 21727.57,
+            "tonal_bits": 7.965,
+            "grey_mean": 127.2,
+            "grey_std": 73.9,
+            "clipped_fraction": 0.0234,
+            "hist_distance": 20.9
+          }
+        },
+        {
+          "case": "wood_grain",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 1,
+          "dominant": "pitted_surface",
+          "max_conf": 0.628,
+          "severity": 80.7,
+          "band": "critical",
+          "signals": {
+            "height": 400,
+            "width": 400,
+            "min_side": 400,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 23.04,
+            "tonal_bits": 6.831,
+            "grey_mean": 126.8,
+            "grey_std": 49.4,
+            "clipped_fraction": 0.0,
+            "hist_distance": 12.4
+          }
+        }
+      ],
+      "correct": 13,
+      "n": 15
+    },
+    "hard_positives": {
+      "cases": [
+        {
+          "case": "jpeg_q20",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 3,
+          "dominant": "inclusion",
+          "max_conf": 0.402,
+          "severity": 94.9,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 4.76,
+            "tonal_bits": 3.75,
+            "grey_mean": 59.8,
+            "grey_std": 11.0,
+            "clipped_fraction": 0.0,
+            "hist_distance": 69.9
+          }
+        },
+        {
+          "case": "lighting_gradient",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 7,
+          "dominant": "inclusion",
+          "max_conf": 0.653,
+          "severity": 100.0,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 10.81,
+            "tonal_bits": 4.543,
+            "grey_mean": 54.0,
+            "grey_std": 6.1,
+            "clipped_fraction": 0.0,
+            "hist_distance": 75.7
+          }
+        },
+        {
+          "case": "motion_blur_k15",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 3,
+          "dominant": "inclusion",
+          "max_conf": 0.68,
+          "severity": 100.0,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 2.33,
+            "tonal_bits": 5.314,
+            "grey_mean": 59.8,
+            "grey_std": 10.6,
+            "clipped_fraction": 0.0,
+            "hist_distance": 69.9
+          }
+        },
+        {
+          "case": "neu_frame",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 7,
+          "dominant": "inclusion",
+          "max_conf": 0.669,
+          "severity": 100.0,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 11.15,
+            "tonal_bits": 5.412,
+            "grey_mean": 59.8,
+            "grey_std": 10.9,
+            "clipped_fraction": 0.0,
+            "hist_distance": 69.9
+          }
+        },
+        {
+          "case": "overexposed_1.7x",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 9,
+          "dominant": "inclusion",
+          "max_conf": 0.598,
+          "severity": 99.6,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0001,
+            "focus": 33.52,
+            "tonal_bits": 5.412,
+            "grey_mean": 101.2,
+            "grey_std": 18.6,
+            "clipped_fraction": 0.0,
+            "hist_distance": 34.2
+          }
+        },
+        {
+          "case": "salt_pepper_steel",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 0,
+          "dominant": null,
+          "max_conf": 0.0,
+          "severity": 0.0,
+          "band": "low",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.2255,
+            "focus": 36176.89,
+            "tonal_bits": 5.411,
+            "grey_mean": 69.5,
+            "grey_std": 43.8,
+            "clipped_fraction": 0.0498,
+            "hist_distance": 60.8
+          }
+        },
+        {
+          "case": "severstal_frame",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 2,
+          "dominant": "scratches",
+          "max_conf": 0.823,
+          "severity": 61.8,
+          "band": "high",
+          "signals": {
+            "height": 256,
+            "width": 1600,
+            "min_side": 256,
+            "aspect": 6.25,
+            "saturation": 0.0,
+            "edge_density": 0.1455,
+            "focus": 1247.06,
+            "tonal_bits": 6.842,
+            "grey_mean": 86.8,
+            "grey_std": 41.5,
+            "clipped_fraction": 0.0197,
+            "hist_distance": 42.6
+          }
+        },
+        {
+          "case": "underexposed_0.5x",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 2,
+          "dominant": "inclusion",
+          "max_conf": 0.601,
+          "severity": 100.0,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 4.05,
+            "tonal_bits": 4.418,
+            "grey_mean": 29.6,
+            "grey_std": 5.5,
+            "clipped_fraction": 0.0,
+            "hist_distance": 99.6
+          }
+        },
+        {
+          "case": "upscaled_16x",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 7,
+          "dominant": "inclusion",
+          "max_conf": 0.675,
+          "severity": 100.0,
+          "band": "critical",
+          "signals": {
+            "height": 3200,
+            "width": 3200,
+            "min_side": 3200,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 3.58,
+            "tonal_bits": 5.403,
+            "grey_mean": 59.7,
+            "grey_std": 10.9,
+            "clipped_fraction": 0.0,
+            "hist_distance": 70.0
+          }
+        },
+        {
+          "case": "upscaled_4x",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 7,
+          "dominant": "inclusion",
+          "max_conf": 0.672,
+          "severity": 100.0,
+          "band": "critical",
+          "signals": {
+            "height": 800,
+            "width": 800,
+            "min_side": 800,
+            "aspect": 1.0,
+            "saturation": 0.0,
+            "edge_density": 0.0,
+            "focus": 3.59,
+            "tonal_bits": 5.403,
+            "grey_mean": 59.7,
+            "grey_std": 10.9,
+            "clipped_fraction": 0.0,
+            "hist_distance": 70.0
+          }
+        },
+        {
+          "case": "warm_cast_steel",
+          "decision": "pass",
+          "failed": [],
+          "n_detections": 6,
+          "dominant": "inclusion",
+          "max_conf": 0.686,
+          "severity": 100.0,
+          "band": "critical",
+          "signals": {
+            "height": 200,
+            "width": 200,
+            "min_side": 200,
+            "aspect": 1.0,
+            "saturation": 28.88,
+            "edge_density": 0.0,
+            "focus": 12.0,
+            "tonal_bits": 5.412,
+            "grey_mean": 60.0,
+            "grey_std": 11.3,
+            "clipped_fraction": 0.0,
+            "hist_distance": 69.7
+          }
+        }
+      ],
+      "correct": 11,
+      "n": 11
+    },
+    "latency_ms": {
+      "guard_200x200_best": 0.277,
+      "guard_200x200_median": 0.287,
+      "guard_1600x256_best": 3.895,
+      "guard_1600x256_median": 3.978,
+      "detector_predict_200x200_best": 9.822,
+      "detector_predict_200x200_median": 12.03,
+      "protocol": "best of 5 runs of 300 (60 for the detector), warm, Apple M5 / MPS"
+    },
+    "plane_ab": {
+      "question": "compute the texture statistics on the 256px analysis plane instead of full resolution?",
+      "noise_separation_fullres": 1.56,
+      "noise_separation_plane": 1.21,
+      "tonal_separation_fullres": 1.3,
+      "tonal_separation_plane": 0.38,
+      "decision": "full resolution; a downscaled QR code gains antialiased grey levels and would pass"
+    }
+  }
+}

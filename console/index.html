@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python console source | Surface defect detection</title>
+<meta name="description" content="The Streamlit surface inspection console in full: the app, six vendored inference modules, a Dockerfile, CPU-pinned requirements and both checkpoints. Runs locally in one command.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230C0F13'/%3E%3Crect x='5' y='5' width='22' height='22' fill='none' stroke='%23F5A524' stroke-width='2.5'/%3E%3Cpath d='M11 20 L16 11 L21 20' fill='none' stroke='%23F5A524' stroke-width='2.5'/%3E%3C/svg%3E">
+<style>
+  .ds { color: var(--dim); font-size: 0.85rem; max-width: 60ch; }
+  td a.mono { font-family: var(--mono); font-size: 0.78rem; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="brand">Jindal Stainless <span>/</span> console source</div>
+    <nav>
+      <a href="../">Back to the detector</a>
+      <a href="../#console">Why it is not embedded</a>
+      <a href="../evidence/">Evidence</a>
+      <a href="https://github.com/surface-vision/surface-vision.github.io/tree/main/console">On GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="kicker">The other console</p>
+    <h1>The Python console, in full, in this repository.</h1>
+    <p class="lede">
+      The detector on the front page runs in your browser and needs no server. This is the other half:
+      a Streamlit console that does the things a tab should not be asked to do &mdash; batch scoring and
+      coil reports, EigenCAM attention maps, a line-speed simulation, and the out-of-scope gate that
+      runs before the detector. It is not a plan and not a screenshot. Every file it needs is below.
+    </p>
+    <p class="note">
+      Hugging Face moved Docker and Gradio Spaces on free CPU behind a PRO subscription and left only
+      static Spaces free, so this container has no free host there. That is a price list, not a defect:
+      the package is an ordinary Docker image and runs anywhere a container runs, starting with your
+      laptop.
+    </p>
+    <pre class="cmd"><code>git clone https://github.com/surface-vision/surface-vision.github.io.git
+cd surface-vision.github.io/console
+docker build -t surface-console . &amp;&amp; docker run -p 7860:7860 surface-console</code></pre>
+    <p class="note">
+      Then open <code>http://127.0.0.1:7860</code>. Without Docker,
+      <code>pip install -r requirements.txt &amp;&amp; streamlit run app.py</code> on Python 3.11 does the
+      same. Both checkpoints are in the clone, so there is nothing to download and no token to obtain.
+    </p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>Every file</h2>
+    <p class="sub">
+      Plus 18 NEU-DET sample frames under <code>data/neu-det/test/images/</code> and one
+      line-scan strip capture under <code>assets/</code>, so the batch and simulation tabs have
+      something to run on out of the box.
+    </p>
+    <h3 class="cons-h">Application</h3>
+    <div class="tbl-wrap" style="margin-top:14px">
+      <table class="data">
+        <thead><tr><th>File</th><th>What it is</th><th class="num">Size</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="app.py" class="mono">app.py</a></td>
+            <td class="ds">The Streamlit application: four tabs -- single frame, batch, line simulation, defect atlas.</td>
+            <td class="num">149 KB</td>
+          </tr>
+          <tr>
+            <td><a href="README.md" class="mono">README.md</a></td>
+            <td class="ds">What the console does, in its own words, with the caveats attached.</td>
+            <td class="num">16 KB</td>
+          </tr>
+          <tr>
+            <td><a href="DEPLOY.md" class="mono">DEPLOY.md</a></td>
+            <td class="ds">How it would be pushed to a Space, including the git-lfs failure mode that would otherwise ship 130-byte pointer files instead of weights.</td>
+            <td class="num">8 KB</td>
+          </tr>
+          <tr>
+            <td><a href="Dockerfile" class="mono">Dockerfile</a></td>
+            <td class="ds">python:3.11-slim, non-root uid 1000, port 7860. What “one command” actually runs.</td>
+            <td class="num">2 KB</td>
+          </tr>
+          <tr>
+            <td><a href="requirements.txt" class="mono">requirements.txt</a></td>
+            <td class="ds">Pins torch to the CPU-only wheel via PyTorch's own index. The comment there explains why the plain PyPI pin would drag gigabytes of CUDA onto a host with no GPU.</td>
+            <td class="num">4 KB</td>
+          </tr>
+          <tr>
+            <td><a href="packages.txt" class="mono">packages.txt</a></td>
+            <td class="ds">The two apt libraries cv2 needs in a container with no X11.</td>
+            <td class="num">1 KB</td>
+          </tr>
+          <tr>
+            <td><a href=".streamlit/config.toml" class="mono">.streamlit/config.toml</a></td>
+            <td class="ds">The palette. The site, the console and the deck read from the same one.</td>
+            <td class="num">3 KB</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 class="cons-h">Inference modules</h3>
+    <div class="tbl-wrap" style="margin-top:14px">
+      <table class="data">
+        <thead><tr><th>File</th><th>What it is</th><th class="num">Size</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="vendor/ood_guard.py" class="mono">vendor/ood_guard.py</a></td>
+            <td class="ds">The out-of-scope gate. Runs first, before the detector, so a frame that is not steel gets a withheld verdict rather than a confident wrong answer.</td>
+            <td class="num">29 KB</td>
+          </tr>
+          <tr>
+            <td><a href="vendor/inference.py" class="mono">vendor/inference.py</a></td>
+            <td class="ds">Detection, severity scoring and the operating point. js/defect-info.js transcribes its scoring rule.</td>
+            <td class="num">54 KB</td>
+          </tr>
+          <tr>
+            <td><a href="vendor/calibrate.py" class="mono">vendor/calibrate.py</a></td>
+            <td class="ds">The isotonic calibrator. js/calibration.js transcribes its knots.</td>
+            <td class="num">59 KB</td>
+          </tr>
+          <tr>
+            <td><a href="vendor/explain.py" class="mono">vendor/explain.py</a></td>
+            <td class="ds">EigenCAM, with occlusion sensitivity as the fallback when the CAM degenerates.</td>
+            <td class="num">38 KB</td>
+          </tr>
+          <tr>
+            <td><a href="vendor/report.py" class="mono">vendor/report.py</a></td>
+            <td class="ds">The coil report: frame-level detections aggregated into a coil disposition.</td>
+            <td class="num">43 KB</td>
+          </tr>
+          <tr>
+            <td><a href="vendor/domain_shift.py" class="mono">vendor/domain_shift.py</a></td>
+            <td class="ds">Photometric normalisation between source domains.</td>
+            <td class="num">30 KB</td>
+          </tr>
+          <tr>
+            <td><a href="vendor/README.md" class="mono">vendor/README.md</a></td>
+            <td class="ds">Why these six modules are vendored rather than imported.</td>
+            <td class="num">3 KB</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 class="cons-h">Checkpoints and reference data</h3>
+    <div class="tbl-wrap" style="margin-top:14px">
+      <table class="data">
+        <thead><tr><th>File</th><th>What it is</th><th class="num">Size</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="models/yolov8n_neudet/weights/best.pt" class="mono">models/yolov8n_neudet/weights/best.pt</a></td>
+            <td class="ds">The shipped 6-class checkpoint. 6,222,186 bytes -- the file every accuracy figure on the site was measured on, and the one exported to the ONNX the browser runs.</td>
+            <td class="num">5.9 MB</td>
+          </tr>
+          <tr>
+            <td><a href="models/yolov8n_joint/weights/best.pt" class="mono">models/yolov8n_joint/weights/best.pt</a></td>
+            <td class="ds">The 10-class joint checkpoint: mAP50 0.7642, and the one that cuts clean-frame false alarms from 93.7% to 32.5%.</td>
+            <td class="num">6.0 MB</td>
+          </tr>
+          <tr>
+            <td><a href="models/domain_reference.json" class="mono">models/domain_reference.json</a></td>
+            <td class="ds">Reference statistics the OOD gate compares a frame against.</td>
+            <td class="num">6 KB</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 class="cons-h">Tools</h3>
+    <div class="tbl-wrap" style="margin-top:14px">
+      <table class="data">
+        <thead><tr><th>File</th><th>What it is</th><th class="num">Size</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="tools/bench_cpu.py" class="mono">tools/bench_cpu.py</a></td>
+            <td class="ds">The CPU latency benchmark.</td>
+            <td class="num">6 KB</td>
+          </tr>
+          <tr>
+            <td><a href="tools/measure_memory.py" class="mono">tools/measure_memory.py</a></td>
+            <td class="ds">Peak RSS measurement.</td>
+            <td class="num">7 KB</td>
+          </tr>
+          <tr>
+            <td><a href="tools/verify_vendor.py" class="mono">tools/verify_vendor.py</a></td>
+            <td class="ds">Checks the vendored modules still match the project originals.</td>
+            <td class="num">5 KB</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="../">Back to the detector</a>
+      <a href="../evidence/">Evidence</a>
+      <a href="https://github.com/surface-vision/surface-vision.github.io/tree/main/console">Browse on GitHub</a>
+      <a href="https://github.com/surface-vision/surface-vision.github.io">Repository</a>
+    </div>
+    <p>
+      A capability demonstration on public research datasets (NEU-DET, GC10-DET, Severstal), not a
+      Jindal Stainless production system. No line data was used.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

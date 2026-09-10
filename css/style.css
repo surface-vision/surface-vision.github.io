@@ -34,6 +34,13 @@
 
 * { box-sizing: border-box; }
 
+/* The UA rule is [hidden]{display:none}, one attribute selector -- which any author
+   class rule that sets `display` beats, because the author sheet outranks the UA sheet
+   at equal specificity. `.btn` sets display:inline-flex, so `<a class="btn" hidden>`
+   rendered as a visible button linking to "#". That is the console link, which must
+   stay invisible until HF_SPACE_URL exists. Make `hidden` mean hidden. */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -245,16 +252,35 @@ table.data tr:last-child td { border-bottom: none; }
 .lim .card h4 { color: var(--text); }
 .lim .card h4::before { content: '\2014\00a0'; color: var(--fail); }
 
-/* ---------- console placeholder ---------- */
+/* ---------- console ---------- */
 
-#console-slot .hatch {
-  background: repeating-linear-gradient(45deg, #1B2129, #1B2129 10px, #212936 10px, #212936 20px);
-  border: 1px solid var(--border); border-radius: 3px;
-  min-height: 200px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; text-align: center; padding: 34px 24px; gap: 8px;
+/* Two-column argument, collapsing to one before the columns get too narrow to read. */
+.cons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 24px; }
+.cons-col h3 { margin: 0 0 10px; font-size: 1.02rem; font-weight: 640; }
+.cons-col p { margin: 0 0 11px; font-size: 0.9rem; color: var(--dim); }
+.cons-col p:last-child { margin-bottom: 0; }
+.cons-col strong { color: var(--text); font-weight: 640; }
+
+.cons-h {
+  margin: 34px 0 0; font-size: 1.02rem; font-weight: 640;
+  padding-top: 22px; border-top: 1px solid var(--border-soft);
 }
-#console-slot .hatch .t { font-weight: 650; }
-#console-slot .hatch .d { color: var(--muted); font-size: 0.87rem; max-width: 56ch; }
+
+/* A command block is the one thing on the page that must not be re-wrapped: a broken
+   line is a command that does not run. It scrolls inside its own box instead. */
+.cmd {
+  margin: 14px 0 0; padding: 13px 15px; background: var(--panel-alt);
+  border: 1px solid var(--border); border-left: 2px solid var(--accent); border-radius: 3px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.cmd code {
+  font-family: var(--mono); font-size: 0.82rem; line-height: 1.75; color: var(--dim);
+  background: none; padding: 0; white-space: pre;
+}
+
+.cons-links { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+
+/* The optional live embed. Only ever present when HF_SPACE_URL is set. */
 #console-slot iframe { width: 100%; height: 78vh; min-height: 520px; border: 1px solid var(--border); border-radius: 3px; background: var(--panel-alt); }
 
 /* ---------- footer ---------- */
@@ -277,4 +303,60 @@ footer p { margin: 6px 0; max-width: 84ch; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .bar > i { transition: none; }
+}
+
+/* ---------- narrow viewports ----------
+   Judges open this on a phone. Three things break a dark data-dense page at 360 px:
+   long unbroken monospace strings (box coordinates, file paths, class names) pushing
+   the body wider than the screen; fixed multi-column grids; and 20 px gutters eating
+   a sixth of the width. Everything wide on this page -- tables, the command block,
+   the canvas -- already scrolls inside its own container, so the rule here is that
+   the BODY never scrolls sideways. */
+
+/* A belt-and-braces guard against one long token anywhere dragging the page wide. */
+html, body { overflow-x: hidden; }
+.wrap { width: 100%; }
+
+/* Monospace runs are the usual culprit: they have no spaces to break at. */
+.src, footer p, .card p, .cons-col p, .note { overflow-wrap: break-word; }
+code { overflow-wrap: break-word; }
+
+@media (max-width: 720px) {
+  .wrap { padding: 0 14px; }
+
+  h1 { font-size: clamp(1.5rem, 6.4vw, 2rem); line-height: 1.22; }
+  h2 { font-size: 1.18rem; }
+  section { padding: 34px 0; }
+
+  /* Auto-fit grids with a 260-320 px minimum still overflow a 360 px viewport once
+     the gutters are counted. Below this width one column is the only honest layout. */
+  .stats, .cards, .cons-grid, .demo-grid { grid-template-columns: 1fr; }
+  .timing { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .stat .v { font-size: 1.3rem; }
+  .lede { font-size: 0.97rem; }
+  .sub { font-size: 0.9rem; }
+
+  /* The masthead nav is already a horizontal scroller; hide the scrollbar so it does
+     not read as a broken element, and let it bleed to the screen edge so it is
+     obviously swipeable. */
+  .mast .wrap { gap: 12px; }
+  .mast .brand { font-size: 0.88rem; white-space: normal; }
+  .mast nav { gap: 14px; font-size: 0.8rem; scrollbar-width: none; -ms-overflow-style: none; }
+  .mast nav::-webkit-scrollbar { display: none; }
+
+  /* Full-width tap targets beat a row of half-width ones on a phone. */
+  .hero-actions .btn, .cons-links .btn { flex: 1 1 100%; text-align: center; }
+
+  .cmd code { font-size: 0.74rem; }
+  footer .links { gap: 10px 14px; }
+}
+
+@media (max-width: 420px) {
+  /* At iPhone SE width the coordinate column of the results table is what forces the
+     scroll. That is fine -- it scrolls in .tbl-scroll -- but the pills and swatches
+     should not wrap mid-row. */
+  .timing { grid-template-columns: 1fr; }
+  .chip { font-size: 0.72rem; }
+  table.data { font-size: 0.78rem; }
 }

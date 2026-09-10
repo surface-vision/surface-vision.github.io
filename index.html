@@ -21,6 +21,7 @@
       <a href="#crossdomain">Cross-domain fix</a>
       <a href="#limits">Limitations</a>
       <a href="#console">Console</a>
+      <a href="evidence/">Evidence</a>
     </nav>
   </div>
 </header>
@@ -29,7 +30,7 @@
 <div class="hero">
   <div class="wrap">
     <p class="kicker">Problem statement 1 &middot; AI surface defect detection</p>
-    <h1>A defect born upstream travels the whole route. This finds it, in your browser, in about ten milliseconds.</h1>
+    <h1>A defect born upstream travels the whole route. This finds it, in your browser, in about thirty milliseconds.</h1>
     <p class="lede">
       Crazing starts at reheat or coiling. Inclusions start at the caster. Rolled-in scale starts at the
       descaler. By the time a coil is graded, melting, rolling, annealing and pickling have all been paid
@@ -41,13 +42,18 @@
       This page is the detector itself, not a description of one. Drop in a steel image below and a
       3.0 M-parameter YOLOv8n runs on the WASM backend of ONNX Runtime, in the tab, with no server
       anywhere. The numbers it prints are calibrated probabilities, and the decode it runs has been
-      checked detection-for-detection against the Python model.
+      checked detection-for-detection against the Python model. Thirty milliseconds is the forward
+      pass measured inside the page itself <span id="heroLatency" class="mono"></span> &mdash;
+      single-threaded WASM, warm-up excluded. Your machine is not this machine, so the timing panel
+      below measures it on yours rather than repeating this number.
+      <span class="src">site/verify/parity_browser.json &rarr; summary.session_run_ms</span>
     </p>
 
     <div class="hero-actions">
       <a class="btn primary" href="#demo">Run the detector</a>
       <a class="btn" href="#parity">See the parity check</a>
-      <a class="btn" href="https://github.com/Prathmesh-28/surface">Repository</a>
+      <a class="btn" href="evidence/">Reports &amp; deck</a>
+      <a class="btn" href="https://github.com/surface-vision/surface-vision.github.io">Repository</a>
     </div>
 
     <div class="stats">
@@ -123,11 +129,13 @@
             <p class="note">
               Twelve NEU-DET test images, two per class, byte-identical copies from
               <code>data/neu-det/test/images</code> &mdash; a split no checkpoint was selected on. The two
-              italic chips are 2048&times;1000 GC10 line-scan frames: they show what the square resize does
-              to a real strip aspect ratio, and they are <em>out of domain for this head</em>. The roll-mark
-              frame raises seven spurious <code>inclusion</code> boxes at raw scores 0.155&ndash;0.418, and the
-              weld-line frame raises nothing at all. Neither is a bug in the page: it is exactly the
-              failure measured in the cross-domain section below.
+              italic chips are 2048&times;1000 GC10 line-scan frames, and they take a different route: at
+              that aspect ratio the frame is cut into three overlapping 1000&times;1000 windows, each
+              scaled uniformly, and merged with one global NMS. Watch the timing panel &mdash; it reports
+              three passes rather than one. They are also <em>out of domain for this head</em>: their real
+              defects are a roll mark and a weld line, and this six-class head has neither class, so what
+              comes back is the nearest class it owns. That is not a bug in the page; it is the failure
+              measured in the cross-domain section below, on a frame you can look at.
             </p>
 
             <div class="ctl" style="margin-top:20px">
@@ -224,6 +232,14 @@
       harness running the same ONNX file under onnxruntime-node. The harness is compared
       detection-for-detection with Python ultralytics at conf 0.15, IoU 0.45, imgsz 256.
     </p>
+    <p class="note">
+      Scope, stated up front: both runs below cover the twelve square NEU-DET frames, which take the
+      single-pass path. The tiled path the two strip chips take has no ultralytics reference to compare
+      against, so it is measured separately &mdash; squashed against tiled on the same two frames &mdash;
+      in <a href="verify/strip_check.json">strip_check.json</a>, and the browser's tiled output is
+      recorded under <code>out_of_domain</code> in
+      <a href="verify/parity_browser.json">parity_browser.json</a>.
+    </p>
 
     <h3>Run A &mdash; the decode module under onnxruntime-node, vs Python</h3>
     <div class="tbl-wrap">
@@ -268,12 +284,14 @@
       <div class="card">
         <h4>Scale, do not pad</h4>
         <p>
-          A non-square frame is squashed into the 256&times;256 input rather than letterboxed, because that
-          is what the project measured: lossless padding loses 0.024&ndash;0.052 mAP50 to ordinary bilinear
-          scaling at the same tensor size, on 8 of 8 configurations, and nearest-neighbour magnification
-          &mdash; also lossless &mdash; is the worst of five arms. For a square source, which every NEU-DET
-          frame is, scaling and letterboxing are the same operation. That is what makes this comparison a
-          valid check on the resize.
+          Within one window the frame is scaled into the 256&times;256 input rather than letterboxed,
+          because that is what the project measured: lossless padding loses 0.024&ndash;0.052 mAP50 to
+          ordinary bilinear scaling at the same tensor size, on 8 of 8 configurations, and
+          nearest-neighbour magnification &mdash; also lossless &mdash; is the worst of five arms. For a
+          square source, which every NEU-DET frame is, scaling and letterboxing are the same operation.
+          That is what makes this comparison a valid check on the resize. A frame that is <em>not</em>
+          square is not squashed either: it is cut into square windows first, so the scale stays uniform
+          on both axes. Padding and squashing are both avoided, by different means.
           <span class="src">reports/input_pipeline_decision.md section 3, reports/input_pipeline_probe.json</span>
         </p>
       </div>
@@ -340,7 +358,7 @@
           <tr><td class="mono"><span class="swatch" style="background:#3796FF"></span>patches</td><td class="num">0.949</td><td><div class="apbar" style="--cc:#3796FF"><i style="width:94.9%"></i></div></td><td class="num">0.622</td><td class="num">0.865</td><td class="num">0.889</td><td class="num">99</td></tr>
           <tr><td class="mono"><span class="swatch" style="background:#AA50DC"></span>pitted_surface</td><td class="num">0.756</td><td><div class="apbar" style="--cc:#AA50DC"><i style="width:75.6%"></i></div></td><td class="num">0.427</td><td class="num">0.657</td><td class="num">0.717</td><td class="num">46</td></tr>
           <tr><td class="mono"><span class="swatch" style="background:#F0BE00"></span>rolled-in_scale</td><td class="num">0.630</td><td><div class="apbar" style="--cc:#F0BE00"><i style="width:63.0%"></i></div></td><td class="num">0.277</td><td class="num">0.566</td><td class="num">0.594</td><td class="num">69</td></tr>
-          <tr><td class="mono"><span class="swatch" style="background:#00C8A0"></span>scratches</td><td class="num">0.909</td><td><div class="apbar" style="--cc:#00C8A0"><i style="width:90.9%"></i></div></td><td class="num">0.415</td><td class="num">0.652</td><td class="num">0.910</td><td class="num">64</td></tr>
+          <tr><td class="mono"><span class="swatch" style="background:#00C8A0"></span>scratches</td><td class="num">0.909</td><td><div class="apbar" style="--cc:#00C8A0"><i style="width:90.9%"></i></div></td><td class="num">0.415</td><td class="num">0.653</td><td class="num">0.910</td><td class="num">64</td></tr>
         </tbody>
       </table>
     </div>
@@ -395,7 +413,7 @@
         <h4>Nano, not small</h4>
         <p>
           The 3.7&times; larger yolov8s loses. At the training size the gap is +0.0688 mAP50 to nano, 95% CI
-          [+0.0309, +0.0990], nano winning in 99.95% of 1,000 bootstrap resamples; at deployment size
+          [+0.0309, +0.0990], nano winning in 99.95% of 2,000 bootstrap resamples; at deployment size
           +0.0181, CI [&minus;0.0084, +0.0424]. The larger model overfits: its classification-loss
           generalisation gap is +0.267 against nano's &minus;0.061. 3.012 M against 11.138 M parameters,
           1.312 against 4.584 GFLOPs at 256 px.
@@ -464,11 +482,15 @@
         <h4>You can see the failure in the demo above</h4>
         <p>
           Click the <em>strip 2048&times;1000 roll mark</em> chip. It is a GC10 line-scan frame of carbon
-          steel with a roll mark on it &mdash; a defect family this six-class head was never trained on. The
-          model raises seven <code>inclusion</code> boxes at raw scores 0.155&ndash;0.418. That is the 93.7%
-          number, live, on a frame you can look at. The weld-line frame raises nothing at all, which is the
-          other half of the same problem &mdash; a real defect this head has no class for.
-          <span class="src">site/verify/parity_browser.json &rarr; out_of_domain</span>
+          steel with a roll mark on it &mdash; a defect family this six-class head was never trained on.
+          Across three tiled passes it returns <code>rolled-in_scale</code> at raw 0.355 and
+          <code>inclusion</code> at 0.270. The weld-line frame returns <code>patches</code> at 0.526 and
+          0.308 and <code>scratches</code> at 0.369. Every one of those five calls is confidently the wrong
+          name, because the right name is not in this head's vocabulary &mdash; and none of them is a
+          refusal. That is the 93.7% number in miniature: a detector with no concept of &ldquo;something
+          else&rdquo; answers anyway. The joint checkpoint in the table above and the out-of-scope gate in
+          the console are the two fixes, and neither is wired into this page.
+          <span class="src">site/verify/parity_browser.json &rarr; out_of_domain (regenerated with the tiled path)</span>
         </p>
       </div>
       <div class="card">
@@ -670,10 +692,15 @@
         <p>
           It runs the six-class NEU-DET head, not the better 10-class joint checkpoint, so the cross-domain
           false alarms above are live here. It has no out-of-scope gate, so it will score a photograph of
-          anything. It squashes a non-square frame into 256&times;256 rather than tiling it, so a
-          2048&times;1000 strip loses aspect ratio &mdash; the shipped console tiles instead, with a single
-          global NMS. And it runs single-threaded WASM on your CPU, so its timing is not the deployment
-          timing.
+          anything &mdash; that gate is <code>vendor/ood_guard.py</code> in the Python console and it has
+          not been ported. Its tiled path over a non-square frame has no Python reference: ultralytics was
+          run on the twelve square NEU-DET frames, so the parity tables above cover the single-pass path
+          only, and the strip results are a browser-against-Node comparison rather than a check against
+          ultralytics. The two strip frames are GC10-DET captures whose real defects &mdash; a roll mark
+          and a weld line &mdash; are not classes this six-class head has, so what it returns on them is
+          the nearest class it owns, not a correct name. And it runs single-threaded WASM on your CPU, so
+          its timing is not the deployment timing.
+          <span class="src">site/verify/strip_check.json; site/verify/parity_browser.json &rarr; out_of_domain</span>
         </p>
       </div>
       <div class="card">
@@ -693,28 +720,151 @@
 <!-- ================================================= console ============== -->
 <section id="console">
   <div class="wrap">
-    <h2>The full console</h2>
+    <h2>The console</h2>
     <p class="sub">
-      The page above is one frame at a time. The Streamlit console is the rest of the system: batch
-      scoring, tiled inference over full-width strip frames with a single global NMS, coil-level
-      disposition against the HOLD / DOWNGRADE rules, the defect atlas, Grad-CAM explanations, the
-      out-of-scope gate, and MES-shaped JSON export. It needs Python and PyTorch, so it is deployed to
-      Hugging Face Spaces rather than to this static host.
+      There are two of them. One is this page, and it is running. The other is a Python console that
+      does the things a browser tab should not be asked to do. Neither is a mock-up of the other.
     </p>
-    <div id="console-slot" style="margin-top:22px">
-      <div class="hatch">
-        <div class="t">Console coming online</div>
-        <div class="d">
-          The Space is packaged and waiting on credentials. When it is up, its URL goes into the
-          <code>HF_SPACE_URL</code> constant at the top of <code>site/js/app.js</code> and it embeds here
-          &mdash; nothing else on this page changes.
+
+    <div id="console-slot">
+      <div id="console-static">
+
+        <div class="cons-grid">
+          <div class="cons-col">
+            <h3>This page is the inspection station</h3>
+            <p>
+              Not a description of one, and not a trailer for the Python build. The 12.1 MB
+              <code>yolov8n_neudet_best.onnx</code> you downloaded a few sections ago is the shipped
+              export of the shipped checkpoint. The resize, the NCHW packing, the decode, the
+              class-aware NMS and the isotonic calibration all come from
+              <code>site/js/detect.js</code>, <code>site/js/tiling.js</code> and
+              <code>site/js/calibration.js</code> &mdash; and those same three files are what
+              <code>site/verify</code> runs under onnxruntime-node and under headless Chrome to check
+              this page against Python ultralytics, detection for detection. Both tables in the
+              verification section above are that comparison.
+            </p>
+            <p>
+              It is not a thin demo. Full-width strip frames are cut into square windows and merged
+              with one global NMS rather than squashed into the square input. Confidences are the
+              calibrated probabilities, not the raw head scores. Severity is scored with the same
+              tier-times-confidence-times-area rule the Python path uses, and every detection carries
+              the operator action for its defect class. The confidence slider re-decodes from the
+              cached output tensors, so it moves the threshold the model was actually thresholded at.
+            </p>
+            <p class="src">site/js/detect.js; site/js/tiling.js; site/js/calibration.js; site/verify/parity_report.json; site/verify/parity_browser.json; site/verify/strip_check.json</p>
+          </div>
+
+          <div class="cons-col">
+            <h3>Running in the tab is the point, not the compromise</h3>
+            <p>
+              Strip imagery is process data. A mill that will not send coil photographs to a vendor
+              cloud has a real objection, and this architecture answers it structurally rather than
+              contractually: <strong>no frame leaves the machine.</strong> The image is read into a
+              canvas, turned into a tensor and discarded. There is no upload, no inference endpoint,
+              no bucket, no retention policy to negotiate.
+            </p>
+            <p>
+              What follows from that is not marketing. There is no cloud dependency, so a WAN outage
+              does not stop inspection. There is no per-inference cost and no autoscaling bill. There
+              is no cold start &mdash; the session is warmed once and the model stays resident. And the
+              artefact is portable in the way that matters: a single ONNX file and a WASM runtime that
+              needs no GPU, no CUDA and no Python. The same file that ran in this tab is the file an
+              industrial PC on the mill floor would load through onnxruntime, which is the version of
+              this that would actually be deployed.
+            </p>
+            <p class="note">
+              To be precise about the claim: the browser is how deployability is
+              <em>demonstrated</em> here, not a proposal to run production quality control as a web
+              page. It is the same weights and the same arithmetic on a runtime anyone can audit by
+              opening dev tools &mdash; and single-threaded WASM on a laptop is a lower bound on the
+              hardware, not the deployment target.
+            </p>
+          </div>
         </div>
-        <div class="d" style="color:#5C6675">
-          Until then, the detector in the section above is the real model, running the real weights.
+
+        <h3 class="cons-h">What the Python console adds over this page</h3>
+        <p class="sub">
+          Four things, and they are the four this page genuinely should not do. They are why the
+          console exists rather than being folded into the tab.
+        </p>
+        <div class="cards">
+          <div class="card">
+            <h4>Batch scoring and the coil report</h4>
+            <p>
+              Many frames through <code>predict_batch</code>, a sortable frame table, then coil-level
+              disposition against the HOLD and DOWNGRADE rules and a downloadable coil report from
+              <code>vendor/report.py</code>. A coil verdict is an aggregate over hundreds of frames;
+              one frame at a time cannot produce one.
+            </p>
+          </div>
+          <div class="card">
+            <h4>EigenCAM attention maps</h4>
+            <p>
+              An <em>Explain</em> button runs a second instrumented forward pass through
+              <code>vendor/explain.py</code> and renders where the layer's features responded, with an
+              occlusion-sensitivity fallback when the CAM degenerates. It needs the PyTorch graph, not
+              the frozen ONNX export this page carries, so it cannot run here at all.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Line simulation</h4>
+            <p>
+              N frames scored one at a time to show per-frame latency, the frame rate a strip at a
+              given speed implies, and how many accelerators a full-width line would need. It is the
+              capacity argument, and it needs a controlled sequential run rather than a click.
+            </p>
+          </div>
+          <div class="card">
+            <h4>The out-of-scope gate</h4>
+            <p>
+              <code>vendor/ood_guard.py</code> runs <em>first</em> in the console: a six-class defect
+              head has no &ldquo;not steel&rdquo; class, so a frame the gate rejects gets a withheld
+              verdict instead of a confident wrong answer. <strong>This page has no such gate</strong>
+              and will happily score a photograph of anything &mdash; the limitation is listed above
+              because it is real.
+            </p>
+          </div>
         </div>
+
+        <h3 class="cons-h">Where it is, and how to run it</h3>
+        <p class="sub">
+          The console is not a plan. It is in this repository, at <code>console/</code>, complete: the
+          Streamlit application, the six <code>vendor/</code> modules it imports, a Dockerfile, a
+          <code>requirements.txt</code> that pins torch to the CPU-only wheel, the 18 sample frames,
+          and both 6 MB checkpoints &mdash; including <code>yolov8n_neudet/weights/best.pt</code>, the
+          exact 6,222,186-byte file every accuracy number on this page was measured on.
+        </p>
+        <pre class="cmd"><code>git clone https://github.com/surface-vision/surface-vision.github.io.git
+cd surface-vision.github.io/console
+docker build -t surface-console . &amp;&amp; docker run -p 7860:7860 surface-console</code></pre>
+        <p class="note">
+          Then open <code>http://127.0.0.1:7860</code>. Without Docker,
+          <code>pip install -r requirements.txt &amp;&amp; streamlit run app.py</code> in the same
+          directory does the same thing on Python 3.11.
+        </p>
+        <p class="cons-links">
+          <a class="btn" href="https://github.com/surface-vision/surface-vision.github.io/tree/main/console">Browse console/ on GitHub</a>
+          <a class="btn" href="console/README.md">Console README</a>
+          <a class="btn" href="console/app.py">app.py</a>
+          <a class="btn" href="console/Dockerfile">Dockerfile</a>
+          <a class="btn" href="console/vendor/ood_guard.py">ood_guard.py</a>
+        </p>
+
+        <p class="note">
+          It is not embedded on this page for one reason, and the reason is a price list rather than a
+          bug: Hugging Face now requires a PRO subscription for Docker and Gradio Spaces on free CPU,
+          and only <em>static</em> Spaces remain free. A Streamlit console in a container has no free
+          host there. The package is unchanged and host-agnostic &mdash; it is an ordinary Docker image
+          and runs anywhere a container runs. If a paid host is attached, its URL goes into the
+          <code>HF_SPACE_URL</code> constant in <code>site/js/app.js</code> and this section becomes
+          the live console embedded in place, with no other edit anywhere on the site.
+        </p>
       </div>
     </div>
-    <p style="margin-top:14px"><a class="btn" id="console-link" href="#" hidden>Open the console in a new tab</a></p>
+
+    <p class="cons-links" style="margin-top:18px">
+      <a class="btn primary" id="console-link" href="#" hidden>Open the hosted console in a new tab</a>
+    </p>
   </div>
 </section>
 
@@ -722,16 +872,20 @@
 <footer>
   <div class="wrap">
     <div class="links">
-      <a href="https://github.com/Prathmesh-28/surface">Repository</a>
-      <a href="https://github.com/Prathmesh-28/surface/blob/main/reports/evaluation.md">Evaluation report</a>
-      <a href="https://github.com/Prathmesh-28/surface/blob/main/reports/model_study.md">Model study</a>
-      <a href="https://github.com/Prathmesh-28/surface/blob/main/reports/gap1_cross_domain_fix.md">Cross-domain fix</a>
-      <a href="https://github.com/Prathmesh-28/surface/blob/main/reports/calibration.md">Calibration</a>
-      <a href="https://github.com/Prathmesh-28/surface/blob/main/reports/gc10_coverage.md">GC10 coverage</a>
-      <a href="https://github.com/Prathmesh-28/surface/blob/main/reports/ood_guard.md">Out-of-scope gate</a>
-      <a href="https://github.com/Prathmesh-28/surface/blob/main/reports/input_pipeline_decision.md">Input pipeline</a>
-      <a href="https://github.com/Prathmesh-28/surface/blob/main/reports/false_alarm.md">False alarms</a>
+      <a href="evidence/">All evidence</a>
+      <a href="evidence/deck/JSW_Surface_Defect_Detection.pptx">Deck (pptx)</a>
+      <a href="evidence/reports/evaluation.md">Evaluation report</a>
+      <a href="evidence/reports/model_study.md">Model study</a>
+      <a href="evidence/reports/gap1_cross_domain_fix.md">Cross-domain fix</a>
+      <a href="evidence/reports/calibration.md">Calibration</a>
+      <a href="evidence/reports/gc10_coverage.md">GC10 coverage</a>
+      <a href="evidence/reports/ood_guard.md">Out-of-scope gate</a>
+      <a href="evidence/reports/input_pipeline_decision.md">Input pipeline</a>
+      <a href="evidence/reports/false_alarm.md">False alarms</a>
       <a href="verify/parity_report.json">parity_report.json</a>
+      <a href="verify/strip_check.json">strip_check.json</a>
+      <a href="console/">Python console source</a>
+      <a href="https://github.com/surface-vision/surface-vision.github.io">Repository</a>
     </div>
     <p>
       Classes, in head-index order: <span class="mono" id="classList"></span>.
@@ -747,8 +901,11 @@
     <p>
       Runtime: onnxruntime-web on the WASM backend, pinned to 1.23.2, loaded from jsDelivr. No build step,
       no bundler, no framework &mdash; plain HTML, CSS and ES modules. Every figure on this page names the
-      file it came from; the 54-row number-to-source audit table is in
-      <code>deck/deck_content.md</code>.
+      file it came from, and the file it names is published under
+      <a href="evidence/">evidence/</a> &mdash; 14 report narratives and 28 JSON artefacts, copied from the
+      project's <code>reports/</code> with absolute build paths rewritten to repository-relative ones and
+      nothing else changed. The 54-row number-to-source audit table is in
+      <a href="evidence/deck/deck_content.md">deck_content.md</a>.
     </p>
   </div>
 </footer>
