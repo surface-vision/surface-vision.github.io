@@ -68,8 +68,10 @@ on the judge's own machine through onnxruntime-web. Twelve of the held-out test 
 slide are built into the page as one-click samples, and any image can be dropped onto it. If a
 judge opens it while I am talking, everything on slides 3 and 4 can be checked in the room.
 
-Two honest details if asked. It runs on the WASM backend, single-threaded, 31.7 ms median a frame
-in Chrome on the machine we measured (site/verify/parity_browser.json); your machine will differ, and
+Two honest details if asked. It runs on the WASM backend, single-threaded, 30-50 ms a frame in
+Chrome on the machine we measured (site/verify/parity_browser.json median 31.7 ms, deck/build/
+live_demo_check.json median 49.1 ms -- the same harness, 1.6x apart between runs); your machine
+will differ, and
 the page times itself rather than repeating our number. And the first load pulls a 12.1 MB model
 once, so on hotel wifi give it a few seconds -- after that it is instant, and it works offline.
 
@@ -302,7 +304,8 @@ holds the decoder constant and says so.
 
 No absolute frame rate anywhere on this slide: GPU throughput on this host moved between 234 and
 283 f/s across sessions for the same model. Bands and ratios only, same discipline as before. The
-browser figure obeys the same rule -- 31.7 ms is one machine, one thread, one frame.
+browser figure obeys the same rule -- 30-50 ms is one machine, one thread, one frame, and the same
+harness on the same 12 frames returned medians of 31.7 ms and 49.1 ms in two recorded runs.
 
 ---
 
@@ -324,7 +327,7 @@ browser figure obeys the same rule -- 31.7 ms is one machine, one thread, one fr
 4. Input size pinned as an accuracy parameter. The same weights lose 54% of mAP50 at 640 px, silently -- and a proper 640 px retrain, now tested, only ties within noise.
 5. Explainable, calibrated, and gated. EigenCAM shows what fired; calibration cuts ECE 0.142 -> 0.046; an OOD gate withholds verdicts on non-steel input, 0 false rejections on 3,200 frames.
 6. YOLO by argument, not by default. On this dataset the published out-of-the-box transformer numbers are DETR 25.2 and RT-DETR 55.0 mAP50 against YOLOv11's 71.6.
-7. Deployable where the data is. The detector is 6.22 MB as PyTorch, 12.1 MB as ONNX, and runs client-side at surface-vision.github.io -- real Chrome, WASM, one thread, 31.7 ms median per frame, 40 of 40 detections identical to PyTorch within 0.14 px. No strip image leaves the plant, no cloud, no per-inference cost, no cold start. A proof of deployability, not a proposal to inspect coil in a browser tab.
+7. Deployable where the data is. The detector is 6.22 MB as PyTorch, 12.1 MB as ONNX, and runs client-side at surface-vision.github.io -- real Chrome, WASM, one thread, 30-50 ms per frame, 40 of 40 detections identical to PyTorch within 0.14 px. No strip image leaves the plant, no cloud, no per-inference cost, no cold start. A proof of deployability, not a proposal to inspect coil in a browser tab.
 
 **Assumptions and limitations**
 
@@ -333,7 +336,7 @@ browser figure obeys the same rule -- 31.7 ms is one machine, one thread, one fr
 - **False alarms.** Three different measurements, not one. The NEU-DET clean-crop proxy (<=23.7%) is a ceiling: effective n 179 of 771, a 5.8%-48.8% mixture by class. The legacy definition reads 59.4%. Slide 3 real clean-steel numbers are the ones to trust.
 - **GC10 thin classes.** Roll marks (rolled_pit, crease) score mean AP50 0.203 on 24 test instances -- one flip moves recall 8-9 points, and 4 of 11 live rolled_pit images produce zero detections. The edge family (AP50 0.880, 61 instances) is a strong proxy for edge geometry, not cracks.
 - **Cost model.** Defect prevalence (5% of frames) and the miss-to-false-alarm price (12:1) are assumptions, not measurements, and only their combination is identifiable. conf 0.15 is set by the 90% detection floor, not by the economics.
-- **Timing.** No absolute latency on this host is reproducible between sessions. Every speed statement here is a band or a ratio -- the browser demo's 31.7 ms median included, which is one machine, one WASM thread, one frame at a time, and is not a line rate.
+- **Timing.** No absolute latency on this host is reproducible between sessions. Every speed statement here is a band or a ratio, never a line rate -- the browser demo included: two recorded runs of the same 12 frames median 31.7 ms and 49.1 ms.
 - **Not measured.** Training-seed variance. Three seeds per architecture is about 6.5 h on this machine and would upgrade the nano-versus-small claim from 'these weights' to 'this architecture'.
 - **Mill geometry.** Line speed, strip width and pixel pitch are a sourced proxy (Ternium at 300 m/min; ISRA at 170 um/px), not Jindal's own figures.
 - **Magnification.** The accuracy curve was measured on 200x200 crops; a 320 px tile at 0.2 mm/px covers 64 mm of strip, and transfer across that scale change is unmeasured. Phase 0 measures it.
@@ -413,7 +416,7 @@ page at all.
 
 Give the boundary before anyone asks for it. This demonstrates deployability; it is not a claim
 that production inspection should run in a web browser. The page is single-threaded WASM handling
-one frame at a time at about 32 ms; slide 2's arithmetic says a real line at full optical
+one frame at a time at 30-50 ms; slide 2's arithmetic says a real line at full optical
 resolution needs about 3,064 inferences a second. The browser is the operator console and the
 proof that the artefact is small enough and portable enough; the line runs the same ONNX on
 accelerators. What transfers between the two is exactly what parity proves: identical detections.
@@ -591,7 +594,7 @@ Every figure that appears on a slide, and the file a judge can open to check it.
 | 53 | OOD gate: **0** false rejections on **3,200** genuine steel frames (1,440+180+180 NEU-DET, 1,400 Severstal); **13/15** correct on the held-out synthetic-negative suite | 4 | `reports/ood_guard.json` -> `ood_guard.real_steel.*` (all `rejected_names` empty), `ood_guard.negatives_heldout.cases`; `reports/ood_guard.md` "Measured -- the confusion table" and "held-out negatives" tables |
 | 54 | Regression: shipped model still reproduces mAP50 **0.7524** exactly after all of the above; `resolve_weights()` and `DEFAULT_IMGSZ=256` unchanged; full suite **540 passed, 8 skipped, 0 failed** | 2, 3, 4 | `reports/gap1_cross_domain_fix.md` section 5 (8-significant-figure reproduction) and section 10 (`resolve_weights()` untouched); `.venv/bin/python -m pytest tests/ -q` run 2026-09-10 |
 | 55 | Browser parity: **40 of 40** detections matched over **12** held-out frames, max box delta **0.14 px** (0.14238), max raw-confidence delta **0.0016** (1.568e-03), **0** discrepancies, verdict **PASS** | 1, 3, 4 | `site/verify/parity_browser.json` -> `summary` (the published page itself, driven in Chrome 148.0.7778.167); the same figures from the decode module under onnxruntime-node are in `site/verify/parity_report.json` -> `summary`. Tolerances 2 px and 0.01, recorded in both files |
-| 56 | Browser inference **31.7 ms** median per frame (min 26.4, max 32.2), preprocess **2.5 ms** median, decode+NMS **0.1 ms** median, warm-up **37 ms** excluded | 4 | `site/verify/parity_browser.json` -> `summary.session_run_ms`, `summary.preprocess_ms`, `summary.decode_nms_ms`, `summary.warmup_ms`; onnxruntime-web on the WASM backend, single-threaded, 200x200 frames at 256 px. The same ONNX under onnxruntime-node on the same machine runs **7.7 ms** median (`site/verify/parity_report.json` -> `summary.median_session_run_ms`) -- a native-versus-WASM difference, not a different model |
+| 56 | Browser inference **30-50 ms** per frame: median **31.7 ms** (min 26.4, max 32.2) in one recorded run and **49.1 ms** (min 26.4, max 94.9) in another, same harness, same 12 frames; preprocess **2.5 ms** median, decode+NMS **0.1 ms** median, warm-up **37 ms** excluded. Quoted as a band because it does not reproduce to a single figure on this host | 4 | `site/verify/parity_browser.json` -> `summary.session_run_ms`, `summary.preprocess_ms`, `summary.decode_nms_ms`, `summary.warmup_ms` and `deck/build/live_demo_check.json` -> `browser_infer_ms`; onnxruntime-web on the WASM backend, single-threaded, 200x200 frames at 256 px. The same ONNX under onnxruntime-node on the same machine runs **7.7 ms** median (`site/verify/parity_report.json` -> `summary.median_session_run_ms`) -- a native-versus-WASM difference, not a different model |
 | 57 | Artefact size **12.1 MB** as ONNX, **6.22 MB** as PyTorch, **3.012 M** parameters | 1, 2, 4, 5 | `site/model/yolov8n_neudet_best.onnx` is 12,128,540 bytes; `reports/model_study.json` -> `checkpoints.yolov8n.weight_file_mb`, `params` |
 | 58 | Live page: HTTP **200**, **27** requests on a cold load, **0** non-GET, **0** carrying a request body, one third-party host (cdn.jsdelivr.net, the runtime), **14** built-in samples all producing detections, **0** page errors, **0** failed or 4xx/5xx requests | 1, 4, 5 | `deck/build/live_demo_check.json`, produced by `node deck/build/verify_live_demo.mjs` against <https://surface-vision.github.io> in Chrome 148.0.7778.167 on 2026-09-10. The request log is in the file, request by request |
 | 59 | The QR code on slide 1 encodes `https://surface-vision.github.io` (version 3, level Q, 29x29 modules, mask 2) | 1 | Generated by `deck/build/qrgen.py`, which has no third-party dependency and verifies itself by reversing its own encoding (Reed-Solomon syndromes zero on every block); decoded back from the rendered PNG by Apple's Vision and Core Image readers via `deck/build/verify_qr.swift`, and by `deck/build/verify_deck.py`, which decodes the copy actually embedded in the .pptx |

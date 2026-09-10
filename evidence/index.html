@@ -47,10 +47,11 @@
       the experiments wrote.
     </p>
     <p class="note">
-      One transformation was applied on copy, and only one: absolute build paths of the form
-      <code>/Users/&hellip;/JSW-PS1/</code> were rewritten to repository-relative, because a file served
-      publicly should not publish the build host's home directory. No number, table or sentence was
-      changed. The originals live in the project's <code>reports/</code> and <code>deck/</code>.
+      One transformation was applied on copy, and only one: absolute build paths were rewritten &mdash;
+      <code>/Users/&hellip;/JSW-PS1/</code> to repository-relative, and scratch paths outside the
+      repository to <code>&lt;scratch&gt;/</code> &mdash; because a file served publicly should not
+      publish the build host's home directory. No number, table or sentence was changed. The originals
+      live in the project's <code>reports/</code> and <code>deck/</code>.
     </p>
   </div>
 </div>
@@ -221,7 +222,10 @@
           against Python ultralytics under onnxruntime-node;
           <a href="../verify/parity_browser.json">parity_browser.json</a> is the published page itself
           driven in headless Chrome; <a href="../verify/strip_check.json">strip_check.json</a> is the
-          wide-strip comparison, squashed against tiled. The harness that writes them is
+          wide-strip comparison, squashed against tiled;
+          <a href="../verify/live_demo_check.json">live_demo_check.json</a> is a cold load of the live
+          URL with every request it made logged, which is where the "nothing is uploaded" claim comes
+          from and the second of the two timing runs the front page quotes as a band. The harness that writes them is
           <a href="https://github.com/surface-vision/surface-vision.github.io/tree/main/verify">verify/</a>.
         </p>
       </div>

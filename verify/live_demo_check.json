@@ -1,0 +1,190 @@
+{
+  "generated_at": "2026-09-10T07:49:33Z",
+  "url": "https://surface-vision.github.io/",
+  "chrome": "Chrome/148.0.7778.167",
+  "http_status": 200,
+  "title": "Surface defect detection on stainless strip | Jindal Stainless",
+  "dom_ready_ms": 855,
+  "samples_clicked": 14,
+  "frames_with_detections": 14,
+  "total_detections": 45,
+  "browser_infer_ms": {
+    "min": 26.400000005960464,
+    "median": 49.099999994039536,
+    "max": 94.90000000596046
+  },
+  "requests_total": 27,
+  "requests_non_get": 0,
+  "requests_with_body": 0,
+  "third_party_hosts": [
+    "cdn.jsdelivr.net"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/",
+      "type": "document",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/css/style.css",
+      "type": "stylesheet",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/js/app.js",
+      "type": "script",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/js/detect.js",
+      "type": "script",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/js/tiling.js",
+      "type": "script",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/js/calibration.js",
+      "type": "script",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/js/defect-info.js",
+      "type": "script",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/verify/parity_report.json",
+      "type": "fetch",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/verify/parity_browser.json",
+      "type": "fetch",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/crazing_271.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.2/dist/ort.wasm.min.mjs",
+      "type": "script",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/model/yolov8n_neudet_best.onnx",
+      "type": "fetch",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.2/dist/ort-wasm-simd-threaded.mjs",
+      "type": "script",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.2/dist/ort-wasm-simd-threaded.wasm",
+      "type": "fetch",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/crazing_272.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/inclusion_271.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/inclusion_272.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/patches_271.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/patches_272.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/pitted_surface_271.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/pitted_surface_272.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/rolled-in_scale_271.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/rolled-in_scale_272.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/scratches_271.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/scratches_272.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/strip_rollmark.jpg",
+      "type": "image",
+      "post_bytes": 0
+    },
+    {
+      "method": "GET",
+      "url": "https://surface-vision.github.io/samples/strip_weldline.jpg",
+      "type": "image",
+      "post_bytes": 0
+    }
+  ],
+  "page_errors": [],
+  "console_errors": [],
+  "bad_requests": [],
+  "verdict": "PASS"
+}

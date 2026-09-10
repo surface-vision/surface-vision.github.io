@@ -30,7 +30,7 @@
 <div class="hero">
   <div class="wrap">
     <p class="kicker">Problem statement 1 &middot; AI surface defect detection</p>
-    <h1>A defect born upstream travels the whole route. This finds it, in your browser, in about thirty milliseconds.</h1>
+    <h1>A defect born upstream travels the whole route. This finds it, in your browser, in tens of milliseconds.</h1>
     <p class="lede">
       Crazing starts at reheat or coiling. Inclusions start at the caster. Rolled-in scale starts at the
       descaler. By the time a coil is graded, melting, rolling, annealing and pickling have all been paid
@@ -42,11 +42,13 @@
       This page is the detector itself, not a description of one. Drop in a steel image below and a
       3.0 M-parameter YOLOv8n runs on the WASM backend of ONNX Runtime, in the tab, with no server
       anywhere. The numbers it prints are calibrated probabilities, and the decode it runs has been
-      checked detection-for-detection against the Python model. Thirty milliseconds is the forward
-      pass measured inside the page itself <span id="heroLatency" class="mono"></span> &mdash;
-      single-threaded WASM, warm-up excluded. Your machine is not this machine, so the timing panel
-      below measures it on yours rather than repeating this number.
-      <span class="src">site/verify/parity_browser.json &rarr; summary.session_run_ms</span>
+      checked detection-for-detection against the Python model. Thirty to fifty milliseconds is the
+      forward pass measured inside the page itself <span id="heroLatency" class="mono"></span> &mdash;
+      single-threaded WASM, warm-up excluded. That is a band and not a figure on purpose: two
+      recorded runs of the same twelve frames returned medians 1.6&times; apart. Your machine is not
+      this machine either, so the timing panel below measures it on yours rather than repeating
+      any of this.
+      <span class="src">site/verify/parity_browser.json &rarr; summary.session_run_ms (31.7 ms); site/verify/live_demo_check.json &rarr; browser_infer_ms (49.1 ms)</span>
     </p>
 
     <div class="hero-actions">
