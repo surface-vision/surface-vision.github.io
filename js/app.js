@@ -1,0 +1,605 @@
+/**
+ * Browser detector for the Jindal Stainless surface-defect model.
+ *
+ * Real inference, in the tab, with no backend: onnxruntime-web on the WASM backend
+ * runs the same 12.1 MB yolov8n_neudet_best.onnx the Python console runs. Every
+ * numeric step -- resize, normalise, decode, NMS, calibrate -- comes from
+ * ./detect.js and ./calibration.js, which site/verify runs under onnxruntime-node
+ * against the Python model. See site/verify/parity_report.json for the result.
+ */
+
+import {
+  CLASS_NAMES, CLASS_COLORS, IMGSZ, SHIPPED_CONF, NMS_IOU,
+  preprocess, decode,
+} from './detect.js';
+import { calibrate, CALIBRATION } from './calibration.js';
+import { DEFECT_INFO, scoreDetection, severityBucket } from './defect-info.js';
+
+/* ==========================================================================
+ * FILL THIS IN AFTER THE HUGGING FACE DEPLOYMENT.
+ *
+ * Paste the Space's embed URL, e.g.
+ *   'https://prathmesh-28-jindal-surface-console.hf.space'
+ * Leave it as the empty string and the console section shows a "coming online"
+ * placeholder instead of a broken iframe. Nothing else needs to change.
+ * ========================================================================== */
+const HF_SPACE_URL = '';
+
+/* onnxruntime-web, pinned to an exact version on both mirrors.
+ *
+ * ort.wasm.* is the WASM-ONLY build. The default ort.min.mjs pulls the JSEP/WebGPU
+ * binary, which is 23.8 MB; this one pulls the plain 11.9 MB binary and nothing else.
+ *
+ * Two bases, tried in order, because a demo whose only job is to open reliably should
+ * not have a single point of failure in a CDN. Both host the identical 1.23.2 files. */
+const ORT_VERSION = '1.23.2';
+const ORT_BASES = [
+  `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`,
+  `https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/${ORT_VERSION}/`,
+];
+const MODEL_URL = new URL('../model/yolov8n_neudet_best.onnx', import.meta.url).href;
+
+const SAMPLES = [
+  { file: 'crazing_271.jpg', cls: 'crazing' },
+  { file: 'crazing_272.jpg', cls: 'crazing' },
+  { file: 'inclusion_271.jpg', cls: 'inclusion' },
+  { file: 'inclusion_272.jpg', cls: 'inclusion' },
+  { file: 'patches_271.jpg', cls: 'patches' },
+  { file: 'patches_272.jpg', cls: 'patches' },
+  { file: 'pitted_surface_271.jpg', cls: 'pitted_surface' },
+  { file: 'pitted_surface_272.jpg', cls: 'pitted_surface' },
+  { file: 'rolled-in_scale_271.jpg', cls: 'rolled-in_scale' },
+  { file: 'rolled-in_scale_272.jpg', cls: 'rolled-in_scale' },
+  { file: 'scratches_271.jpg', cls: 'scratches' },
+  { file: 'scratches_272.jpg', cls: 'scratches' },
+  { file: 'strip_rollmark.jpg', cls: null, label: 'strip 2048x1000 roll mark', wide: true },
+  { file: 'strip_weldline.jpg', cls: null, label: 'strip 2048x1000 weld line', wide: true },
+];
+
+const $ = (id) => document.getElementById(id);
+const rgb = (name) => `rgb(${(CLASS_COLORS[name] || [255, 255, 255]).join(',')})`;
+const fmt = (v, n = 3) => v.toFixed(n);
+
+const state = {
+  ort: null,
+  session: null,
+  loading: null,
+  /** Last raw output0 tensor, kept so the slider re-filters without a session.run. */
+  raw: null,
+  rawDims: null,
+  image: null,      // { bitmapOrImg, width, height, name }
+  dets: [],
+  selected: -1,
+  conf: SHIPPED_CONF,
+  timing: { infer: null, pre: null, post: null, first: null },
+};
+
+/* ---------------------------------------------------------------- status ---- */
+
+function status(msg, isError = false) {
+  const el = $('status');
+  el.textContent = msg;
+  el.classList.toggle('err', isError);
+}
+
+function progress(frac) {
+  $('progbar').style.width = `${Math.max(0, Math.min(1, frac)) * 100}%`;
+}
+
+/* ------------------------------------------------------------ model load ---- */
+
+/**
+ * Lazy: nothing heavy is fetched until the first image. The ONNX file is streamed
+ * with fetch so the progress bar is real byte progress, not a spinner pretending.
+ */
+async function ensureSession() {
+  if (state.session) return state.session;
+  if (state.loading) return state.loading;
+
+  state.loading = (async () => {
+    status(`loading onnxruntime-web ${ORT_VERSION} (WASM)...`);
+    let ort = null;
+    let base = null;
+    const tried = [];
+    for (const candidate of ORT_BASES) {
+      try {
+        ort = await import(/* @vite-ignore */ `${candidate}ort.wasm.min.mjs`);
+        base = candidate;
+        break;
+      } catch (err) {
+        tried.push(`${new URL(candidate).host}: ${err.message}`);
+      }
+    }
+    if (!ort) throw new Error(`no CDN reachable for onnxruntime-web -- ${tried.join(' | ')}`);
+
+    // Without this the runtime looks for its .wasm next to THIS page and fails,
+    // usually silently: no exception, just a session that never resolves. It must
+    // point at the CDN directory the loader itself came from, trailing slash included.
+    ort.env.wasm.wasmPaths = base;
+    // GitHub Pages cannot send COOP/COEP, so SharedArrayBuffer is unavailable and
+    // the threaded build would fall back anyway. Asking for 1 thread up front keeps
+    // the failure out of the console and the start-up deterministic.
+    ort.env.wasm.numThreads = 1;
+    ort.env.wasm.proxy = false;
+    ort.env.logLevel = 'error';
+    state.ort = ort;
+
+    status('downloading model (12.1 MB)...');
+    const buf = await fetchWithProgress(MODEL_URL);
+    progress(1);
+
+    status('initialising session...');
+    const session = await ort.InferenceSession.create(buf, {
+      executionProviders: ['wasm'],
+      graphOptimizationLevel: 'all',
+    });
+    state.session = session;
+
+    // Warm-up. The first run pays for WASM code-gen and arena allocation and is
+    // reported separately; it is never mixed into the quoted inference time.
+    const zeros = new Float32Array(3 * IMGSZ * IMGSZ);
+    const t0 = performance.now();
+    await session.run({ images: new ort.Tensor('float32', zeros, [1, 3, IMGSZ, IMGSZ]) });
+    state.timing.first = performance.now() - t0;
+
+    status(`ready -- onnxruntime-web ${ORT_VERSION}, WASM, 1 thread, via ${new URL(base).host}`);
+    return session;
+  })().catch((err) => {
+    state.loading = null;
+    status(`model failed to load: ${err.message}`, true);
+    throw err;
+  });
+
+  return state.loading;
+}
+
+async function fetchWithProgress(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  const total = Number(res.headers.get('content-length')) || 0;
+  if (!res.body || !total) return await res.arrayBuffer();
+
+  const reader = res.body.getReader();
+  const chunks = [];
+  let got = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    got += value.length;
+    progress(got / total);
+    status(`downloading model ${(got / 1048576).toFixed(1)} / ${(total / 1048576).toFixed(1)} MB`);
+  }
+  const out = new Uint8Array(got);
+  let o = 0;
+  for (const c of chunks) { out.set(c, o); o += c.length; }
+  return out.buffer;
+}
+
+/* ------------------------------------------------------------- inference ---- */
+
+/** Original-size RGBA out of any drawable source. drawImage at natural size only. */
+function pixelsOf(src, w, h) {
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.imageSmoothingEnabled = false;
+  g.drawImage(src, 0, 0);
+  return g.getImageData(0, 0, w, h).data;
+}
+
+async function runOn(source, width, height, name) {
+  const session = await ensureSession();
+  state.image = { source, width, height, name };
+
+  const t0 = performance.now();
+  const rgba = pixelsOf(source, width, height);
+  const { tensor } = preprocess(rgba, width, height, IMGSZ);
+  state.timing.pre = performance.now() - t0;
+
+  const feeds = { images: new state.ort.Tensor('float32', tensor, [1, 3, IMGSZ, IMGSZ]) };
+  const t1 = performance.now();
+  const out = await session.run(feeds);
+  state.timing.infer = performance.now() - t1;
+
+  const o = out.output0;
+  state.raw = o.data;
+  state.rawDims = o.dims;
+  refilter();
+  status(`${name} -- ${state.dets.length} detection${state.dets.length === 1 ? '' : 's'} at conf ${fmt(state.conf, 2)}`);
+}
+
+/**
+ * Re-decode from the cached output tensor. No session.run, so moving the slider is
+ * free -- but it is a genuine re-decode, not a filter over an old detection list:
+ * the confidence threshold changes which candidates enter NMS, so a post-hoc filter
+ * would show boxes the model would not have emitted at that threshold.
+ */
+function refilter() {
+  if (!state.raw || !state.image) return;
+  const { width, height } = state.image;
+  const t0 = performance.now();
+  state.dets = decode(state.raw, {
+    conf: state.conf, iou: NMS_IOU,
+    origW: width, origH: height, size: IMGSZ,
+    numAnchors: state.rawDims[2],
+  }).map((d) => {
+    const cal = calibrate(d.raw);
+    const score = scoreDetection(d.className, d.raw, d.areaFrac);
+    return { ...d, calibrated: cal, score, band: severityBucket(score) };
+  }).sort((a, b) => b.raw - a.raw);
+  state.timing.post = performance.now() - t0;
+  state.selected = -1;
+  render();
+
+  // Public integration point, and the hook the browser half of the parity check uses.
+  // Everything the table shows, at full precision, plus the timings, so the page's own
+  // output can be diffed against the Python model from outside the page. Also what an
+  // embedder would listen to.
+  document.dispatchEvent(new CustomEvent('surface:detections', {
+    detail: {
+      image: state.image.name,
+      width: state.image.width,
+      height: state.image.height,
+      conf: state.conf,
+      iou: NMS_IOU,
+      imgsz: IMGSZ,
+      timing: { ...state.timing },
+      detections: state.dets.map((d) => ({
+        className: d.className, classId: d.classId,
+        raw: d.raw, calibrated: d.calibrated,
+        x1: d.x1, y1: d.y1, x2: d.x2, y2: d.y2,
+        areaFrac: d.areaFrac, score: d.score, band: d.band,
+      })),
+    },
+  }));
+}
+
+/* --------------------------------------------------------------- drawing ---- */
+
+function render() {
+  drawCanvas();
+  drawTable();
+  drawGuidance();
+  drawTiming();
+}
+
+function drawCanvas() {
+  const { source, width, height } = state.image;
+  const cvs = $('view');
+  const hint = $('dropHint');
+  if (hint) hint.style.display = 'none';
+  cvs.style.display = 'block';
+
+  // Render at up to 2x the CSS box for crisp boxes on a 200 px source, capped so a
+  // 2048 px strip does not allocate a needless 4096 px canvas.
+  const box = cvs.parentElement.clientWidth - 2;
+  const scale = Math.min(Math.max(box / width, 1), 2048 / Math.max(width, height), 6);
+  cvs.width = Math.round(width * scale);
+  cvs.height = Math.round(height * scale);
+  cvs.style.width = '100%';
+
+  const g = cvs.getContext('2d');
+  g.imageSmoothingEnabled = scale < 1;
+  g.clearRect(0, 0, cvs.width, cvs.height);
+  g.drawImage(source, 0, 0, cvs.width, cvs.height);
+
+  // Chip and stroke sizes are chosen in DISPLAY pixels, then converted into canvas
+  // pixels, because the two differ in both directions here: a 200 px frame is drawn
+  // into a 541 px canvas (magnified), while a 2048 px strip is drawn 1:1 into a canvas
+  // the browser then shows at 541 CSS px (shrunk 3.8x). Sizing off the render scale
+  // alone made the strip's labels three CSS pixels tall and unreadable.
+  const k = cvs.width / Math.max(box, 1);
+  const lw = Math.max(1, 1.6 * k);
+  const fs = Math.max(9, Math.round(13 * k));
+  const mono = getComputedStyle(document.body).getPropertyValue('--mono').trim();
+  g.font = `600 ${fs}px ${mono}`;
+  g.textBaseline = 'top';
+
+  const pad = Math.round(fs * 0.34);
+  const chipH = fs + pad * 2;
+
+  // Boxes first, then every chip on top, so a later box's edge never cuts an
+  // earlier box's label in half.
+  const chips = [];
+
+  state.dets.forEach((d, i) => {
+    const sel = i === state.selected;
+    const col = rgb(d.className);
+    const x = d.x1 * scale;
+    const y = d.y1 * scale;
+    const w = (d.x2 - d.x1) * scale;
+    const h = (d.y2 - d.y1) * scale;
+
+    g.lineWidth = sel ? lw * 2 : lw;
+    g.strokeStyle = col;
+    g.globalAlpha = state.selected === -1 || sel ? 1 : 0.45;
+    g.strokeRect(x, y, w, h);
+    if (sel) {
+      g.fillStyle = col.replace('rgb(', 'rgba(').replace(')', ',0.14)');
+      g.fillRect(x, y, w, h);
+    }
+    g.globalAlpha = 1;
+    chips.push({ d, sel, col, x, y });
+  });
+
+  for (const { d, sel, col, x, y } of chips) {
+    let text = `${d.className} ${fmt(d.calibrated, 2)}`;
+    let tw = g.measureText(text).width;
+    // A chip wider than the frame is useless; drop to the score alone, then to
+    // nothing, rather than painting over the defect the judge is trying to see.
+    if (tw + pad * 2 > cvs.width) {
+      text = fmt(d.calibrated, 2);
+      tw = g.measureText(text).width;
+      if (tw + pad * 2 > cvs.width) continue;
+    }
+    const chipW = tw + pad * 2;
+    // Keep it inside the canvas on both axes: right-aligned if the box runs off the
+    // right edge, below the box if there is no room above.
+    const cx = Math.max(0, Math.min(x, cvs.width - chipW));
+    const cy = y - chipH < 0 ? Math.min(y, cvs.height - chipH) : y - chipH;
+    g.globalAlpha = state.selected === -1 || sel ? 1 : 0.5;
+    g.fillStyle = col;
+    g.fillRect(cx, cy, chipW, chipH);
+    g.fillStyle = '#0B0E12';
+    g.fillText(text, cx + pad, cy + pad);
+    g.globalAlpha = 1;
+  }
+}
+
+function drawTable() {
+  const body = $('resBody');
+  const empty = $('resEmpty');
+  body.innerHTML = '';
+  const n = state.dets.length;
+  $('detCount').textContent = `${n} detection${n === 1 ? '' : 's'}`;
+  empty.style.display = n ? 'none' : 'block';
+  $('resTable').style.display = n ? 'table' : 'none';
+  if (!n) return;
+
+  state.dets.forEach((d, i) => {
+    const tr = document.createElement('tr');
+    if (i === state.selected) tr.className = 'sel';
+    tr.innerHTML = `
+      <td class="mono"><span class="swatch" style="background:${rgb(d.className)}"></span>${d.className}</td>
+      <td class="num">${fmt(d.calibrated)}</td>
+      <td class="num" style="color:var(--muted)">${fmt(d.raw)}</td>
+      <td class="num" title="${Math.round(d.width)} x ${Math.round(d.height)} px">${Math.round(d.x1)}, ${Math.round(d.y1)}, ${Math.round(d.x2)}, ${Math.round(d.y2)}</td>
+      <td class="num">${(d.areaFrac * 100).toFixed(1)}%</td>
+      <td><span class="pill ${d.band}">${d.band}</span></td>`;
+    tr.addEventListener('click', () => {
+      state.selected = state.selected === i ? -1 : i;
+      render();
+    });
+    body.appendChild(tr);
+  });
+}
+
+function drawGuidance() {
+  const host = $('guide');
+  host.innerHTML = '';
+  if (!state.dets.length) {
+    host.innerHTML = '<p class="empty">No detection above the threshold. Operator guidance appears here, one card per detection.</p>';
+    return;
+  }
+  // One card per distinct class -- the guidance is per defect type, and six copies of
+  // the same paragraph is not more informative than one.
+  const seen = new Map();
+  for (const d of state.dets) {
+    const cur = seen.get(d.className);
+    if (!cur || d.raw > cur.raw) seen.set(d.className, d);
+  }
+  for (const [name, d] of seen) {
+    const info = DEFECT_INFO[name];
+    const count = state.dets.filter((x) => x.className === name).length;
+    const card = document.createElement('div');
+    card.className = 'gcard';
+    card.style.setProperty('--cc', rgb(name));
+    card.innerHTML = `
+      <div class="top">
+        <span class="nm">${name}</span>
+        <span class="pill ${severityBucket(scoreDetection(name, d.raw, d.areaFrac))}">${info.severity} base tier</span>
+        <span class="cf">${count} box${count === 1 ? '' : 'es'} &middot; best p=${fmt(d.calibrated, 2)}</span>
+      </div>
+      <dl>
+        <dt>Likely cause</dt><dd>${info.cause}</dd>
+        <dt>Recommended action</dt><dd>${info.action}</dd>
+      </dl>`;
+    host.appendChild(card);
+  }
+}
+
+function drawTiming() {
+  const t = state.timing;
+  $('tInfer').textContent = t.infer === null ? '--' : `${t.infer.toFixed(1)} ms`;
+  $('tPre').textContent = t.pre === null ? '--' : `${t.pre.toFixed(1)} ms`;
+  $('tPost').textContent = t.post === null ? '--' : `${t.post.toFixed(2)} ms`;
+  $('tFirst').textContent = t.first === null ? '--' : `${t.first.toFixed(0)} ms`;
+}
+
+/* ----------------------------------------------------------------- input ---- */
+
+function loadImageFromURL(url, name) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`could not load ${name}`));
+    img.decoding = 'sync';
+    img.src = url;
+  });
+}
+
+async function useSample(s, chip) {
+  document.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
+  if (chip) chip.classList.add('active');
+  try {
+    status(`loading ${s.file}...`);
+    const img = await loadImageFromURL(`samples/${s.file}`, s.file);
+    await runOn(img, img.naturalWidth, img.naturalHeight, s.file);
+  } catch (err) {
+    status(err.message, true);
+  }
+}
+
+async function useFile(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    status('that is not an image file', true);
+    return;
+  }
+  document.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImageFromURL(url, file.name);
+    await runOn(img, img.naturalWidth, img.naturalHeight, file.name);
+  } catch (err) {
+    status(err.message, true);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+/* ------------------------------------------------------------------- init ---- */
+
+function buildChips() {
+  const host = $('chips');
+  for (const s of SAMPLES) {
+    const b = document.createElement('button');
+    b.className = `chip${s.wide ? ' wide' : ''}`;
+    b.type = 'button';
+    if (s.cls) b.style.setProperty('--cc', rgb(s.cls));
+    b.textContent = s.label || s.file.replace(/\.jpg$/, '');
+    b.addEventListener('click', () => useSample(s, b));
+    host.appendChild(b);
+  }
+}
+
+function wireDrop() {
+  const drop = $('drop');
+  ['dragenter', 'dragover'].forEach((e) => drop.addEventListener(e, (ev) => {
+    ev.preventDefault();
+    drop.classList.add('over');
+  }));
+  ['dragleave', 'drop'].forEach((e) => drop.addEventListener(e, (ev) => {
+    ev.preventDefault();
+    drop.classList.remove('over');
+  }));
+  drop.addEventListener('drop', (ev) => {
+    const f = ev.dataTransfer?.files?.[0];
+    if (f) useFile(f);
+  });
+  $('file').addEventListener('change', (ev) => useFile(ev.target.files[0]));
+  $('pick').addEventListener('click', () => $('file').click());
+  window.addEventListener('paste', (ev) => {
+    const f = [...(ev.clipboardData?.files || [])][0];
+    if (f) useFile(f);
+  });
+}
+
+function wireSlider() {
+  const sl = $('conf');
+  sl.value = String(SHIPPED_CONF);
+  const paint = () => {
+    state.conf = parseFloat(sl.value);
+    const shipped = Math.abs(state.conf - SHIPPED_CONF) < 1e-9;
+    $('confVal').textContent = fmt(state.conf, 2) + (shipped ? ' *' : '');
+    $('confNote').textContent = shipped
+      ? 'the shipped operating point (reports/operating_point.json)'
+      : `moved off the shipped 0.15; p(defect) at this raw score is ${fmt(calibrate(state.conf), 3)}`;
+  };
+  sl.addEventListener('input', () => { paint(); refilter(); });
+  paint();
+}
+
+function wireConsole() {
+  const slot = $('console-slot');
+  if (!HF_SPACE_URL) return;
+  slot.innerHTML = '';
+  const frame = document.createElement('iframe');
+  frame.src = HF_SPACE_URL;
+  frame.title = 'Jindal Stainless surface inspection console';
+  frame.loading = 'lazy';
+  frame.allow = 'clipboard-write; fullscreen';
+  slot.appendChild(frame);
+  const a = $('console-link');
+  if (a) { a.href = HF_SPACE_URL; a.hidden = false; }
+}
+
+function fillFacts() {
+  $('calFacts').textContent =
+    `${CALIBRATION.method}, ${CALIBRATION.nKnots} knots, fitted on ${CALIBRATION.fitSplit}, `
+    + `ECE ${CALIBRATION.eceBefore.toFixed(4)} -> ${CALIBRATION.eceAfter.toFixed(4)} on ${CALIBRATION.evalSplit}`;
+  $('ortVer').textContent = `onnxruntime-web ${ORT_VERSION} / wasm`;
+  $('classList').textContent = CLASS_NAMES.join('  ');
+}
+
+/** Renders site/verify/parity_report.json, so the page cannot drift from the run. */
+async function loadParity() {
+  const host = $('parityBody');
+  if (!host) return;
+  try {
+    const r = await fetch('verify/parity_report.json');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const p = await r.json();
+    const s = p.summary;
+    const row = (k, v, n) => `<tr><td>${k}</td><td class="num">${v}</td><td style="color:var(--muted);font-size:0.82rem">${n}</td></tr>`;
+    host.innerHTML = [
+      row('images compared', s.images, 'two per class, held-out NEU-DET test split'),
+      row('detections, Python', s.python_detections, `ultralytics ${p.python.ultralytics}, conf ${p.python.conf}, iou ${p.python.iou}, imgsz ${p.python.imgsz}`),
+      row('detections, JS', s.js_detections, p.js.runtime + ', shared site/js/detect.js'),
+      row('matched pairs', s.matched_pairs, 'same class, greedy IoU match'),
+      row('max box delta', `${s.max_box_delta_px.toFixed(4)} px`, `tolerance ${p.tolerance.box_px} px`),
+      row('max confidence delta', s.max_conf_delta.toExponential(2), `tolerance ${p.tolerance.conf}`),
+      row('max preprocess pixel delta', `${s.max_preprocess_pixel_delta} / 255`, `mean ${s.mean_preprocess_pixel_delta.toFixed(5)}; our fixed-point resize vs the tensor ultralytics built`),
+      row('median session.run', `${s.median_session_run_ms.toFixed(2)} ms`, `onnxruntime-node on CPU, ${s.timed_runs_per_image} timed runs per image, ${s.warmup_runs} warm-ups discarded`),
+      row('verdict', `<span class="tag ${s.verdict === 'PASS' ? 'pass' : 'warn'}">${s.verdict}</span>`, s.discrepancies === 0 ? 'no discrepancies' : `${s.discrepancies} discrepancies`),
+    ].join('');
+    const st = $('parityStamp');
+    if (st) st.textContent = `run ${p.generated_at}`;
+  } catch (err) {
+    host.innerHTML = `<tr><td colspan="3" style="color:var(--muted)">parity_report.json not reachable (${err.message}). Regenerate it with the two commands above.</td></tr>`;
+  }
+}
+
+/** Renders site/verify/parity_browser.json -- the same page, checked in real Chrome. */
+async function loadBrowserParity() {
+  const host = $('parityBrowserBody');
+  if (!host) return;
+  try {
+    const r = await fetch('verify/parity_browser.json');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const p = await r.json();
+    const s = p.summary;
+    const ms = (o) => `${o.min.toFixed(1)} / ${o.median.toFixed(1)} / ${o.max.toFixed(1)} ms`;
+    const row = (k, v, n) => `<tr><td>${k}</td><td class="num">${v}</td><td style="color:var(--muted);font-size:0.82rem">${n}</td></tr>`;
+    host.innerHTML = [
+      row('images compared', s.images, `driven headless in ${p.chrome}`),
+      row('detections, Python', s.python_detections, `ultralytics ${p.python.ultralytics}, conf ${p.python.conf}, iou ${p.python.iou}, imgsz ${p.python.imgsz}`),
+      row('detections, this page', s.browser_detections, 'onnxruntime-web on WASM, 1 thread'),
+      row('matched pairs', s.matched_pairs, 'same class, greedy IoU match'),
+      row('max box delta', `${s.max_box_delta_px.toFixed(4)} px`, `tolerance ${p.tolerance.box_px} px`),
+      row('max raw confidence delta', s.max_conf_delta.toExponential(2), `tolerance ${p.tolerance.conf}`),
+      row('session.run, min / median / max', ms(s.session_run_ms), 'performance.now() inside the page, warm-up excluded'),
+      row('preprocess', ms(s.preprocess_ms), 'canvas read, fixed-point resize, NCHW pack'),
+      row('decode + NMS', ms(s.decode_nms_ms), 'the part the confidence slider re-runs'),
+      row('warm-up run', `${s.warmup_ms.toFixed(0)} ms`, 'first call only, WASM code-gen and arena allocation; never counted above'),
+      row('page and console errors', s.page_errors.length + s.console_errors.length, s.page_errors.length + s.console_errors.length === 0 ? 'clean load' : (s.page_errors.concat(s.console_errors).join(' | ')),),
+      row('failed or 4xx requests', s.bad_requests.length, s.bad_requests.length === 0 ? 'every asset returned 200' : JSON.stringify(s.bad_requests)),
+      row('verdict', `<span class="tag ${s.verdict === 'PASS' ? 'pass' : 'warn'}">${s.verdict}</span>`, s.discrepancies === 0 ? 'no discrepancies' : `${s.discrepancies} discrepancies`),
+    ].join('');
+    const st = $('parityBrowserStamp');
+    if (st) st.textContent = `run ${p.generated_at}`;
+  } catch (err) {
+    host.innerHTML = `<tr><td colspan="3" style="color:var(--muted)">parity_browser.json not reachable (${err.message}). Regenerate it with <code>npm run serve</code> then <code>npm run parity:browser</code> in site/verify.</td></tr>`;
+  }
+}
+
+buildChips();
+wireDrop();
+wireSlider();
+wireConsole();
+fillFacts();
+loadParity();
+loadBrowserParity();
+drawTiming();
+status('drop a steel image, or click a sample below. The 12.1 MB model downloads on first use.');

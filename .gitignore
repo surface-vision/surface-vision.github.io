@@ -1,0 +1,3 @@
+verify/node_modules/
+verify/*.log
+.DS_Store
