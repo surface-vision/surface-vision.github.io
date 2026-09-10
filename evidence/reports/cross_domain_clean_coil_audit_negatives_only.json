@@ -9,7 +9,7 @@
   ],
   "model": {
     "name": "v8n_neg/best.pt",
-    "weights": "/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/audit_runs/v8n_neg/weights/best.pt",
+    "weights": "<scratch>/audit_runs/v8n_neg/weights/best.pt",
     "device": "mps",
     "conf_threshold": 0.15,
     "iou_threshold": 0.45,

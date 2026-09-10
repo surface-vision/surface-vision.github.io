@@ -23,7 +23,7 @@ have overstated precision. AUC intervals resample whole frames on both arms.
 - checkpoint: `models/yolov8n_neudet/weights/best.pt`
 - sha256: `6661c7a09037137a...`
 - imgsz 256, iou 0.45, device mps, crop 200 px (1.28x magnification)
-- data: `/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/severstal`
+- data: `<scratch>/severstal`
 - scored 505 held-out defect-free frames (4040 tiles) and 191 defective frames (546 labelled defective tiles)
 - withheld from scoring: 495 clean, 209 defective (hash split, frac 0.5, seed `jsw-ps1-cross-domain-holdout-v1`)
 - clean manifest sha256 `1688fe2263c1df0c...`
@@ -119,10 +119,10 @@ is a false alarm and every trigger listed above fired on nothing.
 
 ## Run `audit_negatives_only`
 
-- checkpoint: `/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/audit_runs/v8n_neg/weights/best.pt`
+- checkpoint: `<scratch>/audit_runs/v8n_neg/weights/best.pt`
 - sha256: `f1836bcc0f36ede6...`
 - imgsz 256, iou 0.45, device mps, crop 200 px (1.28x magnification)
-- data: `/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/severstal`
+- data: `<scratch>/severstal`
 - scored 417 held-out defect-free frames (3336 tiles) and 191 defective frames (546 labelled defective tiles)
 - withheld from scoring: 583 clean, 209 defective (hash split, frac 0.5, seed `jsw-ps1-cross-domain-holdout-v1`)
 - clean manifest sha256 `3311712120c6b19e...`, 180 clean frame(s) removed by an explicit training manifest
@@ -218,7 +218,7 @@ is a false alarm and every trigger listed above fired on nothing.
 - checkpoint: `models/yolov8n_joint/weights/best.pt`
 - sha256: `198e9b4bec5b4809...`
 - imgsz 256, iou 0.45, device mps, crop 200 px (1.28x magnification)
-- data: `/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/severstal`
+- data: `<scratch>/severstal`
 - scored 505 held-out defect-free frames (4040 tiles) and 191 defective frames (546 labelled defective tiles)
 - withheld from scoring: 495 clean, 209 defective (hash split, frac 0.5, seed `jsw-ps1-cross-domain-holdout-v1`)
 - clean manifest sha256 `1688fe2263c1df0c...`

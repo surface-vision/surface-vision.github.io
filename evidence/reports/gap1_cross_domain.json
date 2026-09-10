@@ -32,7 +32,7 @@
         "holdout_seed": "jsw-ps1-cross-domain-holdout-v1"
       },
       "dataset": {
-        "root": "/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/severstal",
+        "root": "<scratch>/severstal",
         "note": "Severstal steel defect dataset (Voxel51/severstal_steel_defects), 1600x256 line-scan strip. The clean arm is the subset the dataset itself verifies as defect-free; the defective arm carries pixel masks.",
         "clean_frames_scored": 505,
         "clean_frames_withheld": 495,
@@ -732,7 +732,7 @@
       "generated_at": "2026-09-09T16:12:22+05:30",
       "elapsed_s": 21.329703499999596,
       "model": {
-        "weights": "/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/audit_runs/v8n_neg/weights/best.pt",
+        "weights": "<scratch>/audit_runs/v8n_neg/weights/best.pt",
         "weights_sha256": "f1836bcc0f36ede6cd6fc701508084241780bd7d3d7ce7376de502a639e69ea4",
         "model_name": "v8n_neg/best.pt",
         "class_names": [
@@ -758,7 +758,7 @@
         "holdout_seed": "jsw-ps1-cross-domain-holdout-v1"
       },
       "dataset": {
-        "root": "/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/severstal",
+        "root": "<scratch>/severstal",
         "note": "Held-out arm of the same Severstal pull, with the 180 source frames the audit's negatives-only warm-start actually trained on removed by explicit manifest (--exclude-list). This checkpoint lives in the audit scratchpad, not in models/; it is scored here to show the harness discriminates between checkpoints and to record the negatives-only trap.",
         "clean_frames_scored": 417,
         "clean_frames_withheld": 583,
@@ -1438,7 +1438,7 @@
         "holdout_seed": "jsw-ps1-cross-domain-holdout-v1"
       },
       "dataset": {
-        "root": "/private/tmp/claude-501/-Users-prathmeshwalimbe-Downloads-JSW-PS1/f88a3d3d-c8be-40c8-8600-132f500095d3/scratchpad/severstal",
+        "root": "<scratch>/severstal",
         "note": "Severstal steel defect dataset (Voxel51/severstal_steel_defects), 1600x256 line-scan strip. The clean arm is the subset the dataset itself verifies as defect-free; the defective arm carries pixel masks.",
         "clean_frames_scored": 505,
         "clean_frames_withheld": 495,
