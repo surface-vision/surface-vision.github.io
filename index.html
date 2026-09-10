@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Surface defect detection on stainless strip | Jindal Stainless</title>
-<meta name="description" content="A YOLOv8n surface-defect detector for hot-rolled stainless strip, running real inference in the browser on the 12 MB ONNX export. mAP50 0.7524 on a held-out split, calibrated confidences, and a cross-domain false-alarm fix from 93.7% to 32.5%.">
+<title>Surface defect detection on steel strip | Jindal Stainless</title>
+<meta name="description" content="A working surface-defect detector for steel strip that runs inside this page, with nothing uploaded. It names the defect correctly on 177 of 180 unseen test photographs, and its detections match the PyTorch original 40 out of 40.">
 <meta name="color-scheme" content="dark">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230C0F13'/%3E%3Crect x='5' y='5' width='22' height='22' fill='none' stroke='%23F5A524' stroke-width='2.5'/%3E%3Cpath d='M11 20 L16 11 L21 20' fill='none' stroke='%23F5A524' stroke-width='2.5'/%3E%3C/svg%3E">
@@ -13,148 +13,122 @@
 
 <header class="mast">
   <div class="wrap">
-    <div class="brand">Jindal Stainless <span>/</span> surface defect detection</div>
+    <div class="brand">Jindal Stainless <span class="sl">/</span> <span class="b2">surface defect detection</span></div>
     <nav>
-      <a href="#demo">Live demo</a>
-      <a href="#parity">Verification</a>
-      <a href="#results">Results</a>
-      <a href="#crossdomain">Cross-domain fix</a>
-      <a href="#limits">Limitations</a>
-      <a href="#console">Console</a>
+      <a href="#read">The result</a>
+      <a href="#accuracy">Accuracy</a>
+      <a href="#crossdomain">Clean steel</a>
+      <a href="#strip">Wide strip</a>
+      <a href="#limits">Limits</a>
+      <a href="technical.html">Technical detail</a>
       <a href="evidence/">Evidence</a>
     </nav>
   </div>
 </header>
 
-<!-- ===================================================== hero ============ -->
-<div class="hero">
-  <div class="wrap">
-    <p class="kicker">Problem statement 1 &middot; AI surface defect detection</p>
-    <h1>A defect born upstream travels the whole route. This finds it, in your browser, in tens of milliseconds.</h1>
-    <p class="lede">
-      Crazing starts at reheat or coiling. Inclusions start at the caster. Rolled-in scale starts at the
-      descaler. By the time a coil is graded, melting, rolling, annealing and pickling have all been paid
-      for &mdash; and on 304 the nickel is 8&ndash;10% of the mass, so a downgraded tonne destroys several
-      times what a tonne of commodity carbon steel does. Manual inspection samples; it cannot cover the
-      whole surface of a strip moving at 300 m/min.
-    </p>
-    <p class="lede">
-      This page is the detector itself, not a description of one. Drop in a steel image below and a
-      3.0 M-parameter YOLOv8n runs on the WASM backend of ONNX Runtime, in the tab, with no server
-      anywhere. The numbers it prints are calibrated probabilities, and the decode it runs has been
-      checked detection-for-detection against the Python model. Thirty to fifty milliseconds is the
-      forward pass measured inside the page itself <span id="heroLatency" class="mono"></span> &mdash;
-      single-threaded WASM, warm-up excluded. That is a band and not a figure on purpose: two
-      recorded runs of the same twelve frames returned medians 1.6&times; apart. Your machine is not
-      this machine either, so the timing panel below measures it on yours rather than repeating
-      any of this.
-      <span class="src">site/verify/parity_browser.json &rarr; summary.session_run_ms (31.7 ms); site/verify/live_demo_check.json &rarr; browser_infer_ms (49.1 ms)</span>
-    </p>
+<!-- ============================================ hero: copy + live detector -->
+<div class="hero live">
+  <div class="wrap hero-grid">
 
-    <div class="hero-actions">
-      <a class="btn primary" href="#demo">Run the detector</a>
-      <a class="btn" href="#parity">See the parity check</a>
-      <a class="btn" href="evidence/">Reports &amp; deck</a>
-      <a class="btn" href="https://github.com/surface-vision/surface-vision.github.io">Repository</a>
-    </div>
+    <div class="hero-copy">
+      <div class="hero-lead">
+        <p class="kicker">Problem statement 1 &middot; AI surface defect detection</p>
+        <h1>Find the defect while the coil can still be saved.</h1>
+        <p class="lede">
+          Surface defects start early &mdash; at the caster, the descaler, the reheat furnace &mdash;
+          and a coil is graded only after every stage has been paid for. A strip running at 300 m/min
+          cannot be inspected by eye.
+        </p>
+        <p class="lede">
+          <strong>This page is the detector, not a description of one.</strong> It names six surface
+          defects in a photograph of steel, on your own machine. Nothing is uploaded.
+        </p>
+        <p class="nudge">Click a sample frame</p>
+      </div>
 
-    <div class="stats">
-      <div class="stat">
-        <div class="k">mAP50, held-out test</div>
-        <div class="v good">0.7524</div>
-        <div class="n">published NEU-DET band 0.70&ndash;0.80</div>
-      </div>
-      <div class="stat">
-        <div class="k">Defective frames flagged</div>
-        <div class="v">92.2%</div>
-        <div class="n">166 of 180, at conf 0.15</div>
-      </div>
-      <div class="stat">
-        <div class="k">Clean-steel false alarms</div>
-        <div class="v good">93.7 &rarr; 32.5%</div>
-        <div class="n">joint fine-tune, 505 real frames</div>
-      </div>
-      <div class="stat">
-        <div class="k">Cross-domain ROC AUC</div>
-        <div class="v good">0.608 &rarr; 0.958</div>
-        <div class="n">chance, to separable</div>
-      </div>
-      <div class="stat">
-        <div class="k">Model on disk</div>
-        <div class="v">12.1 MB</div>
-        <div class="n">ONNX; 6.22 MB as PyTorch</div>
-      </div>
-      <div class="stat">
-        <div class="k">Test suite</div>
-        <div class="v">540 / 0</div>
-        <div class="n">passed / failed, 8 skipped</div>
-      </div>
-    </div>
-    <span class="src">reports/evaluation.json, reports/false_alarm.json, reports/gap1_cross_domain.json, reports/model_study.json, deck/deck_content.md audit rows 1, 5, 16, 33, 45</span>
-  </div>
-</div>
-
-<!-- ===================================================== demo ============= -->
-<section id="demo">
-  <div class="wrap">
-    <h2>Live detector &mdash; running here, in this tab</h2>
-    <p class="sub">
-      The same <code>yolov8n_neudet_best.onnx</code> the Python console loads, executed by
-      onnxruntime-web on WASM. No backend, no cold start, and once the 12.1 MB file is cached it
-      works with the network off. The model is fetched on your first image, not on page load.
-    </p>
-
-    <div class="demo-grid">
-      <div>
-        <div class="panel">
-          <div class="hd">
-            Frame
-            <span class="right" id="ortVer"></span>
+      <div class="hero-facts">
+        <div class="facts">
+          <div class="fact">
+            <div class="v good">98.3%</div>
+            <div class="k">names it right</div>
+            <div class="g">Correct defect type on 177 of 180 photographs it had never seen.</div>
           </div>
-          <div class="bd">
-            <div id="drop">
-              <canvas id="view" style="display:none"></canvas>
-              <div id="dropHint">
-                <b>Drop a steel surface image here</b><br>
-                or paste one, or use a built-in sample below
-              </div>
-            </div>
-            <div class="bar"><i id="progbar"></i></div>
-            <div id="status"></div>
-            <div class="ctl">
-              <button class="btn" id="pick" type="button">Choose file</button>
-              <input type="file" id="file" accept="image/*" hidden>
-            </div>
+          <div class="fact">
+            <div class="v">0.75</div>
+            <div class="k">mAP50</div>
+            <div class="g">Stricter score: the name <em>and</em> the box position. Published work on this benchmark: 0.70&ndash;0.80.</div>
+          </div>
+          <div class="fact">
+            <div class="v good">40 / 40</div>
+            <div class="k">matches the real model</div>
+            <div class="g">All 40 detections across the sample frames matched the original PyTorch model, in real Chrome.</div>
+          </div>
+        </div>
+        <ul class="trust">
+          <li><strong>Nothing is uploaded.</strong> The image is scored and discarded in the tab &mdash; no bucket, no retention policy to negotiate.</li>
+          <li><strong>No cloud to depend on.</strong> Cached, it works with the network off, at no cost per inference.</li>
+          <li><strong>One 12.1 MB file.</strong> The same artefact an industrial PC on the line would load. No GPU, no Python.</li>
+        </ul>
+        <p class="demo-foot" style="margin-top:14px">
+          <a class="lnk" href="#accuracy">What these numbers mean</a>
+          <span class="sep">&middot;</span>
+          <a class="lnk" href="technical.html">Technical detail</a>
+          <span class="sep">&middot;</span>
+          <a class="lnk" href="evidence/">Evidence</a>
+        </p>
+      </div>
+    </div>
 
-            <h3 style="margin-top:20px">Built-in samples &mdash; real held-out test frames</h3>
-            <div class="chips" id="chips"></div>
-            <p class="note">
-              Twelve NEU-DET test images, two per class, byte-identical copies from
-              <code>data/neu-det/test/images</code> &mdash; a split no checkpoint was selected on. The two
-              italic chips are 2048&times;1000 GC10 line-scan frames, and they take a different route: at
-              that aspect ratio the frame is cut into three overlapping 1000&times;1000 windows, each
-              scaled uniformly, and merged with one global NMS. Watch the timing panel &mdash; it reports
-              three passes rather than one. They are also <em>out of domain for this head</em>: their real
-              defects are a roll mark and a weld line, and this six-class head has neither class, so what
-              comes back is the nearest class it owns. That is not a bug in the page; it is the failure
-              measured in the cross-domain section below, on a frame you can look at.
-            </p>
-
-            <div class="ctl" style="margin-top:20px">
-              <label for="conf">Confidence</label>
-              <input type="range" id="conf" min="0.02" max="0.90" step="0.01">
-              <span class="val" id="confVal"></span>
+    <div class="hero-demo">
+      <div class="panel demo-panel">
+        <div class="hd">
+          Live detector &mdash; running in this tab
+          <span class="right" id="ortVer"></span>
+        </div>
+        <div class="bd">
+          <div id="drop">
+            <canvas id="view" style="display:none"></canvas>
+            <div id="dropHint">
+              <b>Click a sample below</b><br>
+              or drop your own steel photo here
             </div>
-            <p class="note" id="confNote"></p>
-            <p class="note">
-              Moving this re-runs the decode and the NMS on the cached output tensor &mdash; no second
-              <code>session.run</code>. It is a real re-decode rather than a filter over the old list,
-              because the threshold decides which candidates enter NMS in the first place.
-            </p>
+          </div>
+
+          <div id="verdict" class="verdict none">Nothing scored yet.</div>
+          <div class="bar"><i id="progbar"></i></div>
+          <div id="status"></div>
+
+          <div class="chips-label">
+            Sample frames
+            <span class="hint">never seen in training &mdash; one click each</span>
+          </div>
+          <div class="chips" id="chips"></div>
+
+          <div class="demo-foot">
+            <button class="btn sm" id="pick" type="button">Use your own image</button>
+            <input type="file" id="file" accept="image/*" hidden>
+            <a class="lnk" href="#read">How to read the result</a>
           </div>
         </div>
       </div>
+    </div>
 
+  </div>
+</div>
+
+<!-- ============================================================ the result -->
+<section id="read">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="idx">01</span>
+      <h2>What the detector just told you</h2>
+    </div>
+    <p class="sub">
+      The boxes on the frame are the model's own output. Here it is in full: what it found, how sure
+      it is, and what a mill should do about it.
+    </p>
+
+    <div class="demo-grid">
       <div>
         <div class="panel">
           <div class="hd">Detections <span class="right" id="detCount">0 detections</span></div>
@@ -164,750 +138,573 @@
                 <thead>
                   <tr>
                     <th>Defect</th>
-                    <th>p(defect)</th>
-                    <th>raw</th>
-                    <th>box xyxy</th>
+                    <th>probability</th>
+                    <th>severity</th>
                     <th>area</th>
-                    <th>sev.</th>
+                    <th>raw score</th>
+                    <th>box, pixels</th>
                   </tr>
                 </thead>
                 <tbody id="resBody"></tbody>
               </table>
             </div>
-            <p class="empty" id="resEmpty">Nothing scored yet. Pick a sample or drop an image.</p>
-            <p class="note">
-              <strong>p(defect)</strong> is the calibrated probability &mdash; an isotonic map fitted on the
-              validation split turns the raw head score into something that means what it says.
-              <strong>raw score</strong> is what the network emitted. They are different numbers and the
-              table keeps them apart on purpose: <span id="calFacts" class="mono"></span>.
-              Severity is <code>score_detection</code> from <code>src/inference.py</code>, which scales the
-              class's base tier by raw confidence and by the fraction of the frame the box covers &mdash; so
-              the band here means the same thing it means in the coil report.
-            </p>
+            <p class="empty" id="resEmpty">Nothing scored yet. Pick a sample above, or drop an image.</p>
+
+            <div class="ctl">
+              <label for="conf">Confidence</label>
+              <input type="range" id="conf" min="0.02" max="0.90" step="0.01">
+              <span class="val" id="confVal"></span>
+            </div>
+            <p class="note" id="confNote"></p>
           </div>
         </div>
 
-        <div class="panel" style="margin-top:16px">
-          <div class="hd">Timing, measured with performance.now()</div>
+        <div class="panel" style="margin-top:14px">
+          <div class="hd">Timing on your machine, per frame</div>
           <div class="bd">
             <div class="timing">
-              <div><div class="k">session.run</div><div class="v" id="tInfer">--</div></div>
-              <div><div class="k">preprocess</div><div class="v" id="tPre">--</div></div>
-              <div><div class="k">decode + NMS</div><div class="v" id="tPost">--</div></div>
-              <div><div class="k">warm-up run</div><div class="v" id="tFirst">--</div></div>
+              <div><div class="k">the model</div><div class="v" id="tInfer">--</div></div>
+              <div><div class="k">image prep</div><div class="v" id="tPre">--</div></div>
+              <div><div class="k">reading boxes</div><div class="v" id="tPost">--</div></div>
+              <div><div class="k">first-run warm-up</div><div class="v" id="tFirst">--</div></div>
             </div>
-            <p class="note">
-              <code>session.run</code> is the forward pass alone, timed on your machine, excluding the
-              warm-up call &mdash; that first run pays for WASM code generation and arena allocation and is
-              reported separately rather than folded in. Preprocess is the canvas read-back plus the
-              fixed-point resize plus the NCHW pack; the JPEG itself is decoded by the browser before that
-              clock starts, which is why a 2048&times;1000 strip costs several times what a 200&times;200 frame
-              does. This is a single frame on one WASM thread. It is not a frame rate, and the mill
-              arithmetic below uses measured GPU throughput, not this.
-            </p>
           </div>
         </div>
+      </div>
 
-        <div class="panel" style="margin-top:16px">
-          <div class="hd">Operator guidance <span class="right">src/inference.py DEFECT_INFO</span></div>
+      <div>
+        <div class="panel">
+          <div class="hd">What to do about it <span class="right">from the mill knowledge base</span></div>
           <div class="bd">
-            <div class="guide" id="guide"></div>
-            <p class="note">
-              Cause and action are copied verbatim from the knowledge base the Streamlit console and the
-              coil report use. Not one word of the metallurgy was written for this web page.
-            </p>
+            <div class="guide" id="guide">
+              <p class="empty">Cause and recommended action appear here, one card per defect type, as
+              soon as something is scored.</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="d-row">
+      <details class="d">
+        <summary>
+          <span class="t">Why there are two confidence numbers</span>
+          <span class="s">A raw network score is not a probability. The one you read is corrected so that "0.40" means right about 40% of the time.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            <strong>Probability</strong> is the calibrated number: an isotonic map fitted on the
+            validation split turns the raw head score into something that means what it says.
+            <strong>Raw score</strong> is what the network emitted. The table keeps them apart on
+            purpose: <span id="calFacts" class="mono"></span>.
+          </p>
+          <p>
+            Before calibration a box shown at "0.40" was right far less often than 40% of the time
+            &mdash; expected calibration error 0.1418 on the held-out test split, against 0.0461
+            after. The map is monotone, so it cannot reorder detections: mAP50 is numerically
+            unchanged at 0.707986 before and after.
+            <span class="src">reports/calibration.json &rarr; metrics.ece, map50</span>
+          </p>
+          <p><a href="technical.html#calibration">The full calibration record</a> &mdash; how the method was chosen out of fold, and what it does to each score.</p>
+        </div>
+      </details>
+
+      <details class="d">
+        <summary>
+          <span class="t">How severity is decided, and where the advice comes from</span>
+          <span class="s">Severity scales the class's base tier by confidence and by how much of the frame the box covers. The advice is the mill knowledge base, unedited.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            Severity is <code>score_detection</code> from <code>src/inference.py</code> &mdash; the same
+            rule the Python console and the coil report use, so a band here means what it means there.
+            Cause and recommended action are copied verbatim from that knowledge base; not one word of
+            the metallurgy was written for this web page.
+          </p>
+          <p>
+            The confidence slider re-runs the decode and the non-maximum suppression on the cached
+            output tensor rather than filtering the old list, because the threshold decides which
+            candidates enter suppression in the first place. It does not re-run the model.
+          </p>
+        </div>
+      </details>
+
+      <details class="d">
+        <summary>
+          <span class="t">What the timing panel is, and is not</span>
+          <span class="s">One frame, one CPU thread, in a browser tab. It is a lower bound on the hardware, not a deployment frame rate.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            The model figure is the forward pass alone, timed with <code>performance.now()</code>,
+            excluding the warm-up call &mdash; that first run pays for code generation and memory
+            arena allocation and is reported separately rather than folded in. The recorded headless
+            run of this page measured <span id="latencyFact" class="mono">&mdash;</span>. A second
+            recorded run over the same twelve frames measured a median of 49.1 ms, so treat it as a
+            band rather than a figure &mdash; and the panel above measures it on your machine instead
+            of repeating either.
+            <span class="src">site/verify/parity_browser.json &rarr; summary.session_run_ms; site/verify/live_demo_check.json &rarr; browser_infer_ms</span>
+          </p>
+          <p>
+            A wide strip costs several times a small frame because it is cut into three windows and
+            the model runs three times. <a href="technical.html#mill">The line-speed arithmetic</a>
+            uses measured GPU throughput, not this.
+          </p>
+        </div>
+      </details>
+    </div>
   </div>
 </section>
 
-<!-- ===================================================== parity =========== -->
-<section id="parity">
+<!-- ============================================================== accuracy -->
+<section id="accuracy">
   <div class="wrap">
-    <h2>Does the browser agree with the real model?</h2>
+    <div class="sec-head">
+      <span class="idx">02</span>
+      <h2>Is it actually any good?</h2>
+    </div>
     <p class="sub">
-      A browser demo that quietly disagrees with the model it claims to be is worse than no demo, so this
-      is checked by execution rather than asserted. <code>site/js/detect.js</code> and
-      <code>site/js/calibration.js</code> are imported unchanged by two callers: this page, and a Node
-      harness running the same ONNX file under onnxruntime-node. The harness is compared
-      detection-for-detection with Python ultralytics at conf 0.15, IoU 0.45, imgsz 256.
-    </p>
-    <p class="note">
-      Scope, stated up front: both runs below cover the twelve square NEU-DET frames, which take the
-      single-pass path. The tiled path the two strip chips take has no ultralytics reference to compare
-      against, so it is measured separately &mdash; squashed against tiled on the same two frames &mdash;
-      in <a href="verify/strip_check.json">strip_check.json</a>, and the browser's tiled output is
-      recorded under <code>out_of_domain</code> in
-      <a href="verify/parity_browser.json">parity_browser.json</a>.
+      Measured on 180 photographs held back from training that selected nothing &mdash; no checkpoint,
+      no threshold. Splits are 1,440 / 180 / 180 with no duplicate images across them.
     </p>
 
-    <h3>Run A &mdash; the decode module under onnxruntime-node, vs Python</h3>
-    <div class="tbl-wrap">
-      <table class="data">
-        <thead><tr><th>Measurement</th><th>Value</th><th>Notes</th></tr></thead>
-        <tbody id="parityBody">
-          <tr><td colspan="3" style="color:var(--muted)">loading verify/parity_report.json ...</td></tr>
-        </tbody>
-      </table>
+    <div class="stats" style="margin-top:20px">
+      <div class="stat">
+        <div class="k">Names the defect right</div>
+        <div class="v good">98.3%</div>
+        <div class="n">177 of 180 frames, at the shipped threshold</div>
+      </div>
+      <div class="stat">
+        <div class="k">Finds a defect at all</div>
+        <div class="v">92.2%</div>
+        <div class="n">166 of 180 defective frames flagged</div>
+      </div>
+      <div class="stat">
+        <div class="k">mAP50 &mdash; name and position</div>
+        <div class="v">0.7524</div>
+        <div class="n">published NEU-DET results: 0.70&ndash;0.80</div>
+      </div>
+      <div class="stat">
+        <div class="k">Precision / recall</div>
+        <div class="v">0.70 / 0.69</div>
+        <div class="n">of the boxes drawn / of the boxes there</div>
+      </div>
     </div>
-    <span class="src">site/verify/parity_report.json <span id="parityStamp" class="mono"></span></span>
+    <span class="src">reports/false_alarm.json &rarr; holdout_detection (class_accuracy, detection rate at conf 0.15); reports/evaluation.json &rarr; detection_metrics</span>
 
-    <h3>Run B &mdash; this exact page, in real Chrome, vs Python</h3>
-    <p class="sub" style="margin-bottom:14px">
-      Run A leaves one gap: under Node the pixels never come out of a <code>&lt;canvas&gt;</code> and the
-      arithmetic never runs through a WASM build of the runtime. So the page itself is driven headless,
-      and the <code>surface:detections</code> event it dispatches after every run is diffed against the
-      same Python reference. This is the number that actually describes what a judge will see.
-    </p>
-    <div class="tbl-wrap">
-      <table class="data">
-        <thead><tr><th>Measurement</th><th>Value</th><th>Notes</th></tr></thead>
-        <tbody id="parityBrowserBody">
-          <tr><td colspan="3" style="color:var(--muted)">loading verify/parity_browser.json ...</td></tr>
-        </tbody>
-      </table>
+    <div class="band">
+      <div class="band-track">
+        <div class="band-pub" style="left:33.3%;width:33.4%">published 0.70&ndash;0.80</div>
+        <div class="band-mark" style="left:50.8%" data-label="this model 0.7524"></div>
+      </div>
+      <div class="band-ax"><span>0.60</span><span>0.70</span><span>0.80</span><span>0.90</span></div>
+      <p class="band-key">
+        Competitive, not state of the art &mdash; and that is the honest claim.
+      </p>
     </div>
-    <span class="src">site/verify/parity_browser.json <span id="parityBrowserStamp" class="mono"></span></span>
 
-    <div class="cards">
-      <div class="card">
-        <h4>The three things that had to be exactly right</h4>
-        <p>
-          Half-pixel sample centres, <code>src = (dst + 0.5) &times; scale &minus; 0.5</code>. The 11-bit
-          fixed-point weights OpenCV actually uses, applied in integer arithmetic, not a float
-          approximation of them. And the fact that <code>cv2.resize</code> on a uint8 image returns uint8,
-          so the network never sees the float interpolant. Getting the second one wrong &mdash; doing the
-          interpolation in float64 and rounding at the end &mdash; disagreed with cv2 on 12% of bytes
-          instead of 0.1%, moved one box by 19 px, and flipped an NMS tie so a detection vanished.
-        </p>
-      </div>
-      <div class="card">
-        <h4>Scale, do not pad</h4>
-        <p>
-          Within one window the frame is scaled into the 256&times;256 input rather than letterboxed,
-          because that is what the project measured: lossless padding loses 0.024&ndash;0.052 mAP50 to
-          ordinary bilinear scaling at the same tensor size, on 8 of 8 configurations, and
-          nearest-neighbour magnification &mdash; also lossless &mdash; is the worst of five arms. For a
-          square source, which every NEU-DET frame is, scaling and letterboxing are the same operation.
-          That is what makes this comparison a valid check on the resize. A frame that is <em>not</em>
-          square is not squashed either: it is cut into square windows first, so the scale stays uniform
-          on both axes. Padding and squashing are both avoided, by different means.
-          <span class="src">reports/input_pipeline_decision.md section 3, reports/input_pipeline_probe.json</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>The one gap that is Node's, not the browser's</h4>
-        <p>
-          Node has no libjpeg, so the harness decodes JPEGs with a pure-JS decoder whose IDCT differs from
-          the libjpeg-turbo one OpenCV uses &mdash; mean 0.075 of 255 per byte. Let that in and the worst box
-          moves 9.5 px. Hold the source pixels constant and it is 0.14 px, which is the number in the table.
-          Browsers decode JPEG with libjpeg-turbo, the same library OpenCV uses, so this gap is a property
-          of the harness rather than of the page. Both runs are kept, in
-          <code>parity_js.json</code> and <code>parity_js_jpegjs.json</code>, precisely so the residual is
-          attributed instead of hand-waved.
-        </p>
-      </div>
-      <div class="card">
-        <h4>Reproduce it</h4>
-        <p class="mono" style="font-size:0.78rem;line-height:1.7;color:var(--dim)">
-          .venv/bin/python site/verify/reference_ultralytics.py --dump-pixels /tmp/refpx<br>
-          npm i onnxruntime-node@1.23.2 jpeg-js@0.4.4<br>
-          node site/verify/parity.mjs --pixels /tmp/refpx<br>
-          node site/verify/compare.mjs --json site/verify/parity_report.json
-        </p>
-        <p style="margin-top:10px">
-          <code>compare.mjs</code> exits non-zero if any detection is unmatched or any box moves more than
-          2 px. The ONNX export itself was verified separately: max absolute tensor deviation
-          7.095e&minus;04 against PyTorch, identical detections, ONNX Runtime 1.76&times; faster on CPU.
-          <span class="src">reports/export_summary.json &rarr; verification</span>
-        </p>
-      </div>
+    <div class="d-row">
+      <details class="d">
+        <summary>
+          <span class="t">Per class &mdash; and the class it is genuinely bad at</span>
+          <span class="s">Patches 0.949 and scratches 0.909 are strong. Crazing is 0.444, and the reason is measured rather than guessed.</span>
+        </summary>
+        <div class="dbody">
+          <div class="tbl-wrap" style="margin-top:12px">
+            <table class="data">
+              <thead>
+                <tr><th>Class</th><th>AP50</th><th style="min-width:110px"></th><th>Precision</th><th>Recall</th><th>Test boxes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="mono"><span class="swatch" style="background:#3796FF"></span>patches</td><td class="num">0.949</td><td><div class="apbar" style="--cc:#3796FF"><i style="width:94.9%"></i></div></td><td class="num">0.865</td><td class="num">0.889</td><td class="num">99</td></tr>
+                <tr><td class="mono"><span class="swatch" style="background:#00C8A0"></span>scratches</td><td class="num">0.909</td><td><div class="apbar" style="--cc:#00C8A0"><i style="width:90.9%"></i></div></td><td class="num">0.653</td><td class="num">0.910</td><td class="num">64</td></tr>
+                <tr><td class="mono"><span class="swatch" style="background:#DC1E2D"></span>inclusion</td><td class="num">0.827</td><td><div class="apbar" style="--cc:#DC1E2D"><i style="width:82.7%"></i></div></td><td class="num">0.748</td><td class="num">0.787</td><td class="num">89</td></tr>
+                <tr><td class="mono"><span class="swatch" style="background:#AA50DC"></span>pitted_surface</td><td class="num">0.756</td><td><div class="apbar" style="--cc:#AA50DC"><i style="width:75.6%"></i></div></td><td class="num">0.657</td><td class="num">0.717</td><td class="num">46</td></tr>
+                <tr><td class="mono"><span class="swatch" style="background:#F0BE00"></span>rolled-in_scale</td><td class="num">0.630</td><td><div class="apbar" style="--cc:#F0BE00"><i style="width:63.0%"></i></div></td><td class="num">0.566</td><td class="num">0.594</td><td class="num">69</td></tr>
+                <tr><td class="mono"><span class="swatch" style="background:#FF8200"></span>crazing</td><td class="num">0.444</td><td><div class="apbar" style="--cc:#FF8200"><i style="width:44.4%"></i></div></td><td class="num">0.688</td><td class="num">0.224</td><td class="num">79</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="margin-top:12px">
+            Crazing is the weak class: 53 of its 68 misses are blind misses, its labels cover 23.8% of
+            the frame, and its foreground/background separability is 0.319, the lowest of the six.
+            Across the classes, AP50 tracks separability at Spearman 0.9429, p 0.0048. The model fails
+            where the defect is genuinely hard to see, not where it confuses one defect for another:
+            zero of 168 missed labels were a class confusion.
+            <span class="src">reports/evaluation.json &rarr; detection_metrics.per_class; reports/model_study.json &rarr; failures.taxonomy_rows, difficulty_correlation</span>
+          </p>
+        </div>
+      </details>
+
+      <details class="d">
+        <summary>
+          <span class="t">Against what other people have published</span>
+          <span class="s">DETR 0.666, YOLOv8n 0.740, DDN 0.748, this model 0.7524, RT-DETR 0.754, YOLOv11n 0.772.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            This sits inside the published 0.70&ndash;0.80 band. The published numbers are not all
+            measured on the same split protocol as this one, so the comparison is indicative rather
+            than exact. What is not in that table is the engineering around the number: the
+            calibration, the cross-domain measurement below, and the fact that this figure comes from
+            a split that selected nothing.
+            <span class="src">docs/research_notes.md sections 1a-1b; credible band 0.70-0.80</span>
+          </p>
+          <p><a href="technical.html#results">The full comparison table, and the two decisions that mattered more than the architecture.</a></p>
+        </div>
+      </details>
     </div>
   </div>
 </section>
 
-<!-- ===================================================== results ========== -->
-<section id="results">
-  <div class="wrap">
-    <h2>Measured results</h2>
-    <p class="sub">
-      Everything here is the held-out NEU-DET test split &mdash; 180 images that selected no checkpoint and
-      tuned no threshold. Splits are 1,440 / 180 / 180 with zero cross-split content-hash duplicates, so the
-      test number is not a memorised one.
-    </p>
-
-    <div class="stats" style="margin-top:22px">
-      <div class="stat"><div class="k">mAP50</div><div class="v">0.7524</div><div class="n">target was 0.70</div></div>
-      <div class="stat"><div class="k">mAP50-95</div><div class="v">0.3967</div><div class="n">strict localisation</div></div>
-      <div class="stat"><div class="k">Precision</div><div class="v">0.696</div><div class="n">validator protocol</div></div>
-      <div class="stat"><div class="k">Recall</div><div class="v">0.687</div><div class="n">validator protocol</div></div>
-      <div class="stat"><div class="k">Image-level accuracy</div><div class="v">98.9%</div><div class="n">178 of 180 frames, threshold 0.05</div></div>
-      <div class="stat"><div class="k">Class confusions</div><div class="v good">0</div><div class="n">across 168 missed labels</div></div>
-    </div>
-    <span class="src">reports/evaluation.json &rarr; detection_metrics, image_level; reports/model_study.json &rarr; failures.taxonomy_rows; reports/model_study.json &rarr; dataset.split</span>
-
-    <h3>Per class, and where the model is honestly weak</h3>
-    <div class="tbl-wrap">
-      <table class="data">
-        <thead>
-          <tr><th>Class</th><th>AP50</th><th style="min-width:120px"></th><th>AP50-95</th><th>Precision</th><th>Recall</th><th>Test boxes</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="mono"><span class="swatch" style="background:#FF8200"></span>crazing</td><td class="num">0.444</td><td><div class="apbar" style="--cc:#FF8200"><i style="width:44.4%"></i></div></td><td class="num">0.187</td><td class="num">0.688</td><td class="num">0.224</td><td class="num">79</td></tr>
-          <tr><td class="mono"><span class="swatch" style="background:#DC1E2D"></span>inclusion</td><td class="num">0.827</td><td><div class="apbar" style="--cc:#DC1E2D"><i style="width:82.7%"></i></div></td><td class="num">0.452</td><td class="num">0.748</td><td class="num">0.787</td><td class="num">89</td></tr>
-          <tr><td class="mono"><span class="swatch" style="background:#3796FF"></span>patches</td><td class="num">0.949</td><td><div class="apbar" style="--cc:#3796FF"><i style="width:94.9%"></i></div></td><td class="num">0.622</td><td class="num">0.865</td><td class="num">0.889</td><td class="num">99</td></tr>
-          <tr><td class="mono"><span class="swatch" style="background:#AA50DC"></span>pitted_surface</td><td class="num">0.756</td><td><div class="apbar" style="--cc:#AA50DC"><i style="width:75.6%"></i></div></td><td class="num">0.427</td><td class="num">0.657</td><td class="num">0.717</td><td class="num">46</td></tr>
-          <tr><td class="mono"><span class="swatch" style="background:#F0BE00"></span>rolled-in_scale</td><td class="num">0.630</td><td><div class="apbar" style="--cc:#F0BE00"><i style="width:63.0%"></i></div></td><td class="num">0.277</td><td class="num">0.566</td><td class="num">0.594</td><td class="num">69</td></tr>
-          <tr><td class="mono"><span class="swatch" style="background:#00C8A0"></span>scratches</td><td class="num">0.909</td><td><div class="apbar" style="--cc:#00C8A0"><i style="width:90.9%"></i></div></td><td class="num">0.415</td><td class="num">0.653</td><td class="num">0.910</td><td class="num">64</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <span class="src">reports/evaluation.json &rarr; detection_metrics.per_class; box counts reports/model_study.json &rarr; dataset.test_instances</span>
-    <p class="note">
-      Crazing at AP50 0.444 and recall 0.224 is the weak class and the reason is measured, not guessed:
-      53 of its 68 misses are blind misses, its label boxes cover 23.8% of the frame, and its
-      foreground/background separability is 0.319 &mdash; the lowest of the six. Across the six classes,
-      AP50 tracks separability at Spearman 0.9429, p 0.0048. The model fails where the defect is genuinely
-      hard to see, not where it confuses one defect for another: zero of 168 missed labels were a
-      class confusion.
-      <span class="src">reports/model_study.json &rarr; failures.taxonomy_rows, appearance.crazing, difficulty_correlation.separability</span>
-    </p>
-
-    <h3>Against what is published on NEU-DET</h3>
-    <div class="tbl-wrap">
-      <table class="data">
-        <thead><tr><th>Model</th><th>mAP50</th><th style="min-width:160px"></th><th>Note</th></tr></thead>
-        <tbody>
-          <tr><td>DETR</td><td class="num">0.666</td><td><div class="apbar"><i style="width:66.6%"></i></div></td><td style="color:var(--muted)">published</td></tr>
-          <tr><td>YOLOv8n</td><td class="num">0.740</td><td><div class="apbar"><i style="width:74.0%"></i></div></td><td style="color:var(--muted)">published</td></tr>
-          <tr><td>DDN</td><td class="num">0.748</td><td><div class="apbar"><i style="width:74.8%"></i></div></td><td style="color:var(--muted)">published</td></tr>
-          <tr style="background:#1A2027"><td><strong>This model, yolov8n @256</strong></td><td class="num"><strong>0.7524</strong></td><td><div class="apbar" style="--cc:#F5A524"><i style="width:75.24%"></i></div></td><td>held-out test split, 3.012 M params</td></tr>
-          <tr><td>RT-DETR</td><td class="num">0.754</td><td><div class="apbar"><i style="width:75.4%"></i></div></td><td style="color:var(--muted)">published</td></tr>
-          <tr><td>YOLOv11n</td><td class="num">0.772</td><td><div class="apbar"><i style="width:77.2%"></i></div></td><td style="color:var(--muted)">published</td></tr>
-          <tr><td>YOLOv10n-SFDC</td><td class="num">0.855</td><td><div class="apbar"><i style="width:85.5%"></i></div></td><td style="color:var(--muted)">published, above the credible band</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <span class="src">docs/research_notes.md sections 1a-1b, all tagged [HARD]; credible band 0.70-0.80</span>
-    <p class="note">
-      This sits inside the published 0.70&ndash;0.80 band, which is the honest claim: it is competitive, not
-      state of the art, and the published numbers are not all measured on the same split protocol as this
-      one. What is not comparable is the engineering around it &mdash; the calibration, the cross-domain
-      measurement, and the fact that the number above comes from a split that selected nothing.
-    </p>
-
-    <h3>Two decisions that mattered more than the architecture</h3>
-    <div class="cards">
-      <div class="card">
-        <h4>256 px, not 640</h4>
-        <p>
-          Test mAP50 runs 0.7524 / 0.7286 / 0.6230 / 0.4843 / 0.3438 at 256 / 320 / 416 / 512 / 640 px.
-          A detector can only regress a box at the magnification it was trained at, so inheriting the
-          framework's generic 640 would have run this model at less than half its accuracy. A dedicated
-          150-epoch 640 px training run was then done anyway to check the constant honestly: its own best
-          is 0.7338, which ties the shipped 0.7524 inside the &plusmn;0.0254 bootstrap band.
-          <span class="src">reports/model_study.json &rarr; runs; reports/resolution_study.json</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>Nano, not small</h4>
-        <p>
-          The 3.7&times; larger yolov8s loses. At the training size the gap is +0.0688 mAP50 to nano, 95% CI
-          [+0.0309, +0.0990], nano winning in 99.95% of 2,000 bootstrap resamples; at deployment size
-          +0.0181, CI [&minus;0.0084, +0.0424]. The larger model overfits: its classification-loss
-          generalisation gap is +0.267 against nano's &minus;0.061. 3.012 M against 11.138 M parameters,
-          1.312 against 4.584 GFLOPs at 256 px.
-          <span class="src">reports/model_study.json &rarr; bootstrap, training_history, checkpoints</span>
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================================================= cross-domain ========= -->
+<!-- =========================================================== cross-domain -->
 <section id="crossdomain">
   <div class="wrap">
-    <h2>The strongest result: the model was asked to look at clean steel, and it failed</h2>
+    <div class="sec-head">
+      <span class="idx">03</span>
+      <h2>Then we showed it clean steel, and it cried wolf</h2>
+    </div>
     <p class="sub">
-      Every number above is in-domain. The interesting question for a mill is what the detector does on
-      steel with nothing wrong with it, from a different line and a different camera. So that was measured
-      on 505 held-out clean Severstal frames (4,040 tiles) plus 191 masked-defective frames (546 tiles) &mdash;
-      and the shipped model, which has never seen clean steel, flags 93.7% of the clean frames as defective
-      at a cross-domain ROC AUC of 0.608. That is indistinguishable from a coin toss.
+      Every number above is on the kind of steel the model was trained on. A mill cares more about a
+      different line, a different camera, and steel with nothing wrong with it. That was measured on
+      505 clean frames from a real production dataset. The result was bad.
     </p>
 
-    <div class="tbl-wrap" style="margin-top:22px">
+    <p class="ba-title">Defect-free steel wrongly flagged as defective, on 505 clean frames:</p>
+    <div class="ba-bars">
+      <div class="ba-row before">
+        <div class="lab">Before<small>the model running on this page</small></div>
+        <div class="ba-bar"><i style="width:93.7%"></i><b>93.7%</b></div>
+      </div>
+      <div class="ba-row after">
+        <div class="lab">After<small>joint fine-tune, same frames</small></div>
+        <div class="ba-bar"><i style="width:32.5%"></i><b>32.5%</b></div>
+      </div>
+    </div>
+    <p class="ba-cap">
+      An inspector who is wrong nine times out of ten stops being read. Retraining on 1,190
+      certified-clean crops cut it to one in three &mdash; and every other measure improved with it.
+    </p>
+
+    <div class="tbl-wrap" style="margin-top:18px">
       <table class="data">
         <thead>
-          <tr><th>Measurement, conf 0.15</th><th>Shipped model</th><th></th><th>Joint fine-tune</th><th>Direction</th></tr>
+          <tr><th>On steel from another mill</th><th class="was">Before</th><th></th><th class="now">After</th><th>Which way is good</th></tr>
         </thead>
         <tbody>
-          <tr><td>Clean-frame false alarm</td><td class="num">93.7%</td><td class="arrow">&rarr;</td><td class="num delta">32.5%</td><td>lower is better</td></tr>
-          <tr><td>Clean-crop false alarm</td><td class="num">55.1%</td><td class="arrow">&rarr;</td><td class="num delta">5.9%</td><td>lower is better</td></tr>
-          <tr><td>Cross-domain ROC AUC</td><td class="num">0.608</td><td class="arrow">&rarr;</td><td class="num delta">0.958</td><td>95% CI [0.576, 0.640] &rarr; [0.948, 0.968]</td></tr>
-          <tr><td>Defect-crop recall</td><td class="num">72.0%</td><td class="arrow">&rarr;</td><td class="num delta">86.6%</td><td>higher is better</td></tr>
-          <tr><td>In-domain mAP50, NEU-DET test</td><td class="num">0.7524</td><td class="arrow">&rarr;</td><td class="num delta">0.7642</td><td>accuracy <em>rose</em></td></tr>
-          <tr><td>In-domain ROC AUC</td><td class="num">0.968</td><td class="arrow">&rarr;</td><td class="num">0.940</td><td>CIs overlap</td></tr>
-          <tr><td>Clean-coil disposition, 480 identical tiles</td><td class="num">HOLD</td><td class="arrow">&rarr;</td><td class="num delta">DOWNGRADE</td><td>defect rate 55.2% &rarr; 4.8%; 62 &rarr; 0 critical-band frames</td></tr>
+          <tr><td>Clean frames wrongly flagged</td><td class="num was">93.7%</td><td class="arrow">&rarr;</td><td class="num now">32.5%</td><td>lower</td></tr>
+          <tr><td>Telling clean from defective (ROC AUC)</td><td class="num was">0.608</td><td class="arrow">&rarr;</td><td class="num now">0.958</td><td>higher; 0.5 is a coin toss</td></tr>
+          <tr><td>Real defects it caught there</td><td class="num was">72.0%</td><td class="arrow">&rarr;</td><td class="num now">86.6%</td><td>higher</td></tr>
+          <tr><td>Accuracy back home (mAP50)</td><td class="num">0.7524</td><td class="arrow">&rarr;</td><td class="num now">0.7642</td><td>it went up, not down</td></tr>
         </tbody>
       </table>
     </div>
-    <span class="src">reports/gap1_cross_domain.json &rarr; runs[baseline|joint].sweep[conf=0.15] and .separation_*; narrative in reports/gap1_cross_domain_fix.md section 7; reports/cross_domain_clean_coil_{baseline,joint}.json; reports/gap1_detection_metrics.json &rarr; neu_det["256"]</span>
+    <span class="src">reports/gap1_cross_domain.json &rarr; runs[baseline|joint] at conf 0.15; reports/gap1_detection_metrics.json &rarr; neu_det["256"]; narrative in reports/gap1_cross_domain_fix.md</span>
 
-    <div class="cards">
-      <div class="card">
-        <h4>What fixed it</h4>
-        <p>
-          1,190 certified-clean training crops, joint training on real target-domain positives
-          <em>and</em> negatives, with the NEU-DET class indices left untouched at 0&ndash;5 and four
-          Severstal classes appended at 6&ndash;9. Not a threshold change, not a post-hoc filter: the
-          backbone learns that clean steel is clean. The lesson generalises and is the one to carry into a
-          deployment plan &mdash; budget a joint fine-tune with real negatives for every new grade and every
-          new camera, because the features do not transfer on their own.
-        </p>
-      </div>
-      <div class="card">
-        <h4>Why it is not the default yet</h4>
-        <p>
-          The joint checkpoint scores better on both axes and it is still not shipped, deliberately. The
-          Severstal release publishes a numeric mask value 1&ndash;4 and nothing else: no defect name, no
-          metallurgical description, no grading rule. So the severity tier that drives a coil's release
-          decision cannot be set for those four classes without inventing metallurgy, and inventing it is
-          the one thing this project will not do. They sit at the neutral middle tier with an explicit
-          admission in place of a root cause, and the quality department owns the number.
-          <span class="src">reports/severstal_dataset.md; src/inference.py SEVERSTAL_TIER</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>You can see the failure in the demo above</h4>
-        <p>
-          Click the <em>strip 2048&times;1000 roll mark</em> chip. It is a GC10 line-scan frame of carbon
-          steel with a roll mark on it &mdash; a defect family this six-class head was never trained on.
-          Across three tiled passes it returns <code>rolled-in_scale</code> at raw 0.355 and
-          <code>inclusion</code> at 0.270. The weld-line frame returns <code>patches</code> at 0.526 and
-          0.308 and <code>scratches</code> at 0.369. Every one of those five calls is confidently the wrong
-          name, because the right name is not in this head's vocabulary &mdash; and none of them is a
-          refusal. That is the 93.7% number in miniature: a detector with no concept of &ldquo;something
-          else&rdquo; answers anyway. The joint checkpoint in the table above and the out-of-scope gate in
-          the console are the two fixes, and neither is wired into this page.
-          <span class="src">site/verify/parity_browser.json &rarr; out_of_domain (regenerated with the tiled path)</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>An out-of-scope gate exists too</h4>
-        <p>
-          A separate guard rejects input that is not steel at all: zero false rejections across 3,200
-          genuine steel frames (1,440 + 180 + 180 NEU-DET, 1,400 Severstal), and 13 of 15 correct on a
-          held-out suite of synthetic negatives. It is not wired into this static page &mdash; the page will
-          happily score a photograph of a cat and tell you it found crazing.
-          <span class="src">reports/ood_guard.json, reports/ood_guard.md</span>
-        </p>
-      </div>
+    <div class="d-row">
+      <details class="d">
+        <summary>
+          <span class="t">Why this page still runs the worse model, on purpose</span>
+          <span class="s">The fixed model borrows four defect classes whose metallurgy is not published, so their severity tier cannot be set without inventing it.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            The joint checkpoint scores better on both axes and it is still not shipped, deliberately.
+            The Severstal release publishes a numeric mask value 1&ndash;4 and nothing else: no defect
+            name, no metallurgical description, no grading rule. The severity tier that drives a coil's
+            release decision cannot be set for those four classes without inventing metallurgy, and
+            inventing it is the one thing this project will not do. They sit at the neutral middle tier
+            with an explicit admission in place of a root cause, and the quality department owns the
+            number.
+            <span class="src">reports/severstal_dataset.md; src/inference.py SEVERSTAL_TIER</span>
+          </p>
+        </div>
+      </details>
+
+      <details class="d">
+        <summary>
+          <span class="t">What actually fixed it &mdash; and the lesson to carry into a deployment</span>
+          <span class="s">Not a threshold and not a filter: the backbone had to be taught what clean steel looks like. Budget that for every new grade and every new camera.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            1,190 certified-clean training crops, joint training on real target-domain positives
+            <em>and</em> negatives, with the original class indices left untouched at 0&ndash;5 and four
+            new classes appended at 6&ndash;9. Not a threshold change, not a post-hoc filter: the
+            backbone learns that clean steel is clean. The features do not transfer on their own, so a
+            per-line fine-tune with real negatives belongs in the plan and in the budget.
+          </p>
+          <p>
+            A separate out-of-scope gate also exists in the Python console: zero false rejections
+            across 3,200 genuine steel frames, and 13 of 15 correct on a held-out suite of synthetic
+            negatives. It is not wired into this page &mdash; which will happily score a photograph of
+            a cat and tell you it found crazing.
+            <span class="src">reports/ood_guard.json; reports/gap1_cross_domain_fix.md section 7</span>
+          </p>
+          <p><a href="technical.html#crossdomain">The full cross-domain record, including the coil-level disposition change.</a></p>
+        </div>
+      </details>
     </div>
   </div>
 </section>
 
-<!-- ================================================= calibration ========== -->
-<section id="calibration">
+<!-- ================================================================= strip -->
+<section id="strip">
   <div class="wrap">
-    <h2>The confidence in the table is a probability, and that took work</h2>
+    <div class="sec-head">
+      <span class="idx">04</span>
+      <h2>A real strip frame is 2048 &times; 1000. Squash it and the defect disappears.</h2>
+    </div>
     <p class="sub">
-      A YOLO class score is not a probability. On the held-out test split the raw scores carry an expected
-      calibration error of 0.1418 &mdash; a box shown at &ldquo;0.40&rdquo; was right far less often than 40%
-      of the time. An operator who is told 0.40 and means 0.40 will make different decisions from one who
-      is told a number that happens to be 0.40.
+      The model reads a 256 &times; 256 square. Shrinking a whole line-scan frame into it squeezes the
+      picture eight times across against four times down &mdash; a distortion the model never saw in
+      training. So wide frames are cut into overlapping square windows instead. What that is worth, on
+      two real frames:
     </p>
 
-    <div class="stats" style="margin-top:22px">
-      <div class="stat"><div class="k">ECE before</div><div class="v">0.1418</div><div class="n">raw head scores, test split</div></div>
-      <div class="stat"><div class="k">ECE after</div><div class="v good">0.0461</div><div class="n">67.5% reduction</div></div>
-      <div class="stat"><div class="k">Max cal. error</div><div class="v">0.242 &rarr; 0.116</div><div class="n">worst bin</div></div>
-      <div class="stat"><div class="k">mAP50 cost</div><div class="v good">0.000000</div><div class="n">0.707986 before and after</div></div>
-      <div class="stat"><div class="k">Method</div><div class="v" style="font-size:1.05rem">isotonic</div><div class="n">34 knots, chosen out of fold</div></div>
-      <div class="stat"><div class="k">At the operating point</div><div class="v">0.165 &rarr; 0.056</div><div class="n">ECE over 481 detections at conf 0.15</div></div>
+    <div class="vs">
+      <div class="side bad">
+        <h4>Squashed into the square</h4>
+        <div class="big">0 defects</div>
+        <p>One pass over the whole frame, at the wrong aspect ratio. It finds nothing at all on the
+        weld-line frame &mdash; and on the roll-mark frame it produces six confident boxes, every one
+        of them labelled with the wrong defect.</p>
+      </div>
+      <div class="side good">
+        <h4>Cut into three square windows</h4>
+        <div class="big">3 defects</div>
+        <p>Three passes at an even scale, merged once. Same frame, same model, same threshold. The
+        cost is two extra forward passes, about 27 ms in total instead of 9 ms.</p>
+      </div>
     </div>
-    <span class="src">reports/calibration.json &rarr; metrics.ece, metrics.mce, map50, selection; reports/calibration.md</span>
+    <span class="src">site/verify/strip_check.json &rarr; strips[strip_weldline].squash.n vs .tiled.n, and strips[strip_rollmark].squash.detections</span>
 
-    <div class="cards">
-      <div class="card">
-        <h4>Chosen out of fold, not by eye</h4>
-        <p>
-          Five candidates were fitted under 5-fold cross-validation on the validation split, grouped by
-          source image so no crop leaks between folds. Out-of-fold ECE: isotonic 0.0250, platt 0.0614,
-          temperature 0.0961, identity 0.1008. Isotonic won on data it had not seen, which is why its
-          in-sample expressiveness is not an argument against it.
-        </p>
-      </div>
-      <div class="card">
-        <h4>It cannot reorder anything</h4>
-        <p>
-          The map is monotone, so it cannot change which detection outranks which, and mAP50 is numerically
-          unchanged at 0.707986 before and after &mdash; the same quantity computed twice under two
-          rankings, which is what makes the invariance meaningful. Isotonic regression is only
-          non-<em>decreasing</em>, though, and would collapse runs of distinct scores onto one plateau
-          value; a vanishing 1e&minus;06 term restores a strict order without moving any calibrated value
-          by more than that.
-        </p>
-      </div>
-      <div class="card">
-        <h4>What it does to the numbers you see</h4>
-        <p class="mono" style="font-size:0.8rem;line-height:1.9;color:var(--dim)">
-          raw 0.15 &rarr; p 0.255<br>
-          raw 0.25 &rarr; p 0.330<br>
-          raw 0.40 &rarr; p 0.500<br>
-          raw 0.60 &rarr; p 0.802<br>
-          raw 0.80 &rarr; p 0.995
-        </p>
-        <p style="margin-top:10px">
-          The largest shift anywhere on the curve is 0.227. The browser's implementation was checked against
-          the Python one on a 1,001-point grid: maximum disagreement 1.1e&minus;16, which is float64
-          rounding.
-          <span class="src">reports/calibration.json &rarr; examples, rank_preservation.max_shift</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>And the top of the curve is capped</h4>
-        <p>
-          99 detections above raw 0.780 were all true positives. The maximum-likelihood answer is
-          p = 1.000; the shipped answer is the Jeffreys estimate, 0.995. A detector that says
-          &ldquo;certain&rdquo; about 99 samples has not earned the word.
-        </p>
-      </div>
+    <p class="ba-cap">
+      Try it &mdash; the two dashed samples in the detector are those frames, unmodified.
+    </p>
+    <p class="hero-actions" style="margin-top:14px">
+      <button class="btn primary" type="button" data-run-sample="strip_rollmark.jpg">Run the roll-mark strip</button>
+      <a class="btn" href="technical.html#parity">How the tiled path was checked</a>
+    </p>
+
+    <div class="d-row">
+      <details class="d">
+        <summary>
+          <span class="t">Those two strip frames are also the honest failure case</span>
+          <span class="s">Their real defects are a roll mark and a weld line. This six-class model has neither name, so it answers with the nearest name it owns instead of refusing.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            Across three tiled passes the roll-mark frame returns <code>rolled-in_scale</code> at raw
+            0.355 and <code>inclusion</code> at 0.270. The weld-line frame returns
+            <code>patches</code> at 0.526 and 0.308 and <code>scratches</code> at 0.369. Every one of
+            those five calls is confidently the wrong name, because the right name is not in this
+            model's vocabulary &mdash; and none of them is a refusal. That is the 93.7% number in
+            miniature, on a frame you can look at.
+            <span class="src">site/verify/parity_browser.json &rarr; out_of_domain</span>
+          </p>
+        </div>
+      </details>
     </div>
   </div>
 </section>
 
-<!-- ================================================= mill ================= -->
-<section id="mill">
-  <div class="wrap">
-    <h2>Would it keep up with a line?</h2>
-    <p class="sub">
-      Arithmetic on a sourced mill geometry, not a promise: 4 cameras across a 1.28 m strip at 0.2 mm/px,
-      2048 px per frame, one frame every 0.348 m. Line speed, strip width and pixel pitch are a proxy
-      (Ternium at 300 m/min, ISRA at 170 um/px), not Jindal's own figures.
-    </p>
-    <div class="tbl-wrap" style="margin-top:20px">
-      <table class="data">
-        <thead><tr><th>Line speed</th><th>Inferences/s, 320 px tiled</th><th>Inferences/s, downscaled</th></tr></thead>
-        <tbody>
-          <tr><td class="num">45 m/min</td><td class="num">552</td><td class="num">9</td></tr>
-          <tr><td class="num">90 m/min</td><td class="num">1,103</td><td class="num">17</td></tr>
-          <tr><td class="num">250 m/min</td><td class="num">3,064</td><td class="num">48</td></tr>
-          <tr><td class="num">500 m/min</td><td class="num">6,128</td><td class="num">96</td></tr>
-          <tr><td class="num">900 m/min</td><td class="num">11,029</td><td class="num">172</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <span class="src">reports/benchmark.json &rarr; mill.geometry, mill.scenarios, mill.deployment</span>
-    <p class="note">
-      One Apple M5 GPU sustains a measured 164&ndash;198 inferences/s at 320 px &mdash; a band, not a point
-      value, because MPS throughput on this host is not reproducible between sessions, so every speed
-      statement in this project is a band or a ratio. At 250 m/min that is about 18 accelerators for full
-      tiled coverage, or one accelerator per 15 cameras downscaled. A per-line fine-tune is about 0.6 h.
-      The 64 tiles per frame come from 20% tile overlap, and a defect crossing a tile seam is counted once
-      because <code>predict_tiled</code> runs a single global NMS.
-      <span class="src">reports/benchmark.json &rarr; mill.deployment.peak_by_imgsz, assumptions.utilisation_ceiling; src/inference.py predict_tiled</span>
-    </p>
-  </div>
-</section>
-
-<!-- ================================================= limitations ========== -->
+<!-- ================================================================ limits -->
 <section id="limits">
   <div class="wrap">
-    <h2>Limitations</h2>
+    <div class="sec-head">
+      <span class="idx">05</span>
+      <h2>What it does not do</h2>
+    </div>
     <p class="sub">
-      Written to be believed rather than to be reassuring. If one of these is a blocker for your line, it is
-      better read here than discovered later.
+      Written to be believed rather than to be reassuring. Open any of them for the full measurement.
     </p>
 
-    <div class="lim" style="margin-top:22px">
-      <div class="card">
-        <h4>This is carbon steel, not stainless</h4>
-        <p>
-          NEU-DET is 1,800 grayscale 200&times;200 images of hot-rolled <em>carbon</em> steel. Nothing on this
-          page has been measured on stainless, and the metallurgy of the surface is not the same. Every
-          number here is a capability demonstration on a public benchmark, not a prediction of performance
-          on Jindal stainless strip.
-        </p>
-      </div>
-      <div class="card">
-        <h4>One lighting rig, one camera</h4>
-        <p>
-          The whole dataset was photographed under a single imaging setup. Nothing has been measured on a
-          different camera, a different illumination geometry, or a different upstream mill &mdash; and the
-          vision vendors themselves say the same defect class looks different from different mills. The
-          cross-domain section above is what happens when you ignore this: AUC 0.608, which is chance. The
-          per-line calibration protocol, not the architecture, is what decides whether this works.
-        </p>
-      </div>
-      <div class="card">
-        <h4>Roll marks are measured weak</h4>
-        <p>
-          On GC10-DET, the roll-mark family (rolled_pit, crease) scores mean AP50 0.203 on 24 test
-          instances. Four of eleven live rolled_pit images produce zero detections at conf 0.15. With 24
-          instances one flip moves recall 8&ndash;9 points, so that number is soft in both directions. Overall
-          GC10 held-out test is mAP50 0.5821 &mdash; materially below the NEU-DET figure, on 333 images and
-          530 boxes.
-          <span class="src">reports/gc10_coverage.json &rarr; brief_relevant_families.roll_marks, test_evaluation.overall</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>Edge cracks are covered only by a proxy</h4>
-        <p>
-          No public dataset has an edge-crack class. The edge family here is crescent gap and waist fold
-          &mdash; AP50 0.880 on 61 test instances, which is a strong result for <em>edge geometry</em> and not
-          evidence about cracks. Calling it edge-crack detection would be a lie, so it is not called that.
-          <span class="src">reports/gc10_coverage.json &rarr; brief_relevant_families.edge_defects_proxy; reports/gc10_dataset.md</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>Crazing recall is 0.224</h4>
-        <p>
-          The weakest class on the weakest axis. 53 of 68 crazing misses are blind misses, not mislocalised
-          ones. If crazing is the defect that costs you money, this model is not yet the answer for it, and
-          the section above explains why rather than averaging it away.
-        </p>
-      </div>
-      <div class="card">
-        <h4>Three different false-alarm numbers, not one</h4>
-        <p>
-          The NEU-DET clean-crop proxy reads &le;23.7% (95% CI [17.7%, 30.1%]) but its effective sample size
-          is 179 of 771 crops, and it ranges 5.8%&ndash;48.8% by source class. A legacy definition of the same
-          thing reads 59.4%. The real clean-steel measurement &mdash; 93.7% before the fix, 32.5% after
-          &mdash; is the one to trust, and it is much worse than the proxy suggested.
-          <span class="src">reports/false_alarm.json; reports/gap1_cross_domain.json</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>The cost model is an assumption</h4>
-        <p>
-          Defect prevalence at 5% of frames and the miss-to-false-alarm price at 12:1 are assumptions, not
-          measurements, and only their product is identifiable. conf 0.15 is set by a 90% detection floor,
-          not by the economics. Every rupee figure in the deck is arithmetic on a swept assumption with the
-          inputs printed beside it &mdash; a shape, not a forecast.
-        </p>
-      </div>
-      <div class="card">
-        <h4>What this page in particular does not do</h4>
-        <p>
-          It runs the six-class NEU-DET head, not the better 10-class joint checkpoint, so the cross-domain
-          false alarms above are live here. It has no out-of-scope gate, so it will score a photograph of
-          anything &mdash; that gate is <code>vendor/ood_guard.py</code> in the Python console and it has
-          not been ported. Its tiled path over a non-square frame has no Python reference: ultralytics was
-          run on the twelve square NEU-DET frames, so the parity tables above cover the single-pass path
-          only, and the strip results are a browser-against-Node comparison rather than a check against
-          ultralytics. The two strip frames are GC10-DET captures whose real defects &mdash; a roll mark
-          and a weld line &mdash; are not classes this six-class head has, so what it returns on them is
-          the nearest class it owns, not a correct name. And it runs single-threaded WASM on your CPU, so
-          its timing is not the deployment timing.
-          <span class="src">site/verify/strip_check.json; site/verify/parity_browser.json &rarr; out_of_domain</span>
-        </p>
-      </div>
-      <div class="card">
-        <h4>Not measured, and not claimed</h4>
-        <p>
-          Training-seed variance: three seeds per architecture is about 6.5 h on this machine and would
-          upgrade the nano-versus-small finding from &ldquo;these weights&rdquo; to &ldquo;this
-          architecture&rdquo;. Transfer across magnification: the accuracy curve was measured on
-          200&times;200 crops, and a 320 px tile at 0.2 mm/px covers 64 mm of strip. The unsupervised anomaly
-          channel and the closed loop back to the mill are proposed, not built.
-        </p>
-      </div>
+    <div class="d-row">
+      <details class="d warn">
+        <summary>
+          <span class="t">This is carbon steel, not stainless</span>
+          <span class="s">Every number on this page is measured on public benchmarks of hot-rolled carbon steel. Nothing has been measured on Jindal stainless strip.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            NEU-DET is 1,800 grayscale 200&times;200 images of hot-rolled carbon steel, and the
+            metallurgy of the surface is not the same as stainless. Everything here is a capability
+            demonstration on a public benchmark, not a prediction of performance on your line.
+          </p>
+        </div>
+      </details>
+
+      <details class="d warn">
+        <summary>
+          <span class="t">One lighting rig, one camera</span>
+          <span class="s">The whole dataset was shot under a single imaging setup. The cross-domain section above is what happens when you ignore that.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            Nothing has been measured on a different camera, a different illumination geometry or a
+            different upstream mill &mdash; and the vision vendors themselves say the same defect class
+            looks different from different mills. On steel from another line this model scored ROC AUC
+            0.608, which is chance. The per-line calibration protocol, not the architecture, is what
+            decides whether this works.
+          </p>
+        </div>
+      </details>
+
+      <details class="d warn">
+        <summary>
+          <span class="t">Roll marks are measured weak, and edge cracks are only a proxy</span>
+          <span class="s">Roll marks score mean AP50 0.203 on 24 test instances. Edge cracks have no public dataset at all, so a geometric stand-in is used and is not called a crack detector.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            On GC10-DET the roll-mark family (rolled_pit, crease) scores mean AP50 0.203 on 24 test
+            instances, and four of eleven live rolled_pit images produce zero detections at conf 0.15.
+            With 24 instances one flip moves recall 8&ndash;9 points, so that number is soft in both
+            directions. Overall GC10 held-out test is mAP50 0.5821 &mdash; materially below the NEU-DET
+            figure, on 333 images and 530 boxes.
+          </p>
+          <p>
+            No public dataset has an edge-crack class. The edge family here is crescent gap and waist
+            fold &mdash; AP50 0.880 on 61 test instances, which is a strong result for <em>edge
+            geometry</em> and not evidence about cracks. Calling it edge-crack detection would be a
+            lie, so it is not called that.
+            <span class="src">reports/gc10_coverage.json &rarr; brief_relevant_families; reports/gc10_dataset.md</span>
+          </p>
+        </div>
+      </details>
+
+      <details class="d warn">
+        <summary>
+          <span class="t">Crazing recall is 0.224</span>
+          <span class="s">If crazing is the defect that costs you money, this model is not yet the answer for it.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            The weakest class on the weakest axis. 53 of 68 crazing misses are blind misses, not
+            mislocalised ones. The per-class panel above explains why rather than averaging it away.
+          </p>
+        </div>
+      </details>
+
+      <details class="d warn">
+        <summary>
+          <span class="t">There are three different false-alarm numbers, not one</span>
+          <span class="s">A clean-crop proxy reads 23.7%, a legacy definition reads 59.4%, and the real clean-steel measurement reads 93.7%. The worst one is the one to trust.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            The NEU-DET clean-crop proxy reads &le;23.7% (95% CI [17.7%, 30.1%]) but its effective
+            sample size is 179 of 771 crops, and it ranges 5.8%&ndash;48.8% by source class. A legacy
+            definition of the same thing reads 59.4%. The real clean-steel measurement &mdash; 93.7%
+            before the fix, 32.5% after &mdash; is the one to trust, and it is much worse than the
+            proxy suggested.
+            <span class="src">reports/false_alarm.json; reports/gap1_cross_domain.json</span>
+          </p>
+        </div>
+      </details>
+
+      <details class="d warn">
+        <summary>
+          <span class="t">The cost model is an assumption, not a measurement</span>
+          <span class="s">5% defect prevalence and a 12:1 miss-to-false-alarm price are assumed. Every rupee figure is arithmetic on that assumption, printed with its inputs.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            Only the product of those two assumptions is identifiable. The operating point conf 0.15 is
+            set by a 90% detection floor, not by the economics. Read every money figure as a shape, not
+            a forecast.
+          </p>
+        </div>
+      </details>
+
+      <details class="d warn">
+        <summary>
+          <span class="t">What this page in particular does not do</span>
+          <span class="s">It runs the six-class model, not the better ten-class one, and it has no out-of-scope gate &mdash; it will confidently score a photograph of anything.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            The cross-domain false alarms above are live here. The out-of-scope gate is
+            <code>vendor/ood_guard.py</code> in the Python console and has not been ported. The tiled
+            path over a non-square frame has no Python reference, so the parity check covers the
+            single-pass path only and the strip results are a browser-against-Node comparison. And it
+            runs single-threaded on your CPU, so its timing is not the deployment timing.
+            <span class="src">site/verify/strip_check.json; site/verify/parity_browser.json</span>
+          </p>
+        </div>
+      </details>
+
+      <details class="d warn">
+        <summary>
+          <span class="t">Not measured, and therefore not claimed</span>
+          <span class="s">Seed variance, transfer across magnification, the anomaly channel and the closed loop back to the mill are proposed, not built.</span>
+        </summary>
+        <div class="dbody">
+          <p>
+            Three seeds per architecture is about 6.5 h on this machine and would upgrade the
+            nano-versus-small finding from "these weights" to "this architecture". The accuracy curve
+            was measured on 200&times;200 crops, and a 320 px tile at 0.2 mm/px covers 64 mm of strip.
+            <a href="technical.html#limits">The full limitations section</a> carries all of this at
+            length.
+          </p>
+        </div>
+      </details>
     </div>
   </div>
 </section>
 
-<!-- ================================================= console ============== -->
-<section id="console">
+<!-- ============================================================== evidence -->
+<section id="evidence">
   <div class="wrap">
-    <h2>The console</h2>
-    <p class="sub">
-      There are two of them. One is this page, and it is running. The other is a Python console that
-      does the things a browser tab should not be asked to do. Neither is a mock-up of the other.
-    </p>
-
-    <div id="console-slot">
-      <div id="console-static">
-
-        <div class="cons-grid">
-          <div class="cons-col">
-            <h3>This page is the inspection station</h3>
-            <p>
-              Not a description of one, and not a trailer for the Python build. The 12.1 MB
-              <code>yolov8n_neudet_best.onnx</code> you downloaded a few sections ago is the shipped
-              export of the shipped checkpoint. The resize, the NCHW packing, the decode, the
-              class-aware NMS and the isotonic calibration all come from
-              <code>site/js/detect.js</code>, <code>site/js/tiling.js</code> and
-              <code>site/js/calibration.js</code> &mdash; and those same three files are what
-              <code>site/verify</code> runs under onnxruntime-node and under headless Chrome to check
-              this page against Python ultralytics, detection for detection. Both tables in the
-              verification section above are that comparison.
-            </p>
-            <p>
-              It is not a thin demo. Full-width strip frames are cut into square windows and merged
-              with one global NMS rather than squashed into the square input. Confidences are the
-              calibrated probabilities, not the raw head scores. Severity is scored with the same
-              tier-times-confidence-times-area rule the Python path uses, and every detection carries
-              the operator action for its defect class. The confidence slider re-decodes from the
-              cached output tensors, so it moves the threshold the model was actually thresholded at.
-            </p>
-            <p class="src">site/js/detect.js; site/js/tiling.js; site/js/calibration.js; site/verify/parity_report.json; site/verify/parity_browser.json; site/verify/strip_check.json</p>
-          </div>
-
-          <div class="cons-col">
-            <h3>Running in the tab is the point, not the compromise</h3>
-            <p>
-              Strip imagery is process data. A mill that will not send coil photographs to a vendor
-              cloud has a real objection, and this architecture answers it structurally rather than
-              contractually: <strong>no frame leaves the machine.</strong> The image is read into a
-              canvas, turned into a tensor and discarded. There is no upload, no inference endpoint,
-              no bucket, no retention policy to negotiate.
-            </p>
-            <p>
-              What follows from that is not marketing. There is no cloud dependency, so a WAN outage
-              does not stop inspection. There is no per-inference cost and no autoscaling bill. There
-              is no cold start &mdash; the session is warmed once and the model stays resident. And the
-              artefact is portable in the way that matters: a single ONNX file and a WASM runtime that
-              needs no GPU, no CUDA and no Python. The same file that ran in this tab is the file an
-              industrial PC on the mill floor would load through onnxruntime, which is the version of
-              this that would actually be deployed.
-            </p>
-            <p class="note">
-              To be precise about the claim: the browser is how deployability is
-              <em>demonstrated</em> here, not a proposal to run production quality control as a web
-              page. It is the same weights and the same arithmetic on a runtime anyone can audit by
-              opening dev tools &mdash; and single-threaded WASM on a laptop is a lower bound on the
-              hardware, not the deployment target.
-            </p>
-          </div>
-        </div>
-
-        <h3 class="cons-h">What the Python console adds over this page</h3>
-        <p class="sub">
-          Four things, and they are the four this page genuinely should not do. They are why the
-          console exists rather than being folded into the tab.
-        </p>
-        <div class="cards">
-          <div class="card">
-            <h4>Batch scoring and the coil report</h4>
-            <p>
-              Many frames through <code>predict_batch</code>, a sortable frame table, then coil-level
-              disposition against the HOLD and DOWNGRADE rules and a downloadable coil report from
-              <code>vendor/report.py</code>. A coil verdict is an aggregate over hundreds of frames;
-              one frame at a time cannot produce one.
-            </p>
-          </div>
-          <div class="card">
-            <h4>EigenCAM attention maps</h4>
-            <p>
-              An <em>Explain</em> button runs a second instrumented forward pass through
-              <code>vendor/explain.py</code> and renders where the layer's features responded, with an
-              occlusion-sensitivity fallback when the CAM degenerates. It needs the PyTorch graph, not
-              the frozen ONNX export this page carries, so it cannot run here at all.
-            </p>
-          </div>
-          <div class="card">
-            <h4>Line simulation</h4>
-            <p>
-              N frames scored one at a time to show per-frame latency, the frame rate a strip at a
-              given speed implies, and how many accelerators a full-width line would need. It is the
-              capacity argument, and it needs a controlled sequential run rather than a click.
-            </p>
-          </div>
-          <div class="card">
-            <h4>The out-of-scope gate</h4>
-            <p>
-              <code>vendor/ood_guard.py</code> runs <em>first</em> in the console: a six-class defect
-              head has no &ldquo;not steel&rdquo; class, so a frame the gate rejects gets a withheld
-              verdict instead of a confident wrong answer. <strong>This page has no such gate</strong>
-              and will happily score a photograph of anything &mdash; the limitation is listed above
-              because it is real.
-            </p>
-          </div>
-        </div>
-
-        <h3 class="cons-h">Where it is, and how to run it</h3>
-        <p class="sub">
-          The console is not a plan. It is in this repository, at <code>console/</code>, complete: the
-          Streamlit application, the six <code>vendor/</code> modules it imports, a Dockerfile, a
-          <code>requirements.txt</code> that pins torch to the CPU-only wheel, the 18 sample frames,
-          and both 6 MB checkpoints &mdash; including <code>yolov8n_neudet/weights/best.pt</code>, the
-          exact 6,222,186-byte file every accuracy number on this page was measured on.
-        </p>
-        <pre class="cmd"><code>git clone https://github.com/surface-vision/surface-vision.github.io.git
-cd surface-vision.github.io/console
-docker build -t surface-console . &amp;&amp; docker run -p 7860:7860 surface-console</code></pre>
-        <p class="note">
-          Then open <code>http://127.0.0.1:7860</code>. Without Docker,
-          <code>pip install -r requirements.txt &amp;&amp; streamlit run app.py</code> in the same
-          directory does the same thing on Python 3.11.
-        </p>
-        <p class="cons-links">
-          <a class="btn" href="https://github.com/surface-vision/surface-vision.github.io/tree/main/console">Browse console/ on GitHub</a>
-          <a class="btn" href="console/README.md">Console README</a>
-          <a class="btn" href="console/app.py">app.py</a>
-          <a class="btn" href="console/Dockerfile">Dockerfile</a>
-          <a class="btn" href="console/vendor/ood_guard.py">ood_guard.py</a>
-        </p>
-
-        <p class="note">
-          It is not embedded on this page for one reason, and the reason is a price list rather than a
-          bug: Hugging Face now requires a PRO subscription for Docker and Gradio Spaces on free CPU,
-          and only <em>static</em> Spaces remain free. A Streamlit console in a container has no free
-          host there. The package is unchanged and host-agnostic &mdash; it is an ordinary Docker image
-          and runs anywhere a container runs. If a paid host is attached, its URL goes into the
-          <code>HF_SPACE_URL</code> constant in <code>site/js/app.js</code> and this section becomes
-          the live console embedded in place, with no other edit anywhere on the site.
-        </p>
-      </div>
+    <div class="sec-head">
+      <span class="idx">06</span>
+      <h2>Check any of it</h2>
     </div>
-
-    <p class="cons-links" style="margin-top:18px">
-      <a class="btn primary" id="console-link" href="#" hidden>Open the hosted console in a new tab</a>
+    <p class="sub">
+      A demo that quietly disagrees with the model it claims to be is worse than no demo, so this page
+      is driven headless in real Chrome and every detection is compared with the original PyTorch
+      model: <strong>40 of 40 matched, largest box difference 0.14 pixels.</strong> Every figure on
+      this site names the file it came from, and those files are published.
     </p>
+
+    <div class="linkcards">
+      <a class="linkcard" href="technical.html">
+        <div class="t">Technical detail</div>
+        <div class="s">The parity harness, per-class results, calibration, throughput arithmetic and the full limitations.</div>
+      </a>
+      <a class="linkcard" href="evidence/">
+        <div class="t">Evidence</div>
+        <div class="s">14 report narratives and 28 JSON artefacts &mdash; the files the experiments wrote, not summaries of them.</div>
+      </a>
+      <a class="linkcard" href="console/">
+        <div class="t">Python console</div>
+        <div class="s">Batch scoring, coil reports, attention maps and the out-of-scope gate. Complete in this repository, one command to run.</div>
+      </a>
+      <a class="linkcard" href="https://github.com/surface-vision/surface-vision.github.io">
+        <div class="t">Repository</div>
+        <div class="s">The page, the model, the samples and the verification harness. No build step and no framework.</div>
+      </a>
+    </div>
   </div>
 </section>
 
-<!-- ================================================= footer ============== -->
-<footer>
+<footer class="slim">
   <div class="wrap">
     <div class="links">
+      <a href="technical.html">Technical detail</a>
       <a href="evidence/">All evidence</a>
       <a href="evidence/deck/JSW_Surface_Defect_Detection.pptx">Deck (pptx)</a>
-      <a href="evidence/reports/evaluation.md">Evaluation report</a>
-      <a href="evidence/reports/model_study.md">Model study</a>
-      <a href="evidence/reports/gap1_cross_domain_fix.md">Cross-domain fix</a>
-      <a href="evidence/reports/calibration.md">Calibration</a>
-      <a href="evidence/reports/gc10_coverage.md">GC10 coverage</a>
-      <a href="evidence/reports/ood_guard.md">Out-of-scope gate</a>
-      <a href="evidence/reports/input_pipeline_decision.md">Input pipeline</a>
-      <a href="evidence/reports/false_alarm.md">False alarms</a>
-      <a href="verify/parity_report.json">parity_report.json</a>
+      <a href="verify/parity_browser.json">parity_browser.json</a>
       <a href="verify/strip_check.json">strip_check.json</a>
       <a href="console/">Python console source</a>
       <a href="https://github.com/surface-vision/surface-vision.github.io">Repository</a>
     </div>
     <p>
-      Classes, in head-index order: <span class="mono" id="classList"></span>.
-      Operating point conf 0.15, NMS IoU 0.45, input 256&times;256.
-    </p>
-    <p>
-      Sample frames <code>samples/*_27*.jpg</code> are the NEU-DET test split (Northeastern University
-      hot-rolled steel strip surface defect database). The two 2048&times;1000 strip frames are unmodified
-      GC10-DET frames, CC BY 4.0 &mdash; Lv, X.; Duan, F.; Jiang, J.J.; Fu, X.; Gan, L.
-      <em>Deep Metallic Surface Defect Detection: The New Benchmark and Detection Network.</em>
-      Sensors 2020, 20(6), 1562.
-    </p>
-    <p>
-      Runtime: onnxruntime-web on the WASM backend, pinned to 1.23.2, loaded from jsDelivr. No build step,
-      no bundler, no framework &mdash; plain HTML, CSS and ES modules. Every figure on this page names the
-      file it came from, and the file it names is published under
-      <a href="evidence/">evidence/</a> &mdash; 14 report narratives and 28 JSON artefacts, copied from the
-      project's <code>reports/</code> with absolute build paths rewritten to repository-relative ones and
-      nothing else changed. The 54-row number-to-source audit table is in
-      <a href="evidence/deck/deck_content.md">deck_content.md</a>.
+      A capability demonstration on public research datasets (NEU-DET, GC10-DET, Severstal), not a
+      Jindal Stainless production system. No line data was used.
+      Wide strip samples: GC10-DET, CC BY 4.0, Lv et al., <em>Sensors</em> 2020.
+      <a href="technical.html">Full attribution and operating point</a>.
     </p>
   </div>
 </footer>

@@ -28,7 +28,7 @@ const VIEWPORTS = [
   { name: 'Pixel 7        ', width: 412, height: 915, dsf: 2.6 },
   { name: 'iPad mini port ', width: 768, height: 1024, dsf: 2 },
 ];
-const PAGES = ['', 'evidence/', 'console/'];
+const PAGES = ['', 'technical.html', 'evidence/', 'console/'];
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--no-sandbox'] });
 let fails = 0;

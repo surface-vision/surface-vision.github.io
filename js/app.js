@@ -14,24 +14,10 @@ import {
   CLASS_NAMES, CLASS_COLORS, IMGSZ, SHIPPED_CONF, NMS_IOU,
   preprocess, decode, nms,
 } from './detect.js';
-import { planTiles, tilingApplies } from './tiling.js';
+import { planTiles } from './tiling.js';
 import { calibrate, CALIBRATION } from './calibration.js';
 import { DEFECT_INFO, scoreDetection, severityBucket } from './defect-info.js';
-
-/* ==========================================================================
- * OPTIONAL live embed of the hosted Python console.
- *
- * Empty is the SHIPPED state, and it is not a missing feature: Hugging Face moved
- * Docker and Gradio Spaces on free CPU behind a PRO subscription, and only static
- * Spaces remain free, so the Streamlit console in hf_space/ has no free host. The
- * console section renders its own content -- what that console adds over this page,
- * and how to run it locally -- straight from index.html, with no placeholder and
- * nothing deferred.
- *
- * Paste a URL here (e.g. 'https://<owner>-<space>.hf.space') and wireConsole()
- * replaces that content with the live embed. Nothing else needs to change.
- * ========================================================================== */
-const HF_SPACE_URL = '';
+import { wireConsole } from './console-embed.js';
 
 /* onnxruntime-web, pinned to an exact version on both mirrors.
  *
@@ -47,21 +33,33 @@ const ORT_BASES = [
 ];
 const MODEL_URL = new URL('../model/yolov8n_neudet_best.onnx', import.meta.url).href;
 
+/**
+ * The twelve NEU-DET test frames, then the two wide GC10 strip frames.
+ *
+ * Order is deliberate: the first chip a visitor clicks should be a class the model is
+ * genuinely good at, so the classes run strongest first by held-out AP50 -- patches
+ * 0.949, scratches 0.909, inclusion 0.827, pitted_surface 0.756, rolled-in_scale
+ * 0.630, crazing 0.444 (reports/evaluation.json -> detection_metrics.per_class).
+ * Leading with crazing showed the weakest class in the page's first impression.
+ *
+ * `file` is unchanged and is what the run reports and the parity harness matches on;
+ * `label` is only what the chip says.
+ */
 const SAMPLES = [
-  { file: 'crazing_271.jpg', cls: 'crazing' },
-  { file: 'crazing_272.jpg', cls: 'crazing' },
-  { file: 'inclusion_271.jpg', cls: 'inclusion' },
-  { file: 'inclusion_272.jpg', cls: 'inclusion' },
-  { file: 'patches_271.jpg', cls: 'patches' },
-  { file: 'patches_272.jpg', cls: 'patches' },
-  { file: 'pitted_surface_271.jpg', cls: 'pitted_surface' },
-  { file: 'pitted_surface_272.jpg', cls: 'pitted_surface' },
-  { file: 'rolled-in_scale_271.jpg', cls: 'rolled-in_scale' },
-  { file: 'rolled-in_scale_272.jpg', cls: 'rolled-in_scale' },
-  { file: 'scratches_271.jpg', cls: 'scratches' },
-  { file: 'scratches_272.jpg', cls: 'scratches' },
-  { file: 'strip_rollmark.jpg', cls: null, label: 'strip 2048x1000 roll mark (tiled)', wide: true },
-  { file: 'strip_weldline.jpg', cls: null, label: 'strip 2048x1000 weld line (tiled)', wide: true },
+  { file: 'patches_271.jpg', cls: 'patches', label: 'Patches 1' },
+  { file: 'patches_272.jpg', cls: 'patches', label: 'Patches 2' },
+  { file: 'scratches_271.jpg', cls: 'scratches', label: 'Scratches 1' },
+  { file: 'scratches_272.jpg', cls: 'scratches', label: 'Scratches 2' },
+  { file: 'inclusion_271.jpg', cls: 'inclusion', label: 'Inclusion 1' },
+  { file: 'inclusion_272.jpg', cls: 'inclusion', label: 'Inclusion 2' },
+  { file: 'pitted_surface_271.jpg', cls: 'pitted_surface', label: 'Pitted surface 1' },
+  { file: 'pitted_surface_272.jpg', cls: 'pitted_surface', label: 'Pitted surface 2' },
+  { file: 'rolled-in_scale_271.jpg', cls: 'rolled-in_scale', label: 'Rolled-in scale 1' },
+  { file: 'rolled-in_scale_272.jpg', cls: 'rolled-in_scale', label: 'Rolled-in scale 2' },
+  { file: 'crazing_271.jpg', cls: 'crazing', label: 'Crazing 1' },
+  { file: 'crazing_272.jpg', cls: 'crazing', label: 'Crazing 2' },
+  { file: 'strip_rollmark.jpg', cls: null, label: 'Wide strip: roll mark', wide: true },
+  { file: 'strip_weldline.jpg', cls: null, label: 'Wide strip: weld line', wide: true },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -89,26 +87,40 @@ const state = {
 
 function status(msg, isError = false) {
   const el = $('status');
+  if (!el) return;
   el.textContent = msg;
   el.classList.toggle('err', isError);
 }
 
 function progress(frac) {
-  $('progbar').style.width = `${Math.max(0, Math.min(1, frac)) * 100}%`;
+  const el = $('progbar');
+  if (el) el.style.width = `${Math.max(0, Math.min(1, frac)) * 100}%`;
+}
+
+/** The bar is only shown while there is something to report. */
+function progressVisible(on) {
+  const el = $('progbar');
+  if (el && el.parentElement) el.parentElement.classList.toggle('on', on);
 }
 
 /* ------------------------------------------------------------ model load ---- */
 
 /**
- * Lazy: nothing heavy is fetched until the first image. The ONNX file is streamed
- * with fetch so the progress bar is real byte progress, not a spinner pretending.
+ * Started eagerly on load (see preload() at the bottom) so that a visitor's first
+ * click returns a result rather than beginning a 12.1 MB download -- but never
+ * awaited by anything on the page, so nothing is blocked on it. A click that lands
+ * mid-download joins this same promise instead of starting a second one.
+ *
+ * The ONNX file is streamed with fetch so the progress bar is real byte progress,
+ * not a spinner pretending.
  */
 async function ensureSession() {
   if (state.session) return state.session;
   if (state.loading) return state.loading;
 
   state.loading = (async () => {
-    status(`loading onnxruntime-web ${ORT_VERSION} (WASM)...`);
+    progressVisible(true);
+    status('starting the detector...');
     let ort = null;
     let base = null;
     const tried = [];
@@ -135,11 +147,11 @@ async function ensureSession() {
     ort.env.logLevel = 'error';
     state.ort = ort;
 
-    status('downloading model (12.1 MB)...');
+    status('downloading the model -- 12.1 MB, once...');
     const buf = await fetchWithProgress(MODEL_URL);
     progress(1);
 
-    status('initialising session...');
+    status('preparing the model...');
     const session = await ort.InferenceSession.create(buf, {
       executionProviders: ['wasm'],
       graphOptimizationLevel: 'all',
@@ -153,11 +165,13 @@ async function ensureSession() {
     await session.run({ images: new ort.Tensor('float32', zeros, [1, 3, IMGSZ, IMGSZ]) });
     state.timing.first = performance.now() - t0;
 
-    status(`ready -- onnxruntime-web ${ORT_VERSION}, WASM, 1 thread, via ${new URL(base).host}`);
+    progressVisible(false);
+    status('ready -- the model is loaded and running on your CPU. Click a sample.');
     return session;
   })().catch((err) => {
     state.loading = null;
-    status(`model failed to load: ${err.message}`, true);
+    progressVisible(false);
+    status(`the model could not load: ${err.message}`, true);
     throw err;
   });
 
@@ -179,7 +193,7 @@ async function fetchWithProgress(url) {
     chunks.push(value);
     got += value.length;
     progress(got / total);
-    status(`downloading model ${(got / 1048576).toFixed(1)} / ${(total / 1048576).toFixed(1)} MB`);
+    status(`downloading the model -- ${(got / 1048576).toFixed(1)} of ${(total / 1048576).toFixed(1)} MB`);
   }
   const out = new Uint8Array(got);
   let o = 0;
@@ -262,11 +276,13 @@ async function runOn(source, width, height, name) {
   state.timing.tiles = tiles.length;
 
   refilter();
-  const n = state.dets.length;
-  status(`${name} -- ${n} detection${n === 1 ? '' : 's'} at conf ${fmt(state.conf, 2)}`
+  // The verdict line above states the ANSWER; this line states how it was computed, so
+  // the two do not say the same thing twice.
+  status(`${name} -- ${width}x${height}, `
     + (tiles.length > 1
-      ? `, from ${tiles.length} tiled passes over ${width}x${height} merged by one global NMS`
-      : ''));
+      ? `${tiles.length} tiled passes merged by one global NMS`
+      : 'single pass')
+    + `, conf ${fmt(state.conf, 2)}`);
 }
 
 /**
@@ -359,9 +375,48 @@ function refilter() {
 
 function render() {
   drawCanvas();
+  drawVerdict();
   drawTable();
   drawGuidance();
   drawTiming();
+}
+
+/**
+ * The one-line answer, directly under the frame and above the fold: how many
+ * detections, the strongest one, its severity band and what the forward pass cost.
+ * The six-column table below the fold is the same answer in full.
+ */
+function drawVerdict() {
+  const el = $('verdict');
+  if (!el) return;
+  if (!state.image) {
+    el.className = 'verdict none';
+    el.textContent = 'Nothing scored yet.';
+    return;
+  }
+  const n = state.dets.length;
+  if (!n) {
+    el.className = 'verdict none';
+    el.textContent = `No defect above the threshold in ${state.image.name}.`;
+    return;
+  }
+  const top = state.dets[0];
+  const t = state.timing;
+  el.className = 'verdict';
+  el.style.setProperty('--cc', rgb(top.className));
+  el.innerHTML = `<span class="dot"></span>`
+    + `<span class="nm">${n} detection${n === 1 ? '' : 's'}</span>`
+    + `<span class="sep">&middot;</span>`
+    // The calibrated probability, said the way a person would say it. Floored rather
+    // than rounded so the wording can never claim more than the number does.
+    + `<span><span class="nm">${top.className.replace(/_/g, ' ')}</span>, `
+    + `${Math.floor(top.calibrated * 100)}% confidence</span>`
+    + `<span class="sep">&middot;</span><span class="pill ${top.band}">${top.band}</span>`
+    // The timing sits at the far end with no separator in front of it, so that when
+    // the line wraps on a narrow panel it does not leave a dangling middot behind.
+    + (t.infer === null ? ''
+      : `<span class="ms mono">${t.infer.toFixed(0)} ms`
+        + `${t.tiles > 1 ? ` over ${t.tiles} passes` : ''}</span>`);
 }
 
 function drawCanvas() {
@@ -370,14 +425,28 @@ function drawCanvas() {
   const hint = $('dropHint');
   if (hint) hint.style.display = 'none';
   cvs.style.display = 'block';
+  // The dashed "drop something here" border has done its job once there is a frame in
+  // the box; leaving it up makes a real result look like an empty placeholder.
+  cvs.parentElement.classList.add('has-image');
 
-  // Render at up to 2x the CSS box for crisp boxes on a 200 px source, capped so a
-  // 2048 px strip does not allocate a needless 4096 px canvas.
-  const box = cvs.parentElement.clientWidth - 2;
+  // DISPLAY size first. The panel width is one bound; the canvas's CSS max-height is
+  // the other, and it is the one that matters now that the detector sits above the
+  // fold -- without it a 200x200 sample would blow up to the full panel width and
+  // push the sample chips off the screen. Reading the cap back from the stylesheet
+  // keeps the two in one place: CSS decides how tall the frame may be, and every
+  // number below is derived from the size actually shown.
+  const avail = Math.max(1, cvs.parentElement.clientWidth - 2);
+  const capH = parseFloat(getComputedStyle(cvs).maxHeight);
+  const capW = Number.isFinite(capH) ? capH * (width / height) : Infinity;
+  const box = Math.max(1, Math.min(avail, capW));
+
+  // Render at up to 2x the displayed box for crisp boxes on a 200 px source, capped so
+  // a 2048 px strip does not allocate a needless 4096 px canvas.
   const scale = Math.min(Math.max(box / width, 1), 2048 / Math.max(width, height), 6);
   cvs.width = Math.round(width * scale);
   cvs.height = Math.round(height * scale);
-  cvs.style.width = '100%';
+  cvs.style.width = `${Math.round(box)}px`;
+  cvs.style.height = 'auto';
 
   const g = cvs.getContext('2d');
   g.imageSmoothingEnabled = scale < 1;
@@ -420,10 +489,10 @@ function drawCanvas() {
       g.fillRect(x, y, w, h);
     }
     g.globalAlpha = 1;
-    chips.push({ d, sel, col, x, y });
+    chips.push({ d, sel, col, x, y, h });
   });
 
-  for (const { d, sel, col, x, y } of chips) {
+  for (const { d, sel, col, x, y, h } of chips) {
     let text = `${d.className} ${fmt(d.calibrated, 2)}`;
     let tw = g.measureText(text).width;
     // A chip wider than the frame is useless; drop to the score alone, then to
@@ -437,7 +506,14 @@ function drawCanvas() {
     // Keep it inside the canvas on both axes: right-aligned if the box runs off the
     // right edge, below the box if there is no room above.
     const cx = Math.max(0, Math.min(x, cvs.width - chipW));
-    const cy = y - chipH < 0 ? Math.min(y, cvs.height - chipH) : y - chipH;
+    // Above the box by preference. With no room above -- a detection touching the top
+    // edge of the frame, which is common on a strip crop -- drop the chip INSIDE the
+    // box, but only if the box is tall enough to still show as a box afterwards. A
+    // 70 px box under a 78 px chip would be swallowed whole and the judge would see a
+    // label floating over bare steel, so in that case put the chip below the box.
+    const cy = y - chipH >= 0 ? y - chipH
+      : (h >= chipH * 1.25 ? y
+        : Math.min(y + h, cvs.height - chipH));
     g.globalAlpha = state.selected === -1 || sel ? 1 : 0.5;
     g.fillStyle = col;
     g.fillRect(cx, cy, chipW, chipH);
@@ -460,13 +536,16 @@ function drawTable() {
   state.dets.forEach((d, i) => {
     const tr = document.createElement('tr');
     if (i === state.selected) tr.className = 'sel';
+    // Column order is the reading order of the answer: what, how sure, how bad, how
+    // big -- then the two engineering columns, which are the ones allowed to scroll
+    // off the right edge of a narrow panel.
     tr.innerHTML = `
       <td class="mono"><span class="swatch" style="background:${rgb(d.className)}"></span>${d.className}</td>
       <td class="num">${fmt(d.calibrated)}</td>
-      <td class="num" style="color:var(--muted)">${fmt(d.raw)}</td>
-      <td class="num" title="${Math.round(d.width)} x ${Math.round(d.height)} px">${Math.round(d.x1)}, ${Math.round(d.y1)}, ${Math.round(d.x2)}, ${Math.round(d.y2)}</td>
+      <td><span class="pill ${d.band}">${d.band}</span></td>
       <td class="num">${(d.areaFrac * 100).toFixed(1)}%</td>
-      <td><span class="pill ${d.band}">${d.band}</span></td>`;
+      <td class="num" style="color:var(--muted)">${fmt(d.raw)}</td>
+      <td class="num" title="${Math.round(d.width)} x ${Math.round(d.height)} px">${Math.round(d.x1)}, ${Math.round(d.y1)}, ${Math.round(d.x2)}, ${Math.round(d.y2)}</td>`;
     tr.addEventListener('click', () => {
       state.selected = state.selected === i ? -1 : i;
       render();
@@ -566,19 +645,48 @@ async function useFile(file) {
 
 function buildChips() {
   const host = $('chips');
-  for (const s of SAMPLES) {
+  if (!host) return;
+  let noted = false;
+  SAMPLES.forEach((s, i) => {
+    // The two wide frames take a different route through the model, so they are
+    // announced rather than dropped in among the square ones.
+    if (s.wide && !noted) {
+      noted = true;
+      const note = document.createElement('div');
+      note.className = 'row-note';
+      note.textContent = '2048 x 1000 line-scan frames -- these are cut into three windows:';
+      host.appendChild(note);
+    }
     const b = document.createElement('button');
-    b.className = `chip${s.wide ? ' wide' : ''}`;
+    b.className = `chip${s.wide ? ' wide' : ''}${i === 0 ? ' suggest' : ''}`;
     b.type = 'button';
+    b.dataset.sample = s.file;
     if (s.cls) b.style.setProperty('--cc', rgb(s.cls));
     b.textContent = s.label || s.file.replace(/\.jpg$/, '');
     b.addEventListener('click', () => useSample(s, b));
     host.appendChild(b);
+  });
+}
+
+/**
+ * Buttons elsewhere on the page that run a named sample -- the strip section's
+ * "run the roll-mark strip". They drive the chip itself rather than duplicating the
+ * run path, so there is exactly one way a sample gets scored.
+ */
+function wireSampleButtons() {
+  for (const el of document.querySelectorAll('[data-run-sample]')) {
+    el.addEventListener('click', () => {
+      const chip = document.querySelector(`#chips .chip[data-sample="${el.dataset.runSample}"]`);
+      if (!chip) return;
+      chip.click();
+      document.getElementById('drop')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
   }
 }
 
 function wireDrop() {
   const drop = $('drop');
+  if (!drop) return;
   ['dragenter', 'dragover'].forEach((e) => drop.addEventListener(e, (ev) => {
     ev.preventDefault();
     drop.classList.add('over');
@@ -601,6 +709,7 @@ function wireDrop() {
 
 function wireSlider() {
   const sl = $('conf');
+  if (!sl) return;
   sl.value = String(SHIPPED_CONF);
   const paint = () => {
     state.conf = parseFloat(sl.value);
@@ -614,119 +723,68 @@ function wireSlider() {
   paint();
 }
 
-/**
- * Upgrades the console section to a live embed IF a host URL exists.
- *
- * The default path returns immediately and leaves index.html's own content standing:
- * what the Python console adds over this page, and how to run it. That content is the
- * shipped state and it is complete -- there is no placeholder to fill, and nothing on
- * the page is waiting on this function. Which is why this reads the static block
- * rather than writing one: with JavaScript disabled the section still says everything
- * it needs to.
- */
-function wireConsole() {
-  if (!HF_SPACE_URL) return;
-
-  const slot = $('console-slot');
-  const stat = $('console-static');
-  if (!slot) return;
-  if (stat) stat.remove();
-
-  const frame = document.createElement('iframe');
-  frame.src = HF_SPACE_URL;
-  frame.title = 'Jindal Stainless surface inspection console';
-  frame.loading = 'lazy';
-  frame.allow = 'clipboard-write; fullscreen';
-  slot.appendChild(frame);
-
-  const a = $('console-link');
-  if (a) { a.href = HF_SPACE_URL; a.hidden = false; }
-}
-
 function fillFacts() {
-  $('calFacts').textContent =
+  const set = (id, text) => { const el = $(id); if (el) el.textContent = text; };
+  set('calFacts',
     `${CALIBRATION.method}, ${CALIBRATION.nKnots} knots, fitted on ${CALIBRATION.fitSplit}, `
-    + `ECE ${CALIBRATION.eceBefore.toFixed(4)} -> ${CALIBRATION.eceAfter.toFixed(4)} on ${CALIBRATION.evalSplit}`;
-  $('ortVer').textContent = `onnxruntime-web ${ORT_VERSION} / wasm`;
-  $('classList').textContent = CLASS_NAMES.join('  ');
+    + `ECE ${CALIBRATION.eceBefore.toFixed(4)} -> ${CALIBRATION.eceAfter.toFixed(4)} on ${CALIBRATION.evalSplit}`);
+  set('ortVer', `onnxruntime-web ${ORT_VERSION} / wasm`);
+  set('classList', CLASS_NAMES.join('  '));
 }
 
-/** Renders site/verify/parity_report.json, so the page cannot drift from the run. */
-async function loadParity() {
-  const host = $('parityBody');
-  if (!host) return;
-  try {
-    const r = await fetch('verify/parity_report.json');
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const p = await r.json();
-    const s = p.summary;
-    const row = (k, v, n) => `<tr><td>${k}</td><td class="num">${v}</td><td style="color:var(--muted);font-size:0.82rem">${n}</td></tr>`;
-    host.innerHTML = [
-      row('images compared', s.images, 'two per class, held-out NEU-DET test split'),
-      row('detections, Python', s.python_detections, `ultralytics ${p.python.ultralytics}, conf ${p.python.conf}, iou ${p.python.iou}, imgsz ${p.python.imgsz}`),
-      row('detections, JS', s.js_detections, p.js.runtime + ', shared site/js/detect.js'),
-      row('matched pairs', s.matched_pairs, 'same class, greedy IoU match'),
-      row('max box delta', `${s.max_box_delta_px.toFixed(4)} px`, `tolerance ${p.tolerance.box_px} px`),
-      row('max confidence delta', s.max_conf_delta.toExponential(2), `tolerance ${p.tolerance.conf}`),
-      row('max preprocess pixel delta', `${s.max_preprocess_pixel_delta} / 255`, `mean ${s.mean_preprocess_pixel_delta.toFixed(5)}; our fixed-point resize vs the tensor ultralytics built`),
-      row('median session.run', `${s.median_session_run_ms.toFixed(2)} ms`, `onnxruntime-node on CPU, ${s.timed_runs_per_image} timed runs per image, ${s.warmup_runs} warm-ups discarded`),
-      row('verdict', `<span class="tag ${s.verdict === 'PASS' ? 'pass' : 'warn'}">${s.verdict}</span>`, s.discrepancies === 0 ? 'no discrepancies' : `${s.discrepancies} discrepancies`),
-    ].join('');
-    const st = $('parityStamp');
-    if (st) st.textContent = `run ${p.generated_at}`;
-  } catch (err) {
-    host.innerHTML = `<tr><td colspan="3" style="color:var(--muted)">parity_report.json not reachable (${err.message}). Regenerate it with the two commands above.</td></tr>`;
-  }
-}
-
-/** Renders site/verify/parity_browser.json -- the same page, checked in real Chrome. */
-async function loadBrowserParity() {
-  const host = $('parityBrowserBody');
-  if (!host) return;
-  try {
-    const r = await fetch('verify/parity_browser.json');
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const p = await r.json();
-    const s = p.summary;
-    const ms = (o) => `${o.min.toFixed(1)} / ${o.median.toFixed(1)} / ${o.max.toFixed(1)} ms`;
-    const row = (k, v, n) => `<tr><td>${k}</td><td class="num">${v}</td><td style="color:var(--muted);font-size:0.82rem">${n}</td></tr>`;
-    host.innerHTML = [
-      row('images compared', s.images, `driven headless in ${p.chrome}`),
-      row('detections, Python', s.python_detections, `ultralytics ${p.python.ultralytics}, conf ${p.python.conf}, iou ${p.python.iou}, imgsz ${p.python.imgsz}`),
-      row('detections, this page', s.browser_detections, 'onnxruntime-web on WASM, 1 thread'),
-      row('matched pairs', s.matched_pairs, 'same class, greedy IoU match'),
-      row('max box delta', `${s.max_box_delta_px.toFixed(4)} px`, `tolerance ${p.tolerance.box_px} px`),
-      row('max raw confidence delta', s.max_conf_delta.toExponential(2), `tolerance ${p.tolerance.conf}`),
-      row('session.run, min / median / max', ms(s.session_run_ms), 'performance.now() inside the page, warm-up excluded'),
-      row('preprocess', ms(s.preprocess_ms), 'canvas read, fixed-point resize, NCHW pack'),
-      row('decode + NMS', ms(s.decode_nms_ms), 'the part the confidence slider re-runs'),
-      row('warm-up run', `${s.warmup_ms.toFixed(0)} ms`, 'first call only, WASM code-gen and arena allocation; never counted above'),
-      row('page and console errors', s.page_errors.length + s.console_errors.length, s.page_errors.length + s.console_errors.length === 0 ? 'clean load' : (s.page_errors.concat(s.console_errors).join(' | ')),),
-      row('failed or 4xx requests', s.bad_requests.length, s.bad_requests.length === 0 ? 'every asset returned 200' : JSON.stringify(s.bad_requests)),
-      row('verdict', `<span class="tag ${s.verdict === 'PASS' ? 'pass' : 'warn'}">${s.verdict}</span>`, s.discrepancies === 0 ? 'no discrepancies' : `${s.discrepancies} discrepancies`),
-    ].join('');
-    const st = $('parityBrowserStamp');
-    if (st) st.textContent = `run ${p.generated_at}`;
-
-    // The hero quotes a latency. Fill it from this artefact rather than from the
-    // HTML, so the headline number cannot drift away from the measurement the
-    // moment the parity run is repeated on different hardware.
-    const hero = $('heroLatency');
-    if (hero) {
-      const r = s.session_run_ms;
-      hero.textContent = `(min ${r.min.toFixed(1)}, median ${r.median.toFixed(1)}, max ${r.max.toFixed(1)} ms)`;
+/**
+ * The recorded latency band inside the timing disclosure is read from the artefact
+ * rather than typed into the HTML, so the page cannot drift away from the run that
+ * produced it. Fetched on first open, not on load: nothing on the front page should
+ * pay for a 25 KB report that a reader may never expand.
+ */
+function wireLatencyFact() {
+  const host = $('latencyFact');
+  const det = host && host.closest('details');
+  if (!det) return;
+  let done = false;
+  det.addEventListener('toggle', async () => {
+    if (done || !det.open) return;
+    done = true;
+    try {
+      const r = await fetch('verify/parity_browser.json');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const p = await r.json();
+      const t = p.summary.session_run_ms;
+      host.textContent = `min ${t.min.toFixed(1)}, median ${t.median.toFixed(1)}, `
+        + `max ${t.max.toFixed(1)} ms over ${p.summary.images} frames, in ${p.chrome}`;
+    } catch (err) {
+      done = false;
+      host.textContent = `(verify/parity_browser.json unreadable: ${err.message})`;
     }
-  } catch (err) {
-    host.innerHTML = `<tr><td colspan="3" style="color:var(--muted)">parity_browser.json not reachable (${err.message}). Regenerate it with <code>npm run serve</code> then <code>npm run parity:browser</code> in site/verify.</td></tr>`;
-  }
+  });
 }
+
+/* ------------------------------------------------------------------ boot ---- */
 
 buildChips();
+wireSampleButtons();
+wireLatencyFact();
 wireDrop();
 wireSlider();
 wireConsole();
 fillFacts();
-loadParity();
-loadBrowserParity();
 drawTiming();
-status('drop a steel image, or click a sample below. The 12.1 MB model downloads on first use.');
+drawVerdict();
+status('starting the detector...');
+
+/**
+ * Warm the runtime and the 12.1 MB model as soon as the browser is idle.
+ *
+ * The old page fetched nothing until the first click, which meant the first click
+ * bought a CDN round trip, a 12.1 MB download and a session build before it returned
+ * anything. Starting it here turns that into a click that answers. It is deliberately
+ * not awaited and nothing renders behind it: the page is fully usable while it runs,
+ * the progress bar under the frame reports real byte progress, and a click that
+ * arrives mid-download joins the same promise rather than starting a second one.
+ */
+function preload() {
+  ensureSession().catch(() => { /* status() has already said so, in the panel */ });
+}
+if ('requestIdleCallback' in window) requestIdleCallback(preload, { timeout: 1500 });
+else setTimeout(preload, 250);

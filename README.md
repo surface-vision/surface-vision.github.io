@@ -12,7 +12,8 @@ inside your own browser.
 
 | | |
 |---|---|
-| `index.html`, `css/`, `js/` | The demo page. `js/detect.js` is the pre/post-processing, `js/tiling.js` the wide-strip path, `js/calibration.js` the isotonic calibrator's knots. |
+| `index.html`, `css/`, `js/` | The front page: the live detector, above the fold, and the short version of every result. `js/detect.js` is the pre/post-processing, `js/tiling.js` the wide-strip path, `js/calibration.js` the isotonic calibrator's knots. |
+| `technical.html` | The long version, one click from the front page: the parity harness output, per-class results, the cross-domain fix in full, calibration, throughput arithmetic, every limitation and the Python console. Nothing was deleted from the site in the redesign; it moved here. |
 | `model/` | The ONNX export the page runs. 12,128,540 bytes. |
 | `samples/` | Twelve held-out NEU-DET test frames plus two 2048x1000 GC10 line-scan strip chips. |
 | `verify/` | The parity harness and its output. |
@@ -27,11 +28,12 @@ Every figure below is traceable to a file in `evidence/reports/`.
 |---|---|---|
 | mAP50, held-out test split (180 frames, never trained or tuned on) | **0.7524** | `model_study.json` |
 | mAP50-95 / precision / recall | 0.3967 / 0.696 / 0.687 | `model_study.json` |
-| Image-level classification accuracy | 98.9% (178 of 180) | `evaluation.json` |
+| Defect-type accuracy at the shipped conf 0.15 | 98.3% (177 of 180) | `false_alarm.json` → `holdout_detection` |
+| Image-level classification accuracy at conf 0.05 | 98.9% (178 of 180) | `evaluation.json` |
 | Joint checkpoint, same split | mAP50 **0.7642**, clean-frame false alarms 93.7% → 32.5%, cross-domain ROC AUC 0.608 → 0.958 | `gap1_cross_domain.json`, `gap1_detection_metrics.json` |
 | Calibration error (ECE), before → after isotonic | 0.1418 → 0.0461, mAP unchanged | `calibration.json` |
 | Browser vs the PyTorch reference | **40 of 40** detections matched, max box delta 0.14 px, max confidence delta 0.0016 | `verify/parity_browser.json` |
-| Browser inference | 30–50 ms per frame, single-threaded WASM (medians of 31.7 ms and 49.1 ms in two recorded runs) | `verify/parity_browser.json`, `verify/live_demo_check.json` |
+| Browser inference | 25–50 ms per frame, single-threaded WASM (medians of 27.1 ms and 49.1 ms in two recorded runs) | `verify/parity_browser.json`, `verify/live_demo_check.json` |
 
 ## What this page deliberately does not do
 

@@ -68,6 +68,8 @@ header.mast {
 }
 .mast .wrap { display: flex; align-items: center; gap: 18px; height: 56px; }
 .mast .brand { font-weight: 650; letter-spacing: 0.01em; white-space: nowrap; }
+.mast .brand a { color: inherit; text-decoration: none; }
+.mast .brand a:hover { color: var(--text); }
 .mast .brand span { color: var(--accent); }
 .mast nav { display: flex; gap: 18px; margin-left: auto; font-size: 0.86rem; overflow-x: auto; }
 .mast nav a { color: var(--muted); white-space: nowrap; }
@@ -75,7 +77,7 @@ header.mast {
 
 /* ---------- hero ---------- */
 
-.hero { border-bottom: 1px solid var(--border); padding: 54px 0 44px; }
+.hero { border-bottom: 1px solid var(--border); padding: 40px 0 34px; }
 .kicker {
   font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
   color: var(--accent); font-weight: 600;
@@ -114,7 +116,7 @@ h1 {
 
 /* ---------- sections ---------- */
 
-section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+section { padding: 46px 0; border-bottom: 1px solid var(--border); scroll-margin-top: 58px; }
 section > .wrap > h2 {
   font-size: clamp(1.35rem, 2.4vw, 1.75rem); margin: 0; font-weight: 660; letter-spacing: -0.01em;
 }
@@ -147,6 +149,7 @@ h3 { font-size: 1.02rem; font-weight: 640; margin: 30px 0 10px; }
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 #drop.over { border-color: var(--accent); background: #16191C; }
+#drop.has-image { border-style: solid; border-color: var(--border); background: #0B0E12; }
 #drop canvas { display: block; max-width: 100%; height: auto; image-rendering: crisp-edges; }
 #dropHint { color: var(--muted); font-size: 0.88rem; text-align: center; padding: 30px 20px; }
 #dropHint b { color: var(--text); font-weight: 600; }
@@ -341,7 +344,7 @@ code { overflow-wrap: break-word; }
      not read as a broken element, and let it bleed to the screen edge so it is
      obviously swipeable. */
   .mast .wrap { gap: 12px; }
-  .mast .brand { font-size: 0.88rem; white-space: normal; }
+  .mast .brand { font-size: 0.86rem; white-space: nowrap; }
   .mast nav { gap: 14px; font-size: 0.8rem; scrollbar-width: none; -ms-overflow-style: none; }
   .mast nav::-webkit-scrollbar { display: none; }
 
@@ -359,4 +362,296 @@ code { overflow-wrap: break-word; }
   .timing { grid-template-columns: 1fr; }
   .chip { font-size: 0.72rem; }
   table.data { font-size: 0.78rem; }
+}
+
+/* ======================================================================
+   REDESIGN LAYER -- the one-page front door.
+   Everything above this line is still used verbatim by evidence/,
+   console/ and technical.html; nothing here overrides those pages.
+   The rule for the front page: the working detector is above the fold,
+   the prose is one screen of plain language, and every claim that used
+   to be printed inline is now one click away in a <details> or on
+   technical.html.
+   ====================================================================== */
+
+/* ---------- hero: copy on the left, the running detector on the right ---------- */
+
+.hero.live { padding: 26px 0 30px; }
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 30px; align-items: start;
+}
+.hero-copy { display: flex; flex-direction: column; gap: 0; }
+
+.hero-lead h1 {
+  font-size: clamp(1.62rem, 2.9vw, 2.3rem);
+  margin: 9px 0 0; line-height: 1.09; letter-spacing: -0.022em;
+}
+.hero-lead .lede { font-size: 1rem; line-height: 1.55; margin-top: 13px; max-width: 52ch; }
+.hero-lead .lede strong { color: var(--text); font-weight: 650; }
+
+/* The invitation. It points right on a wide screen and down on a phone,
+   because that is where the detector actually is in each layout. */
+.nudge {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+  font-size: 0.92rem; font-weight: 640; color: var(--accent);
+}
+.nudge::after { content: '\2192'; font-size: 1.05rem; }
+
+.hero-facts { margin-top: 18px; }
+
+/* ---------- three headline numbers, each with a plain-English gloss ---------- */
+
+.facts {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+}
+.fact { background: var(--panel); padding: 12px 13px 13px; }
+.fact .v { font-family: var(--mono); font-size: 1.24rem; font-weight: 650; letter-spacing: -0.01em; }
+.fact .v.good { color: var(--pass); }
+.fact .k { font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+.fact .g { font-size: 0.75rem; line-height: 1.42; color: var(--dim); margin-top: 6px; }
+
+/* ---------- the detector panel ---------- */
+
+.panel.demo-panel > .bd { padding: 13px; }
+.demo-panel #drop { min-height: 250px; }
+/* A 200 px sample blown up to the full panel width would push the samples off
+   the fold, and a 2048 px strip would be a letterbox slit. Cap the DISPLAY
+   height; app.js reads this back and picks the canvas resolution from it, so
+   the label chips stay legible at whatever size the cap lands on. */
+.demo-panel #drop canvas { max-height: min(42vh, 360px); }
+
+.verdict {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 10px; padding: 9px 11px; border-radius: 3px;
+  background: var(--panel-alt); border: 1px solid var(--border);
+  font-size: 0.84rem;
+}
+.verdict .dot { width: 9px; height: 9px; border-radius: 2px; background: var(--cc, var(--muted)); flex: none; }
+.verdict .nm { font-weight: 650; }
+.verdict .sep { color: #43505F; }
+.verdict .mono { color: var(--muted); }
+.verdict .ms { margin-left: auto; padding-left: 10px; }
+.verdict.none { color: var(--muted); }
+
+/* The progress bar is a progress bar, not a rule: it exists only while the 12.1 MB
+   model is coming down, and disappears once there is nothing to report. */
+.demo-panel .bar { margin-top: 11px; display: none; }
+.demo-panel .bar.on { display: block; }
+.demo-panel #status { margin-top: 8px; font-size: 0.76rem; }
+
+.chips-label {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  margin-top: 14px; font-size: 0.7rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.chips-label .hint { letter-spacing: 0; text-transform: none; color: #6E7887; font-size: 0.74rem; }
+
+/* Sample chips: one click, obviously clickable, colour-coded by defect class. */
+.chips { gap: 7px; margin-top: 9px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--sans); font-size: 0.78rem; font-weight: 600;
+  padding: 7px 10px; border-radius: 3px;
+  background: #1A212A; border: 1px solid #2B3541; border-left: 1px solid #2B3541;
+  color: var(--dim); cursor: pointer; line-height: 1;
+}
+.chip::before {
+  content: ''; width: 8px; height: 8px; border-radius: 2px; flex: none;
+  background: var(--cc, var(--muted));
+}
+.chip:hover { background: #222D39; border-color: #435263; color: var(--text); }
+.chip.active { color: var(--text); border-color: var(--accent); background: #23282B; }
+.chip.wide { font-style: normal; border-style: dashed; }
+.chip.suggest { box-shadow: 0 0 0 1px rgba(245,165,36,0.55); }
+.chips .row-note {
+  flex-basis: 100%; margin: 5px 0 1px; font-size: 0.72rem; color: var(--muted);
+}
+
+.demo-foot {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 13px;
+  font-size: 0.8rem; color: var(--muted);
+}
+.btn.sm { padding: 6px 11px; font-size: 0.8rem; }
+.lnk { color: var(--accent); font-weight: 600; }
+
+/* Three lines of plain reassurance, in the space the copy column leaves. */
+.trust { list-style: none; margin: 16px 0 0; padding: 0; }
+.trust li {
+  position: relative; padding-left: 17px; margin-top: 7px;
+  font-size: 0.82rem; color: var(--muted); line-height: 1.45;
+}
+.trust li::before {
+  content: ''; position: absolute; left: 0; top: 8px;
+  width: 6px; height: 6px; border-radius: 1px; background: var(--accent);
+}
+.trust strong { color: var(--dim); font-weight: 640; }
+
+/* ---------- section furniture ---------- */
+
+.sec-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+/* h2 here is not a direct child of .wrap, so it would keep the UA's 0.83em margins
+   and open a gap the size of a paragraph between the heading and its own subtitle. */
+.sec-head h2 {
+  margin: 0; font-weight: 660; letter-spacing: -0.01em;
+  font-size: clamp(1.3rem, 2.3vw, 1.7rem);
+}
+.sec-head .idx {
+  font-family: var(--mono); font-size: 0.72rem; color: var(--accent);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+section > .wrap > .sub { margin-top: 8px; }
+
+/* ---------- collapsible depth ---------- */
+
+details.d {
+  border: 1px solid var(--border); border-radius: 3px; background: var(--panel);
+  margin-top: 10px;
+}
+details.d > summary {
+  cursor: pointer; padding: 12px 40px 12px 14px; position: relative; list-style: none;
+}
+details.d > summary::-webkit-details-marker { display: none; }
+details.d > summary::after {
+  content: '+'; position: absolute; right: 14px; top: 11px;
+  font-family: var(--mono); font-size: 1rem; color: var(--muted);
+}
+details.d[open] > summary::after { content: '\2212'; }
+details.d > summary:hover { background: #191F27; }
+details.d > summary .t { display: block; font-weight: 640; font-size: 0.93rem; color: var(--text); }
+details.d > summary .s { display: block; font-size: 0.85rem; color: var(--dim); margin-top: 4px; max-width: 78ch; }
+details.d .dbody {
+  padding: 2px 14px 14px; font-size: 0.86rem; color: var(--dim); max-width: 84ch;
+}
+details.d .dbody p { margin: 0 0 10px; }
+details.d .dbody p:last-child { margin-bottom: 0; }
+details.d .dbody .src { margin-top: 6px; }
+details.d.warn { border-left: 3px solid var(--fail); }
+details.d.warn > summary .t::before { content: '\2014\00a0'; color: var(--fail); }
+
+.d-row { display: grid; gap: 10px; margin-top: 14px; }
+
+/* ---------- where this model sits against published work ---------- */
+
+.band { margin-top: 30px; max-width: 560px; }
+.band-track {
+  position: relative; height: 38px; border: 1px solid var(--border);
+  background: var(--panel-alt); border-radius: 3px;
+}
+.band-pub {
+  position: absolute; top: 0; bottom: 0; background: rgba(138,148,163,0.2);
+  border-left: 1px solid #3A4553; border-right: 1px solid #3A4553;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 0.66rem; color: var(--muted); text-align: center;
+}
+.band-mark { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--accent); }
+.band-mark::after {
+  content: attr(data-label); position: absolute; left: 50%; transform: translateX(-50%);
+  top: -21px; font-family: var(--mono); font-size: 0.72rem; font-weight: 650;
+  color: var(--accent); white-space: nowrap;
+}
+.band-ax { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-top: 5px; }
+.band-key { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+
+/* ---------- before / after ---------- */
+
+.ba-title { margin: 22px 0 0; font-size: 0.92rem; font-weight: 640; color: var(--text); }
+.ba-bars { display: grid; gap: 12px; margin-top: 12px; }
+.ba-row { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 14px; align-items: center; }
+.ba-row .lab { font-size: 0.78rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; }
+.ba-row.before .lab { color: var(--fail); }
+.ba-row.after .lab { color: var(--pass); }
+.ba-row .lab small { display: block; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--muted); margin-top: 3px; font-size: 0.74rem; }
+.ba-bar { position: relative; height: 30px; background: var(--panel-alt); border: 1px solid var(--border); border-radius: 3px; }
+.ba-bar > i { position: absolute; inset: 0 auto 0 0; border-radius: 2px 0 0 2px; }
+.ba-row.before .ba-bar > i { background: rgba(248,81,73,0.42); }
+.ba-row.after .ba-bar > i { background: rgba(63,185,80,0.42); }
+.ba-bar > b {
+  position: absolute; top: 0; bottom: 0; left: 10px; display: flex; align-items: center;
+  font-family: var(--mono); font-size: 0.88rem; font-weight: 650;
+}
+.ba-cap { font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
+
+table.data td.was { color: var(--fail); font-weight: 650; }
+table.data td.now { color: var(--pass); font-weight: 650; }
+table.data th.was { color: var(--fail); }
+table.data th.now { color: var(--pass); }
+
+/* ---------- squashed vs tiled ---------- */
+
+.vs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 20px; }
+.vs .side { border: 1px solid var(--border); border-radius: 3px; background: var(--panel); padding: 15px 16px; }
+.vs .side.bad { border-left: 3px solid var(--fail); }
+.vs .side.good { border-left: 3px solid var(--pass); }
+.vs .side h4 { margin: 0 0 6px; font-size: 0.92rem; font-weight: 640; }
+.vs .side .big { font-family: var(--mono); font-size: 1.5rem; font-weight: 650; margin: 8px 0 2px; }
+.vs .side.bad .big { color: var(--fail); }
+.vs .side.good .big { color: var(--pass); }
+.vs .side p { margin: 6px 0 0; font-size: 0.85rem; color: var(--dim); }
+
+/* ---------- link cards ---------- */
+
+.linkcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 20px; }
+.linkcard {
+  display: block; border: 1px solid var(--border); border-radius: 3px;
+  background: var(--panel); padding: 14px 15px; color: var(--text);
+}
+.linkcard:hover { border-color: var(--accent); text-decoration: none; }
+.linkcard .t { font-weight: 640; font-size: 0.93rem; }
+.linkcard .t::after { content: '\00a0\2192'; color: var(--accent); }
+.linkcard .s { font-size: 0.81rem; color: var(--muted); margin-top: 5px; line-height: 1.45; }
+
+/* ---------- footer, front page ---------- */
+
+footer.slim { padding: 26px 0 40px; }
+footer.slim .links { margin-bottom: 12px; }
+
+/* ---------- narrow ---------- */
+
+@media (max-width: 980px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 20px; }
+  /* The headline leads, the detector comes second, the numbers third: on a phone
+     the judge should reach a clickable sample without passing a stat strip. */
+  .hero-copy { display: contents; }
+  .hero-lead { order: 1; }
+  .hero-demo { order: 2; }
+  .hero-facts { order: 3; margin-top: 0; }
+  .nudge::after { content: '\2193'; }
+  .hero-lead .lede { max-width: 60ch; }
+}
+
+@media (max-width: 720px) {
+  .hero.live { padding: 14px 0 22px; }
+
+  /* One line of masthead, or the brand eats a fifth of the fold. */
+  .mast .brand .b2 { display: none; }
+  .mast .brand .sl { display: none; }
+  .hero.live .kicker { font-size: 0.6rem; letter-spacing: 0.1em; }
+
+  /* The runtime version is a footnote; it is not worth a second header line here. */
+  .demo-panel > .hd .right { display: none; }
+  .chips-label { margin-top: 12px; }
+  .hero-lead h1 { font-size: clamp(1.42rem, 6vw, 1.75rem); line-height: 1.16; }
+  .hero-lead .lede { font-size: 0.94rem; margin-top: 10px; }
+  .hero-lead .nudge { margin-top: 11px; }
+  .hero-lead h1 { margin-top: 7px; }
+  .facts { grid-template-columns: 1fr; }
+  .fact { padding: 11px 13px; }
+  .demo-panel #drop { min-height: 150px; }
+  /* Tight enough that the verdict line under the frame is still on the first screen
+     of a 390x844 phone after a sample is clicked -- the answer and the picture of the
+     answer arrive together, without a scroll. */
+  .demo-panel #drop canvas { max-height: max(34vh, 180px); }
+  .verdict { font-size: 0.79rem; padding: 7px 9px; gap: 7px; }
+  .verdict .ms { margin-left: 0; padding-left: 0; }
+  .demo-panel > .bd { padding: 11px; }
+  #dropHint { padding: 18px 16px; }
+  .chip { font-size: 0.75rem; padding: 7px 9px; }
+  .ba-row { grid-template-columns: 1fr; gap: 6px; }
+  .ba-row .lab small { display: inline; margin-left: 6px; }
+  .band-mark::after { font-size: 0.68rem; }
+  details.d > summary { padding-right: 34px; }
 }
