@@ -45,6 +45,26 @@ export const DEFECT_INFO = {
     "cause": "Linear mechanical gouging from contact with fixed or damaged plant: seized or non-rotating table rollers, worn side guides and side guards, damaged pinch rolls or coiler mandrel, hard scale debris dragged along the strip, or mishandling during coil transport and strapping.",
     "severity": "medium",
     "action": "Walk the run-out table and inspect for seized or scored rollers, dress or replace damaged side guides, guards and pinch rolls, clear scale debris from the table, and review coil handling, tong and strapping practice. Deep scratches act as crack initiators in forming and must be ground out or the length cropped."
+  },
+  "severstal_1": {
+    "cause": "A surface defect the model learned from real mill strip, but whose type the public training data does not name. It is clearly not clean steel and not one of the six named types, so no root cause is claimed.",
+    "severity": "medium",
+    "action": "Send the frame to an inspector to classify before the coil is released, and note whether it repeats at the same position across the strip (points to a roll or guide) or moves around (points to the process). In a pilot these are mapped to the plant's own defect catalogue."
+  },
+  "severstal_2": {
+    "cause": "A surface defect the model learned from real mill strip, but whose type the public training data does not name. It is clearly not clean steel and not one of the six named types, so no root cause is claimed.",
+    "severity": "medium",
+    "action": "Send the frame to an inspector to classify before the coil is released, and note whether it repeats at the same position across the strip (points to a roll or guide) or moves around (points to the process). In a pilot these are mapped to the plant's own defect catalogue."
+  },
+  "severstal_3": {
+    "cause": "A surface defect the model learned from real mill strip, but whose type the public training data does not name. It is clearly not clean steel and not one of the six named types, so no root cause is claimed.",
+    "severity": "medium",
+    "action": "Send the frame to an inspector to classify before the coil is released, and note whether it repeats at the same position across the strip (points to a roll or guide) or moves around (points to the process). In a pilot these are mapped to the plant's own defect catalogue."
+  },
+  "severstal_4": {
+    "cause": "A surface defect the model learned from real mill strip, but whose type the public training data does not name. It is clearly not clean steel and not one of the six named types, so no root cause is claimed.",
+    "severity": "medium",
+    "action": "Send the frame to an inspector to classify before the coil is released, and note whether it repeats at the same position across the strip (points to a roll or guide) or moves around (points to the process). In a pilot these are mapped to the plant's own defect catalogue."
   }
 };
 

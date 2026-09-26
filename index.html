@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Surface defect detection on steel strip | Jindal Stainless</title>
-<meta name="description" content="A working surface-defect detector for steel strip that runs inside this page, with nothing uploaded. It names the defect correctly on 177 of 180 unseen test photographs, and its detections match the PyTorch original 40 out of 40.">
+<title>Surface defect detection for steel strip | Live demo</title>
+<meta name="description" content="A working AI detector for steel-strip surface defects that runs inside this page. Nothing is uploaded. On real mill strip it catches 9 in 10 defects and wrongly flags fewer than 1 in 20 clean images.">
 <meta name="color-scheme" content="dark">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230C0F13'/%3E%3Crect x='5' y='5' width='22' height='22' fill='none' stroke='%23F5A524' stroke-width='2.5'/%3E%3Cpath d='M11 20 L16 11 L21 20' fill='none' stroke='%23F5A524' stroke-width='2.5'/%3E%3C/svg%3E">
@@ -13,35 +13,33 @@
 
 <header class="mast">
   <div class="wrap">
-    <div class="brand">Jindal Stainless <span class="sl">/</span> <span class="b2">surface defect detection</span></div>
+    <div class="brand">Surface Vision <span class="sl">/</span> <span class="b2">steel strip defect detection</span></div>
     <nav>
-      <a href="#read">The result</a>
-      <a href="#accuracy">Accuracy</a>
-      <a href="#crossdomain">Clean steel</a>
-      <a href="#strip">Wide strip</a>
+      <a href="#try">Try it</a>
+      <a href="#read">Your result</a>
+      <a href="#results">How well it works</a>
+      <a href="#how">How it works</a>
       <a href="#limits">Limits</a>
-      <a href="technical.html">Technical detail</a>
-      <a href="evidence/">Evidence</a>
     </nav>
   </div>
 </header>
 
 <!-- ============================================ hero: copy + live detector -->
-<div class="hero live">
+<div class="hero live" id="try">
   <div class="wrap hero-grid">
 
     <div class="hero-copy">
       <div class="hero-lead">
-        <p class="kicker">Problem statement 1 &middot; AI surface defect detection</p>
+        <p class="kicker">Jindal Stainless &middot; Stainless Spark &middot; Problem statement 1</p>
         <h1>Find the defect while the coil can still be saved.</h1>
         <p class="lede">
-          Surface defects start early &mdash; at the caster, the descaler, the reheat furnace &mdash;
-          and a coil is graded only after every stage has been paid for. A strip running at 300 m/min
-          cannot be inspected by eye.
+          Surface defects start early, at the caster, the descaler or the furnace, but a coil is graded
+          only at the end of the line. At 300 m/min no inspector can see the whole surface.
         </p>
         <p class="lede">
-          <strong>This page is the detector, not a description of one.</strong> It names six surface
-          defects in a photograph of steel, on your own machine. Nothing is uploaded.
+          <strong>This page is the detector.</strong> Click a sample, or drop in your own photo of steel:
+          it finds each defect, names it, rates how serious it is and says what to do about it.
+          Everything runs on your own machine. Nothing is uploaded.
         </p>
         <p class="nudge">Click a sample frame</p>
       </div>
@@ -49,42 +47,32 @@
       <div class="hero-facts">
         <div class="facts">
           <div class="fact">
-            <div class="v good">98.3%</div>
-            <div class="k">names it right</div>
-            <div class="g">Correct defect type on 177 of 180 photographs it had never seen.</div>
+            <div class="v good">90%</div>
+            <div class="k">of defects caught</div>
+            <div class="g">On real mill strip it had never seen: 258 of 288 defective images.</div>
           </div>
           <div class="fact">
-            <div class="v">0.75</div>
-            <div class="k">mAP50</div>
-            <div class="g">Stricter score: the name <em>and</em> the box position. Published work on this benchmark: 0.70&ndash;0.80.</div>
+            <div class="v good">4.7%</div>
+            <div class="k">false alarms</div>
+            <div class="g">Only 14 of 300 clean mill images wrongly flagged. The previous version flagged 52%.</div>
           </div>
           <div class="fact">
-            <div class="v good">40 / 40</div>
-            <div class="k">matches the real model</div>
-            <div class="g">All 40 detections across the sample frames matched the original PyTorch model, in real Chrome.</div>
+            <div class="v">178 / 180</div>
+            <div class="k">right defect type</div>
+            <div class="g">Names the defect correctly on 178 of 180 unseen test photographs.</div>
           </div>
         </div>
         <ul class="trust">
-          <li><strong>Nothing is uploaded.</strong> The image is scored and discarded in the tab &mdash; no bucket, no retention policy to negotiate.</li>
-          <li><strong>No cloud to depend on.</strong> Cached, it works with the network off, at no cost per inference.</li>
-          <li><strong>One 12.1 MB file.</strong> The same artefact an industrial PC on the line would load. No GPU, no Python.</li>
+          <li><strong>Private.</strong> The image is analysed and discarded inside this tab.</li>
+          <li><strong>No cloud needed.</strong> Once loaded, it keeps working with the network off.</li>
+          <li><strong>Ordinary hardware.</strong> Runs on a laptop CPU, the same model an industrial PC on the line would load.</li>
         </ul>
-        <p class="demo-foot" style="margin-top:14px">
-          <a class="lnk" href="#accuracy">What these numbers mean</a>
-          <span class="sep">&middot;</span>
-          <a class="lnk" href="technical.html">Technical detail</a>
-          <span class="sep">&middot;</span>
-          <a class="lnk" href="evidence/">Evidence</a>
-        </p>
       </div>
     </div>
 
     <div class="hero-demo">
       <div class="panel demo-panel">
-        <div class="hd">
-          Live detector &mdash; running in this tab
-          <span class="right" id="ortVer"></span>
-        </div>
+        <div class="hd">Live detector, running in this tab</div>
         <div class="bd">
           <div id="drop">
             <canvas id="view" style="display:none"></canvas>
@@ -94,20 +82,20 @@
             </div>
           </div>
 
-          <div id="verdict" class="verdict none">Nothing scored yet.</div>
+          <div id="verdict" class="verdict none">Nothing analysed yet.</div>
           <div class="bar"><i id="progbar"></i></div>
           <div id="status"></div>
 
           <div class="chips-label">
-            Sample frames
-            <span class="hint">never seen in training &mdash; one click each</span>
+            Sample images
+            <span class="hint">none were used in training</span>
           </div>
           <div class="chips" id="chips"></div>
 
           <div class="demo-foot">
             <button class="btn sm" id="pick" type="button">Use your own image</button>
             <input type="file" id="file" accept="image/*" hidden>
-            <a class="lnk" href="#read">How to read the result</a>
+            <a class="lnk" href="#read">See the full result</a>
           </div>
         </div>
       </div>
@@ -121,64 +109,49 @@
   <div class="wrap">
     <div class="sec-head">
       <span class="idx">01</span>
-      <h2>What the detector just told you</h2>
+      <h2>What the detector found</h2>
     </div>
     <p class="sub">
-      The boxes on the frame are the model's own output. Here it is in full: what it found, how sure
-      it is, and what a mill should do about it.
+      Each defect it found, how sure it is, how serious it is, and what the mill should do about it.
+      Click a row to highlight that defect on the image.
     </p>
 
     <div class="demo-grid">
       <div>
         <div class="panel">
-          <div class="hd">Detections <span class="right" id="detCount">0 detections</span></div>
+          <div class="hd">Defects <span class="right" id="detCount">0 defects found</span></div>
           <div class="bd">
             <div class="tbl-scroll">
               <table class="res" id="resTable" style="display:none">
                 <thead>
                   <tr>
                     <th>Defect</th>
-                    <th>probability</th>
-                    <th>severity</th>
-                    <th>area</th>
-                    <th>raw score</th>
-                    <th>box, pixels</th>
+                    <th>Confidence</th>
+                    <th>Severity</th>
+                    <th>Size</th>
                   </tr>
                 </thead>
                 <tbody id="resBody"></tbody>
               </table>
             </div>
-            <p class="empty" id="resEmpty">Nothing scored yet. Pick a sample above, or drop an image.</p>
+            <p class="empty" id="resEmpty">Nothing analysed yet. Pick a sample above, or drop an image.</p>
 
             <div class="ctl">
-              <label for="conf">Confidence</label>
+              <label for="conf">Alarm threshold</label>
               <input type="range" id="conf" min="0.02" max="0.90" step="0.01">
               <span class="val" id="confVal"></span>
             </div>
             <p class="note" id="confNote"></p>
           </div>
         </div>
-
-        <div class="panel" style="margin-top:14px">
-          <div class="hd">Timing on your machine, per frame</div>
-          <div class="bd">
-            <div class="timing">
-              <div><div class="k">the model</div><div class="v" id="tInfer">--</div></div>
-              <div><div class="k">image prep</div><div class="v" id="tPre">--</div></div>
-              <div><div class="k">reading boxes</div><div class="v" id="tPost">--</div></div>
-              <div><div class="k">first-run warm-up</div><div class="v" id="tFirst">--</div></div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div>
         <div class="panel">
-          <div class="hd">What to do about it <span class="right">from the mill knowledge base</span></div>
+          <div class="hd">What to do about it</div>
           <div class="bd">
             <div class="guide" id="guide">
-              <p class="empty">Cause and recommended action appear here, one card per defect type, as
-              soon as something is scored.</p>
+              <p class="empty">Likely cause and recommended action appear here, one card per defect type.</p>
             </div>
           </div>
         </div>
@@ -188,67 +161,28 @@
     <div class="d-row">
       <details class="d">
         <summary>
-          <span class="t">Why there are two confidence numbers</span>
-          <span class="s">A raw network score is not a probability. The one you read is corrected so that "0.40" means right about 40% of the time.</span>
+          <span class="t">What "confidence" means</span>
+          <span class="s">It is checked against reality: when the detector says 70%, it is right about 70% of the time.</span>
         </summary>
         <div class="dbody">
           <p>
-            <strong>Probability</strong> is the calibrated number: an isotonic map fitted on the
-            validation split turns the raw head score into something that means what it says.
-            <strong>Raw score</strong> is what the network emitted. The table keeps them apart on
-            purpose: <span id="calFacts" class="mono"></span>.
-          </p>
-          <p>
-            Before calibration a box shown at "0.40" was right far less often than 40% of the time
-            &mdash; expected calibration error 0.1418 on the held-out test split, against 0.0461
-            after. The map is monotone, so it cannot reorder detections: mAP50 is numerically
-            unchanged at 0.707986 before and after.
-            <span class="src">reports/calibration.json &rarr; metrics.ece, map50</span>
-          </p>
-          <p><a href="technical.html#calibration">The full calibration record</a> &mdash; how the method was chosen out of fold, and what it does to each score.</p>
-        </div>
-      </details>
-
-      <details class="d">
-        <summary>
-          <span class="t">How severity is decided, and where the advice comes from</span>
-          <span class="s">Severity scales the class's base tier by confidence and by how much of the frame the box covers. The advice is the mill knowledge base, unedited.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            Severity is <code>score_detection</code> from <code>src/inference.py</code> &mdash; the same
-            rule the Python console and the coil report use, so a band here means what it means there.
-            Cause and recommended action are copied verbatim from that knowledge base; not one word of
-            the metallurgy was written for this web page.
-          </p>
-          <p>
-            The confidence slider re-runs the decode and the non-maximum suppression on the cached
-            output tensor rather than filtering the old list, because the threshold decides which
-            candidates enter suppression in the first place. It does not re-run the model.
+            A neural network's raw score is not a probability. We corrected it using images the model was
+            never trained on, so the confidence you read is honest. After the correction, the stated
+            confidence is within about 3 percentage points of how often the detector is actually right.
           </p>
         </div>
       </details>
-
       <details class="d">
         <summary>
-          <span class="t">What the timing panel is, and is not</span>
-          <span class="s">One frame, one CPU thread, in a browser tab. It is a lower bound on the hardware, not a deployment frame rate.</span>
+          <span class="t">How severity is decided</span>
+          <span class="s">It combines how serious the defect type is, how sure the detector is, and how much of the surface it covers.</span>
         </summary>
         <div class="dbody">
           <p>
-            The model figure is the forward pass alone, timed with <code>performance.now()</code>,
-            excluding the warm-up call &mdash; that first run pays for code generation and memory
-            arena allocation and is reported separately rather than folded in. The recorded headless
-            run of this page measured <span id="latencyFact" class="mono">&mdash;</span>. A second
-            recorded run over the same twelve frames measured a median of 49.1 ms, so treat it as a
-            band rather than a figure &mdash; and the panel above measures it on your machine instead
-            of repeating either.
-            <span class="src">site/verify/parity_browser.json &rarr; summary.session_run_ms; site/verify/live_demo_check.json &rarr; browser_infer_ms</span>
-          </p>
-          <p>
-            A wide strip costs several times a small frame because it is cut into three windows and
-            the model runs three times. <a href="technical.html#mill">The line-speed arithmetic</a>
-            uses measured GPU throughput, not this.
+            Each defect type has a base level: an inclusion, for example, is critical because it cannot be
+            rolled or pickled out, while a light scratch is medium. The detector raises or lowers that level
+            with its confidence and with the size of the defect, and reports low, medium, high or critical.
+            The causes and actions come from published steelmaking practice.
           </p>
         </div>
       </details>
@@ -256,455 +190,118 @@
   </div>
 </section>
 
-<!-- ============================================================== accuracy -->
-<section id="accuracy">
+<!-- ======================================================== how well -->
+<section id="results">
   <div class="wrap">
     <div class="sec-head">
       <span class="idx">02</span>
-      <h2>Is it actually any good?</h2>
+      <h2>How well it works</h2>
     </div>
     <p class="sub">
-      Measured on 180 photographs held back from training that selected nothing &mdash; no checkpoint,
-      no threshold. Splits are 1,440 / 180 / 180 with no duplicate images across them.
+      Measured on images held back from training. Nothing on this page was tuned to them.
     </p>
 
-    <div class="stats" style="margin-top:20px">
-      <div class="stat">
-        <div class="k">Names the defect right</div>
-        <div class="v good">98.3%</div>
-        <div class="n">177 of 180 frames, at the shipped threshold</div>
-      </div>
-      <div class="stat">
-        <div class="k">Finds a defect at all</div>
-        <div class="v">92.2%</div>
-        <div class="n">166 of 180 defective frames flagged</div>
-      </div>
-      <div class="stat">
-        <div class="k">mAP50 &mdash; name and position</div>
-        <div class="v">0.7524</div>
-        <div class="n">published NEU-DET results: 0.70&ndash;0.80</div>
-      </div>
-      <div class="stat">
-        <div class="k">Precision / recall</div>
-        <div class="v">0.70 / 0.69</div>
-        <div class="n">of the boxes drawn / of the boxes there</div>
-      </div>
-    </div>
-    <span class="src">reports/false_alarm.json &rarr; holdout_detection (class_accuracy, detection rate at conf 0.15); reports/evaluation.json &rarr; detection_metrics</span>
-
-    <div class="band">
-      <div class="band-track">
-        <div class="band-pub" style="left:33.3%;width:33.4%">published 0.70&ndash;0.80</div>
-        <div class="band-mark" style="left:50.8%" data-label="this model 0.7524"></div>
-      </div>
-      <div class="band-ax"><span>0.60</span><span>0.70</span><span>0.80</span><span>0.90</span></div>
-      <p class="band-key">
-        Competitive, not state of the art &mdash; and that is the honest claim.
-      </p>
-    </div>
-
-    <div class="d-row">
-      <details class="d">
-        <summary>
-          <span class="t">Per class &mdash; and the class it is genuinely bad at</span>
-          <span class="s">Patches 0.949 and scratches 0.909 are strong. Crazing is 0.444, and the reason is measured rather than guessed.</span>
-        </summary>
-        <div class="dbody">
-          <div class="tbl-wrap" style="margin-top:12px">
-            <table class="data">
-              <thead>
-                <tr><th>Class</th><th>AP50</th><th style="min-width:110px"></th><th>Precision</th><th>Recall</th><th>Test boxes</th></tr>
-              </thead>
-              <tbody>
-                <tr><td class="mono"><span class="swatch" style="background:#3796FF"></span>patches</td><td class="num">0.949</td><td><div class="apbar" style="--cc:#3796FF"><i style="width:94.9%"></i></div></td><td class="num">0.865</td><td class="num">0.889</td><td class="num">99</td></tr>
-                <tr><td class="mono"><span class="swatch" style="background:#00C8A0"></span>scratches</td><td class="num">0.909</td><td><div class="apbar" style="--cc:#00C8A0"><i style="width:90.9%"></i></div></td><td class="num">0.653</td><td class="num">0.910</td><td class="num">64</td></tr>
-                <tr><td class="mono"><span class="swatch" style="background:#DC1E2D"></span>inclusion</td><td class="num">0.827</td><td><div class="apbar" style="--cc:#DC1E2D"><i style="width:82.7%"></i></div></td><td class="num">0.748</td><td class="num">0.787</td><td class="num">89</td></tr>
-                <tr><td class="mono"><span class="swatch" style="background:#AA50DC"></span>pitted_surface</td><td class="num">0.756</td><td><div class="apbar" style="--cc:#AA50DC"><i style="width:75.6%"></i></div></td><td class="num">0.657</td><td class="num">0.717</td><td class="num">46</td></tr>
-                <tr><td class="mono"><span class="swatch" style="background:#F0BE00"></span>rolled-in_scale</td><td class="num">0.630</td><td><div class="apbar" style="--cc:#F0BE00"><i style="width:63.0%"></i></div></td><td class="num">0.566</td><td class="num">0.594</td><td class="num">69</td></tr>
-                <tr><td class="mono"><span class="swatch" style="background:#FF8200"></span>crazing</td><td class="num">0.444</td><td><div class="apbar" style="--cc:#FF8200"><i style="width:44.4%"></i></div></td><td class="num">0.688</td><td class="num">0.224</td><td class="num">79</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p style="margin-top:12px">
-            Crazing is the weak class: 53 of its 68 misses are blind misses, its labels cover 23.8% of
-            the frame, and its foreground/background separability is 0.319, the lowest of the six.
-            Across the classes, AP50 tracks separability at Spearman 0.9429, p 0.0048. The model fails
-            where the defect is genuinely hard to see, not where it confuses one defect for another:
-            zero of 168 missed labels were a class confusion.
-            <span class="src">reports/evaluation.json &rarr; detection_metrics.per_class; reports/model_study.json &rarr; failures.taxonomy_rows, difficulty_correlation</span>
-          </p>
-        </div>
-      </details>
-
-      <details class="d">
-        <summary>
-          <span class="t">Against what other people have published</span>
-          <span class="s">DETR 0.666, YOLOv8n 0.740, DDN 0.748, this model 0.7524, RT-DETR 0.754, YOLOv11n 0.772.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            This sits inside the published 0.70&ndash;0.80 band. The published numbers are not all
-            measured on the same split protocol as this one, so the comparison is indicative rather
-            than exact. What is not in that table is the engineering around the number: the
-            calibration, the cross-domain measurement below, and the fact that this figure comes from
-            a split that selected nothing.
-            <span class="src">docs/research_notes.md sections 1a-1b; credible band 0.70-0.80</span>
-          </p>
-          <p><a href="technical.html#results">The full comparison table, and the two decisions that mattered more than the architecture.</a></p>
-        </div>
-      </details>
-    </div>
-  </div>
-</section>
-
-<!-- =========================================================== cross-domain -->
-<section id="crossdomain">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="idx">03</span>
-      <h2>Then we showed it clean steel, and it cried wolf</h2>
-    </div>
-    <p class="sub">
-      Every number above is on the kind of steel the model was trained on. A mill cares more about a
-      different line, a different camera, and steel with nothing wrong with it. That was measured on
-      505 clean frames from a real production dataset. The result was bad.
-    </p>
-
-    <p class="ba-title">Defect-free steel wrongly flagged as defective, on 505 clean frames:</p>
     <div class="ba-bars">
+      <div class="ba-title" style="margin-bottom:8px">Clean mill strip wrongly flagged as defective</div>
       <div class="ba-row before">
-        <div class="lab">Before<small>the model running on this page</small></div>
-        <div class="ba-bar"><i style="width:93.7%"></i><b>93.7%</b></div>
+        <div class="lab">First version<small>trained on lab images only</small></div>
+        <div class="ba-bar"><i style="width:51.7%"></i><b>52%</b></div>
       </div>
       <div class="ba-row after">
-        <div class="lab">After<small>joint fine-tune, same frames</small></div>
-        <div class="ba-bar"><i style="width:32.5%"></i><b>32.5%</b></div>
+        <div class="lab">This version<small>also trained on real clean strip</small></div>
+        <div class="ba-bar"><i style="width:4.7%"></i><b>4.7%</b></div>
       </div>
     </div>
     <p class="ba-cap">
-      An inspector who is wrong nine times out of ten stops being read. Retraining on 1,190
-      certified-clean crops cut it to one in three &mdash; and every other measure improved with it.
+      A detector that raises an alarm on every other clean coil gets ignored. Teaching it what clean
+      steel looks like cut false alarms by a factor of ten, and it caught more real defects, not fewer.
     </p>
 
     <div class="tbl-wrap" style="margin-top:18px">
       <table class="data">
         <thead>
-          <tr><th>On steel from another mill</th><th class="was">Before</th><th></th><th class="now">After</th><th>Which way is good</th></tr>
+          <tr><th>On images it never saw</th><th class="was">First version</th><th></th><th class="now">This version</th></tr>
         </thead>
         <tbody>
-          <tr><td>Clean frames wrongly flagged</td><td class="num was">93.7%</td><td class="arrow">&rarr;</td><td class="num now">32.5%</td><td>lower</td></tr>
-          <tr><td>Telling clean from defective (ROC AUC)</td><td class="num was">0.608</td><td class="arrow">&rarr;</td><td class="num now">0.958</td><td>higher; 0.5 is a coin toss</td></tr>
-          <tr><td>Real defects it caught there</td><td class="num was">72.0%</td><td class="arrow">&rarr;</td><td class="num now">86.6%</td><td>higher</td></tr>
-          <tr><td>Accuracy back home (mAP50)</td><td class="num">0.7524</td><td class="arrow">&rarr;</td><td class="num now">0.7642</td><td>it went up, not down</td></tr>
+          <tr><td>Clean mill strip wrongly flagged</td><td class="num was">155 of 300</td><td class="arrow">&rarr;</td><td class="num now">14 of 300</td></tr>
+          <tr><td>Defects caught on real mill strip</td><td class="num was">133 of 288</td><td class="arrow">&rarr;</td><td class="num now">258 of 288</td></tr>
+          <tr><td>Right defect type named (lab images)</td><td class="num was">177 of 180</td><td class="arrow">&rarr;</td><td class="num now">178 of 180</td></tr>
         </tbody>
       </table>
     </div>
-    <span class="src">reports/gap1_cross_domain.json &rarr; runs[baseline|joint] at conf 0.15; reports/gap1_detection_metrics.json &rarr; neu_det["256"]; narrative in reports/gap1_cross_domain_fix.md</span>
-
-    <div class="d-row">
-      <details class="d">
-        <summary>
-          <span class="t">Why this page still runs the worse model, on purpose</span>
-          <span class="s">The fixed model borrows four defect classes whose metallurgy is not published, so their severity tier cannot be set without inventing it.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            The joint checkpoint scores better on both axes and it is still not shipped, deliberately.
-            The Severstal release publishes a numeric mask value 1&ndash;4 and nothing else: no defect
-            name, no metallurgical description, no grading rule. The severity tier that drives a coil's
-            release decision cannot be set for those four classes without inventing metallurgy, and
-            inventing it is the one thing this project will not do. They sit at the neutral middle tier
-            with an explicit admission in place of a root cause, and the quality department owns the
-            number.
-            <span class="src">reports/severstal_dataset.md; src/inference.py SEVERSTAL_TIER</span>
-          </p>
-        </div>
-      </details>
-
-      <details class="d">
-        <summary>
-          <span class="t">What actually fixed it &mdash; and the lesson to carry into a deployment</span>
-          <span class="s">Not a threshold and not a filter: the backbone had to be taught what clean steel looks like. Budget that for every new grade and every new camera.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            1,190 certified-clean training crops, joint training on real target-domain positives
-            <em>and</em> negatives, with the original class indices left untouched at 0&ndash;5 and four
-            new classes appended at 6&ndash;9. Not a threshold change, not a post-hoc filter: the
-            backbone learns that clean steel is clean. The features do not transfer on their own, so a
-            per-line fine-tune with real negatives belongs in the plan and in the budget.
-          </p>
-          <p>
-            A separate out-of-scope gate also exists in the Python console: zero false rejections
-            across 3,200 genuine steel frames, and 13 of 15 correct on a held-out suite of synthetic
-            negatives. It is not wired into this page &mdash; which will happily score a photograph of
-            a cat and tell you it found crazing.
-            <span class="src">reports/ood_guard.json; reports/gap1_cross_domain_fix.md section 7</span>
-          </p>
-          <p><a href="technical.html#crossdomain">The full cross-domain record, including the coil-level disposition change.</a></p>
-        </div>
-      </details>
-    </div>
+    <p class="note" style="margin-top:10px">
+      Test data: 180 lab photographs of six defect types, and 588 images of real production strip from a
+      steel mill (288 with defects, 300 clean). Public research datasets; no Jindal Stainless data was used.
+    </p>
   </div>
 </section>
 
-<!-- ================================================================= strip -->
-<section id="strip">
+<!-- ======================================================== how it works -->
+<section id="how">
   <div class="wrap">
     <div class="sec-head">
-      <span class="idx">04</span>
-      <h2>A real strip frame is 2048 &times; 1000. Squash it and the defect disappears.</h2>
+      <span class="idx">03</span>
+      <h2>How it works</h2>
     </div>
-    <p class="sub">
-      The model reads a 256 &times; 256 square. Shrinking a whole line-scan frame into it squeezes the
-      picture eight times across against four times down &mdash; a distortion the model never saw in
-      training. So wide frames are cut into overlapping square windows instead. What that is worth, on
-      two real frames:
-    </p>
-
-    <div class="vs">
-      <div class="side bad">
-        <h4>Squashed into the square</h4>
-        <div class="big">0 defects</div>
-        <p>One pass over the whole frame, at the wrong aspect ratio. It finds nothing at all on the
-        weld-line frame &mdash; and on the roll-mark frame it produces six confident boxes, every one
-        of them labelled with the wrong defect.</p>
-      </div>
-      <div class="side good">
-        <h4>Cut into three square windows</h4>
-        <div class="big">3 defects</div>
-        <p>Three passes at an even scale, merged once. Same frame, same model, same threshold. The
-        cost is two extra forward passes, about 27 ms in total instead of 9 ms.</p>
-      </div>
-    </div>
-    <span class="src">site/verify/strip_check.json &rarr; strips[strip_weldline].squash.n vs .tiled.n, and strips[strip_rollmark].squash.detections</span>
-
-    <p class="ba-cap">
-      Try it &mdash; the two dashed samples in the detector are those frames, unmodified.
-    </p>
-    <p class="hero-actions" style="margin-top:14px">
-      <button class="btn primary" type="button" data-run-sample="strip_rollmark.jpg">Run the roll-mark strip</button>
-      <a class="btn" href="technical.html#parity">How the tiled path was checked</a>
-    </p>
-
-    <div class="d-row">
-      <details class="d">
-        <summary>
-          <span class="t">Those two strip frames are also the honest failure case</span>
-          <span class="s">Their real defects are a roll mark and a weld line. This six-class model has neither name, so it answers with the nearest name it owns instead of refusing.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            Across three tiled passes the roll-mark frame returns <code>rolled-in_scale</code> at raw
-            0.355 and <code>inclusion</code> at 0.270. The weld-line frame returns
-            <code>patches</code> at 0.526 and 0.308 and <code>scratches</code> at 0.369. Every one of
-            those five calls is confidently the wrong name, because the right name is not in this
-            model's vocabulary &mdash; and none of them is a refusal. That is the 93.7% number in
-            miniature, on a frame you can look at.
-            <span class="src">site/verify/parity_browser.json &rarr; out_of_domain</span>
-          </p>
-        </div>
-      </details>
+    <p class="sub">Four steps, all inside this page. On a mill line the same model reads camera frames instead of uploads.</p>
+    <div class="cards">
+      <div class="card"><div class="tag">1 &middot; See</div><p>An image of the strip surface comes in. Wide images are split into overlapping square windows so small defects keep their detail.</p></div>
+      <div class="card"><div class="tag">2 &middot; Find</div><p>A compact neural network marks each defect and names its type. It was trained on lab images and on real clean and defective mill strip.</p></div>
+      <div class="card"><div class="tag">3 &middot; Rate</div><p>Each defect gets an honest confidence and a severity from low to critical, based on its type, the detector's certainty and its size.</p></div>
+      <div class="card"><div class="tag">4 &middot; Act</div><p>The likely cause and the recommended action are shown for the process that caused it, from melting and casting to handling.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ================================================================ limits -->
+<!-- ============================================================= limits -->
 <section id="limits">
   <div class="wrap">
     <div class="sec-head">
-      <span class="idx">05</span>
-      <h2>What it does not do</h2>
+      <span class="idx">04</span>
+      <h2>What it does not do yet</h2>
     </div>
-    <p class="sub">
-      Written to be believed rather than to be reassuring. Open any of them for the full measurement.
-    </p>
+    <p class="sub">What a pilot on a real line would need to prove.</p>
 
     <div class="d-row">
       <details class="d warn">
         <summary>
-          <span class="t">This is carbon steel, not stainless</span>
-          <span class="s">Every number on this page is measured on public benchmarks of hot-rolled carbon steel. Nothing has been measured on Jindal stainless strip.</span>
+          <span class="t">It has not seen stainless steel yet</span>
+          <span class="s">Trained and tested on public carbon-steel datasets. The next step is training on the plant's own strip.</span>
         </summary>
-        <div class="dbody">
-          <p>
-            NEU-DET is 1,800 grayscale 200&times;200 images of hot-rolled carbon steel, and the
-            metallurgy of the surface is not the same as stainless. Everything here is a capability
-            demonstration on a public benchmark, not a prediction of performance on your line.
-          </p>
-        </div>
+        <div class="dbody"><p>Stainless surfaces and finishes look different from hot-rolled carbon steel. Performance on a stainless line has to be measured there, after training on that line's own clean and defective strip.</p></div>
       </details>
-
       <details class="d warn">
         <summary>
-          <span class="t">One lighting rig, one camera</span>
-          <span class="s">The whole dataset was shot under a single imaging setup. The cross-domain section above is what happens when you ignore that.</span>
+          <span class="t">Some mill defects are found but not named</span>
+          <span class="s">The public mill data does not name its defect types, so those are shown as "Unclassified defect" for an inspector to classify.</span>
         </summary>
-        <div class="dbody">
-          <p>
-            Nothing has been measured on a different camera, a different illumination geometry or a
-            different upstream mill &mdash; and the vision vendors themselves say the same defect class
-            looks different from different mills. On steel from another line this model scored ROC AUC
-            0.608, which is chance. The per-line calibration protocol, not the architecture, is what
-            decides whether this works.
-          </p>
-        </div>
+        <div class="dbody"><p>The detector knows these are not clean steel, and says so, but claims no root cause. In a pilot they would be mapped to the plant's own defect catalogue.</p></div>
       </details>
-
       <details class="d warn">
         <summary>
-          <span class="t">Roll marks are measured weak, and edge cracks are only a proxy</span>
-          <span class="s">Roll marks score mean AP50 0.203 on 24 test instances. Edge cracks have no public dataset at all, so a geometric stand-in is used and is not called a crack detector.</span>
+          <span class="t">Some defect types are not covered</span>
+          <span class="s">Roll marks, weld lines and edge cracks are not in its vocabulary yet.</span>
         </summary>
-        <div class="dbody">
-          <p>
-            On GC10-DET the roll-mark family (rolled_pit, crease) scores mean AP50 0.203 on 24 test
-            instances, and four of eleven live rolled_pit images produce zero detections at conf 0.15.
-            With 24 instances one flip moves recall 8&ndash;9 points, so that number is soft in both
-            directions. Overall GC10 held-out test is mAP50 0.5821 &mdash; materially below the NEU-DET
-            figure, on 333 images and 530 boxes.
-          </p>
-          <p>
-            No public dataset has an edge-crack class. The edge family here is crescent gap and waist
-            fold &mdash; AP50 0.880 on 61 test instances, which is a strong result for <em>edge
-            geometry</em> and not evidence about cracks. Calling it edge-crack detection would be a
-            lie, so it is not called that.
-            <span class="src">reports/gc10_coverage.json &rarr; brief_relevant_families; reports/gc10_dataset.md</span>
-          </p>
-        </div>
+        <div class="dbody"><p>Public datasets have few or no examples of these. Covering them needs targeted images from the line, and edge cameras for edge cracks.</p></div>
       </details>
-
       <details class="d warn">
         <summary>
-          <span class="t">Crazing recall is 0.224</span>
-          <span class="s">If crazing is the defect that costs you money, this model is not yet the answer for it.</span>
+          <span class="t">It checks steel photos, not any photo</span>
+          <span class="s">Give it something that is not steel and it may still report a defect.</span>
         </summary>
-        <div class="dbody">
-          <p>
-            The weakest class on the weakest axis. 53 of 68 crazing misses are blind misses, not
-            mislocalised ones. The per-class panel above explains why rather than averaging it away.
-          </p>
-        </div>
+        <div class="dbody"><p>On a line the cameras only ever see strip, and a separate check that rejects non-steel images is part of the full system. This demo page does not include it.</p></div>
       </details>
-
-      <details class="d warn">
-        <summary>
-          <span class="t">There are three different false-alarm numbers, not one</span>
-          <span class="s">A clean-crop proxy reads 23.7%, a legacy definition reads 59.4%, and the real clean-steel measurement reads 93.7%. The worst one is the one to trust.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            The NEU-DET clean-crop proxy reads &le;23.7% (95% CI [17.7%, 30.1%]) but its effective
-            sample size is 179 of 771 crops, and it ranges 5.8%&ndash;48.8% by source class. A legacy
-            definition of the same thing reads 59.4%. The real clean-steel measurement &mdash; 93.7%
-            before the fix, 32.5% after &mdash; is the one to trust, and it is much worse than the
-            proxy suggested.
-            <span class="src">reports/false_alarm.json; reports/gap1_cross_domain.json</span>
-          </p>
-        </div>
-      </details>
-
-      <details class="d warn">
-        <summary>
-          <span class="t">The cost model is an assumption, not a measurement</span>
-          <span class="s">5% defect prevalence and a 12:1 miss-to-false-alarm price are assumed. Every rupee figure is arithmetic on that assumption, printed with its inputs.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            Only the product of those two assumptions is identifiable. The operating point conf 0.15 is
-            set by a 90% detection floor, not by the economics. Read every money figure as a shape, not
-            a forecast.
-          </p>
-        </div>
-      </details>
-
-      <details class="d warn">
-        <summary>
-          <span class="t">What this page in particular does not do</span>
-          <span class="s">It runs the six-class model, not the better ten-class one, and it has no out-of-scope gate &mdash; it will confidently score a photograph of anything.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            The cross-domain false alarms above are live here. The out-of-scope gate is
-            <code>vendor/ood_guard.py</code> in the Python console and has not been ported. The tiled
-            path over a non-square frame has no Python reference, so the parity check covers the
-            single-pass path only and the strip results are a browser-against-Node comparison. And it
-            runs single-threaded on your CPU, so its timing is not the deployment timing.
-            <span class="src">site/verify/strip_check.json; site/verify/parity_browser.json</span>
-          </p>
-        </div>
-      </details>
-
-      <details class="d warn">
-        <summary>
-          <span class="t">Not measured, and therefore not claimed</span>
-          <span class="s">Seed variance, transfer across magnification, the anomaly channel and the closed loop back to the mill are proposed, not built.</span>
-        </summary>
-        <div class="dbody">
-          <p>
-            Three seeds per architecture is about 6.5 h on this machine and would upgrade the
-            nano-versus-small finding from "these weights" to "this architecture". The accuracy curve
-            was measured on 200&times;200 crops, and a 320 px tile at 0.2 mm/px covers 64 mm of strip.
-            <a href="technical.html#limits">The full limitations section</a> carries all of this at
-            length.
-          </p>
-        </div>
-      </details>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================== evidence -->
-<section id="evidence">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="idx">06</span>
-      <h2>Check any of it</h2>
-    </div>
-    <p class="sub">
-      A demo that quietly disagrees with the model it claims to be is worse than no demo, so this page
-      is driven headless in real Chrome and every detection is compared with the original PyTorch
-      model: <strong>40 of 40 matched, largest box difference 0.14 pixels.</strong> Every figure on
-      this site names the file it came from, and those files are published.
-    </p>
-
-    <div class="linkcards">
-      <a class="linkcard" href="technical.html">
-        <div class="t">Technical detail</div>
-        <div class="s">The parity harness, per-class results, calibration, throughput arithmetic and the full limitations.</div>
-      </a>
-      <a class="linkcard" href="evidence/">
-        <div class="t">Evidence</div>
-        <div class="s">14 report narratives and 28 JSON artefacts &mdash; the files the experiments wrote, not summaries of them.</div>
-      </a>
-      <a class="linkcard" href="console/">
-        <div class="t">Python console</div>
-        <div class="s">Batch scoring, coil reports, attention maps and the out-of-scope gate. Complete in this repository, one command to run.</div>
-      </a>
-      <a class="linkcard" href="https://github.com/surface-vision/surface-vision.github.io">
-        <div class="t">Repository</div>
-        <div class="s">The page, the model, the samples and the verification harness. No build step and no framework.</div>
-      </a>
     </div>
   </div>
 </section>
 
 <footer class="slim">
   <div class="wrap">
-    <div class="links">
-      <a href="technical.html">Technical detail</a>
-      <a href="evidence/">All evidence</a>
-      <a href="evidence/deck/JSW_Surface_Defect_Detection.pptx">Deck (pptx)</a>
-      <a href="verify/parity_browser.json">parity_browser.json</a>
-      <a href="verify/strip_check.json">strip_check.json</a>
-      <a href="console/">Python console source</a>
-      <a href="https://github.com/surface-vision/surface-vision.github.io">Repository</a>
-    </div>
     <p>
-      A capability demonstration on public research datasets (NEU-DET, GC10-DET, Severstal), not a
-      Jindal Stainless production system. No line data was used.
-      Wide strip samples: GC10-DET, CC BY 4.0, Lv et al., <em>Sensors</em> 2020.
-      <a href="technical.html">Full attribution and operating point</a>.
+      Built for the Jindal Stainless &ldquo;Stainless Spark&rdquo; case competition by Prathmesh Walimbe
+      and Krishna Kanta Mondal, IIT Bombay. A demonstration, not a Jindal Stainless system.
+      Trained and tested on public research datasets: NEU-DET (Northeastern University) and
+      Severstal steel defects.
     </p>
   </div>
 </footer>

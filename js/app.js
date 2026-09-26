@@ -11,13 +11,12 @@
  */
 
 import {
-  CLASS_NAMES, CLASS_COLORS, IMGSZ, SHIPPED_CONF, NMS_IOU,
+  CLASS_NAMES, CLASS_COLORS, IMGSZ, SHIPPED_CONF, NMS_IOU, displayName,
   preprocess, decode, nms,
 } from './detect.js';
 import { planTiles } from './tiling.js';
 import { calibrate, CALIBRATION } from './calibration.js';
 import { DEFECT_INFO, scoreDetection, severityBucket } from './defect-info.js';
-import { wireConsole } from './console-embed.js';
 
 /* onnxruntime-web, pinned to an exact version on both mirrors.
  *
@@ -31,7 +30,7 @@ const ORT_BASES = [
   `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`,
   `https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/${ORT_VERSION}/`,
 ];
-const MODEL_URL = new URL('../model/yolov8n_neudet_best.onnx', import.meta.url).href;
+const MODEL_URL = new URL('../model/detector.onnx', import.meta.url).href;
 
 /**
  * The twelve NEU-DET test frames, then the two wide GC10 strip frames.
@@ -58,8 +57,10 @@ const SAMPLES = [
   { file: 'rolled-in_scale_272.jpg', cls: 'rolled-in_scale', label: 'Rolled-in scale 2' },
   { file: 'crazing_271.jpg', cls: 'crazing', label: 'Crazing 1' },
   { file: 'crazing_272.jpg', cls: 'crazing', label: 'Crazing 2' },
-  { file: 'strip_rollmark.jpg', cls: null, label: 'Wide strip: roll mark', wide: true },
-  { file: 'strip_weldline.jpg', cls: null, label: 'Wide strip: weld line', wide: true },
+  { file: 'mill_defect_1.jpg', cls: 'severstal_1', label: 'Mill strip: defect 1', mill: true },
+  { file: 'mill_defect_2.jpg', cls: 'severstal_3', label: 'Mill strip: defect 2', mill: true },
+  { file: 'mill_clean_1.jpg', cls: null, label: 'Mill strip: clean 1', mill: true },
+  { file: 'mill_clean_2.jpg', cls: null, label: 'Mill strip: clean 2', mill: true },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -147,11 +148,11 @@ async function ensureSession() {
     ort.env.logLevel = 'error';
     state.ort = ort;
 
-    status('downloading the model -- 12.1 MB, once...');
+    status('loading the detector (12 MB, first visit only)...');
     const buf = await fetchWithProgress(MODEL_URL);
     progress(1);
 
-    status('preparing the model...');
+    status('starting the detector...');
     const session = await ort.InferenceSession.create(buf, {
       executionProviders: ['wasm'],
       graphOptimizationLevel: 'all',
@@ -166,12 +167,12 @@ async function ensureSession() {
     state.timing.first = performance.now() - t0;
 
     progressVisible(false);
-    status('ready -- the model is loaded and running on your CPU. Click a sample.');
+    status('Ready. Click a sample, or use your own image.');
     return session;
   })().catch((err) => {
     state.loading = null;
     progressVisible(false);
-    status(`the model could not load: ${err.message}`, true);
+    status('The detector could not load. Please refresh the page.', true);
     throw err;
   });
 
@@ -193,7 +194,7 @@ async function fetchWithProgress(url) {
     chunks.push(value);
     got += value.length;
     progress(got / total);
-    status(`downloading the model -- ${(got / 1048576).toFixed(1)} of ${(total / 1048576).toFixed(1)} MB`);
+    status(`loading the detector -- ${(got / 1048576).toFixed(1)} of ${(total / 1048576).toFixed(1)} MB`);
   }
   const out = new Uint8Array(got);
   let o = 0;
@@ -245,7 +246,7 @@ async function runOn(source, width, height, name) {
 
   const tiles = planTiles(width, height, IMGSZ);
   if (tiles.length > 1) {
-    status(`${name} -- ${width}x${height}, ${tiles.length} tiled passes...`);
+    status(`analysing ${name}...`);
   }
 
   let pre = 0;
@@ -278,11 +279,7 @@ async function runOn(source, width, height, name) {
   refilter();
   // The verdict line above states the ANSWER; this line states how it was computed, so
   // the two do not say the same thing twice.
-  status(`${name} -- ${width}x${height}, `
-    + (tiles.length > 1
-      ? `${tiles.length} tiled passes merged by one global NMS`
-      : 'single pass')
-    + `, conf ${fmt(state.conf, 2)}`);
+  status(`Analysed ${name}.`);
 }
 
 /**
@@ -397,7 +394,7 @@ function drawVerdict() {
   const n = state.dets.length;
   if (!n) {
     el.className = 'verdict none';
-    el.textContent = `No defect above the threshold in ${state.image.name}.`;
+    el.textContent = 'No defect found. This steel looks clean.';
     return;
   }
   const top = state.dets[0];
@@ -405,11 +402,11 @@ function drawVerdict() {
   el.className = 'verdict';
   el.style.setProperty('--cc', rgb(top.className));
   el.innerHTML = `<span class="dot"></span>`
-    + `<span class="nm">${n} detection${n === 1 ? '' : 's'}</span>`
+    + `<span class="nm">${n} defect${n === 1 ? '' : 's'}</span>`
     + `<span class="sep">&middot;</span>`
     // The calibrated probability, said the way a person would say it. Floored rather
     // than rounded so the wording can never claim more than the number does.
-    + `<span><span class="nm">${top.className.replace(/_/g, ' ')}</span>, `
+    + `<span><span class="nm">${displayName(top.className)}</span>, `
     + `${Math.floor(top.calibrated * 100)}% confidence</span>`
     + `<span class="sep">&middot;</span><span class="pill ${top.band}">${top.band}</span>`
     // The timing sits at the far end with no separator in front of it, so that when
@@ -493,12 +490,12 @@ function drawCanvas() {
   });
 
   for (const { d, sel, col, x, y, h } of chips) {
-    let text = `${d.className} ${fmt(d.calibrated, 2)}`;
+    let text = `${displayName(d.className)} ${Math.floor(d.calibrated * 100)}%`;
     let tw = g.measureText(text).width;
     // A chip wider than the frame is useless; drop to the score alone, then to
     // nothing, rather than painting over the defect the judge is trying to see.
     if (tw + pad * 2 > cvs.width) {
-      text = fmt(d.calibrated, 2);
+      text = `${Math.floor(d.calibrated * 100)}%`;
       tw = g.measureText(text).width;
       if (tw + pad * 2 > cvs.width) continue;
     }
@@ -528,7 +525,7 @@ function drawTable() {
   const empty = $('resEmpty');
   body.innerHTML = '';
   const n = state.dets.length;
-  $('detCount').textContent = `${n} detection${n === 1 ? '' : 's'}`;
+  $('detCount').textContent = `${n} defect${n === 1 ? '' : 's'} found`;
   empty.style.display = n ? 'none' : 'block';
   $('resTable').style.display = n ? 'table' : 'none';
   if (!n) return;
@@ -540,12 +537,10 @@ function drawTable() {
     // big -- then the two engineering columns, which are the ones allowed to scroll
     // off the right edge of a narrow panel.
     tr.innerHTML = `
-      <td class="mono"><span class="swatch" style="background:${rgb(d.className)}"></span>${d.className}</td>
-      <td class="num">${fmt(d.calibrated)}</td>
+      <td><span class="swatch" style="background:${rgb(d.className)}"></span>${displayName(d.className)}</td>
+      <td class="num">${Math.floor(d.calibrated * 100)}%</td>
       <td><span class="pill ${d.band}">${d.band}</span></td>
-      <td class="num">${(d.areaFrac * 100).toFixed(1)}%</td>
-      <td class="num" style="color:var(--muted)">${fmt(d.raw)}</td>
-      <td class="num" title="${Math.round(d.width)} x ${Math.round(d.height)} px">${Math.round(d.x1)}, ${Math.round(d.y1)}, ${Math.round(d.x2)}, ${Math.round(d.y2)}</td>`;
+      <td class="num">${(d.areaFrac * 100).toFixed(1)}%</td>`;
     tr.addEventListener('click', () => {
       state.selected = state.selected === i ? -1 : i;
       render();
@@ -558,27 +553,28 @@ function drawGuidance() {
   const host = $('guide');
   host.innerHTML = '';
   if (!state.dets.length) {
-    host.innerHTML = '<p class="empty">No detection above the threshold. Operator guidance appears here, one card per detection.</p>';
+    host.innerHTML = '<p class="empty">No defect found, so there is nothing to act on.</p>';
     return;
   }
   // One card per distinct class -- the guidance is per defect type, and six copies of
   // the same paragraph is not more informative than one.
   const seen = new Map();
   for (const d of state.dets) {
-    const cur = seen.get(d.className);
-    if (!cur || d.raw > cur.raw) seen.set(d.className, d);
+    const cur = seen.get(displayName(d.className));
+    if (!cur || d.raw > cur.raw) seen.set(displayName(d.className), d);
   }
-  for (const [name, d] of seen) {
+  for (const [label, d] of seen) {
+    const name = d.className;
     const info = DEFECT_INFO[name];
-    const count = state.dets.filter((x) => x.className === name).length;
+    const count = state.dets.filter((x) => displayName(x.className) === label).length;
     const card = document.createElement('div');
     card.className = 'gcard';
     card.style.setProperty('--cc', rgb(name));
     card.innerHTML = `
       <div class="top">
-        <span class="nm">${name}</span>
-        <span class="pill ${severityBucket(scoreDetection(name, d.raw, d.areaFrac))}">${info.severity} base tier</span>
-        <span class="cf">${count} box${count === 1 ? '' : 'es'} &middot; best p=${fmt(d.calibrated, 2)}</span>
+        <span class="nm">${label}</span>
+        <span class="pill ${severityBucket(scoreDetection(name, d.raw, d.areaFrac))}">${severityBucket(scoreDetection(name, d.raw, d.areaFrac))} severity</span>
+        <span class="cf">${count} found &middot; up to ${Math.floor(d.calibrated * 100)}% confidence</span>
       </div>
       <dl>
         <dt>Likely cause</dt><dd>${info.cause}</dd>
@@ -590,6 +586,7 @@ function drawGuidance() {
 
 function drawTiming() {
   const t = state.timing;
+  if (!$('tInfer')) return;
   // With tiling the session.run figure is a sum over windows, and saying so is the
   // difference between an honest number and one that looks like a regression.
   $('tInfer').textContent = t.infer === null
@@ -616,9 +613,9 @@ async function useSample(s, chip) {
   document.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
   if (chip) chip.classList.add('active');
   try {
-    status(`loading ${s.file}...`);
-    const img = await loadImageFromURL(`samples/${s.file}`, s.file);
-    await runOn(img, img.naturalWidth, img.naturalHeight, s.file);
+    status(`loading ${s.label}...`);
+    const img = await loadImageFromURL(`samples/${s.file}`, s.label);
+    await runOn(img, img.naturalWidth, img.naturalHeight, s.label);
   } catch (err) {
     status(err.message, true);
   }
@@ -650,11 +647,11 @@ function buildChips() {
   SAMPLES.forEach((s, i) => {
     // The two wide frames take a different route through the model, so they are
     // announced rather than dropped in among the square ones.
-    if (s.wide && !noted) {
+    if (s.mill && !noted) {
       noted = true;
       const note = document.createElement('div');
       note.className = 'row-note';
-      note.textContent = '2048 x 1000 line-scan frames -- these are cut into three windows:';
+      note.textContent = 'Real production strip from a steel mill, with and without defects:';
       host.appendChild(note);
     }
     const b = document.createElement('button');
@@ -714,60 +711,24 @@ function wireSlider() {
   const paint = () => {
     state.conf = parseFloat(sl.value);
     const shipped = Math.abs(state.conf - SHIPPED_CONF) < 1e-9;
-    $('confVal').textContent = fmt(state.conf, 2) + (shipped ? ' *' : '');
+    $('confVal').textContent = `${Math.round(state.conf * 100)}%`;
     $('confNote').textContent = shipped
-      ? 'the shipped operating point (reports/operating_point.json)'
-      : `moved off the shipped 0.15; p(defect) at this raw score is ${fmt(calibrate(state.conf), 3)}`;
+      ? 'recommended setting'
+      : (state.conf < SHIPPED_CONF ? 'more sensitive: catches more, with more false alarms'
+        : 'stricter: fewer false alarms, may miss faint defects');
   };
   sl.addEventListener('input', () => { paint(); refilter(); });
   paint();
 }
 
-function fillFacts() {
-  const set = (id, text) => { const el = $(id); if (el) el.textContent = text; };
-  set('calFacts',
-    `${CALIBRATION.method}, ${CALIBRATION.nKnots} knots, fitted on ${CALIBRATION.fitSplit}, `
-    + `ECE ${CALIBRATION.eceBefore.toFixed(4)} -> ${CALIBRATION.eceAfter.toFixed(4)} on ${CALIBRATION.evalSplit}`);
-  set('ortVer', `onnxruntime-web ${ORT_VERSION} / wasm`);
-  set('classList', CLASS_NAMES.join('  '));
-}
-
-/**
- * The recorded latency band inside the timing disclosure is read from the artefact
- * rather than typed into the HTML, so the page cannot drift away from the run that
- * produced it. Fetched on first open, not on load: nothing on the front page should
- * pay for a 25 KB report that a reader may never expand.
- */
-function wireLatencyFact() {
-  const host = $('latencyFact');
-  const det = host && host.closest('details');
-  if (!det) return;
-  let done = false;
-  det.addEventListener('toggle', async () => {
-    if (done || !det.open) return;
-    done = true;
-    try {
-      const r = await fetch('verify/parity_browser.json');
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const p = await r.json();
-      const t = p.summary.session_run_ms;
-      host.textContent = `min ${t.min.toFixed(1)}, median ${t.median.toFixed(1)}, `
-        + `max ${t.max.toFixed(1)} ms over ${p.summary.images} frames, in ${p.chrome}`;
-    } catch (err) {
-      done = false;
-      host.textContent = `(verify/parity_browser.json unreadable: ${err.message})`;
-    }
-  });
-}
+function fillFacts() {}
 
 /* ------------------------------------------------------------------ boot ---- */
 
 buildChips();
 wireSampleButtons();
-wireLatencyFact();
 wireDrop();
 wireSlider();
-wireConsole();
 fillFacts();
 drawTiming();
 drawVerdict();

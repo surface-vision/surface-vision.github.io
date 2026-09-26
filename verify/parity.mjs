@@ -43,7 +43,7 @@ function arg(name, fallback = null) {
   return i >= 0 && process.argv[i + 1] ? process.argv[i + 1] : fallback;
 }
 
-const MODEL = path.join(ROOT, 'site', 'model', 'yolov8n_neudet_best.onnx');
+const MODEL = path.join(ROOT, 'site', 'model', 'detector.onnx');
 const PY = JSON.parse(readFileSync(arg('--python', path.join(HERE, 'parity_python.json')), 'utf8'));
 const PIXELS = arg('--pixels', null);
 // Forces the jpeg-js source path while keeping the cv2 dumps available for the delta

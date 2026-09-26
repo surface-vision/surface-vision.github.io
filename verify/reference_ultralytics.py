@@ -29,7 +29,8 @@ sys.path.insert(0, str(ROOT))
 
 from src.inference import CLASS_NAMES, DEFAULT_IMGSZ  # noqa: E402
 
-WEIGHTS = ROOT / "models" / "yolov8n_neudet" / "weights" / "best.pt"
+WEIGHTS = ROOT / "models" / "yolov8n_joint" / "weights" / "best.pt"
+DEFAULT_IMGSZ = 320  # the demo model's size, chosen on val
 CONF = 0.15
 IOU = 0.45
 
@@ -63,6 +64,7 @@ def main() -> int:
             raise SystemExit(f"missing image: {p}")
 
     model = YOLO(str(WEIGHTS))
+    CLASS_NAMES = [model.names[i] for i in range(len(model.names))]  # from the checkpoint itself
     payload = {
         # Repo-relative on purpose: this file is served by GitHub Pages and the
         # page fetches it, so an absolute path here publishes the build host's

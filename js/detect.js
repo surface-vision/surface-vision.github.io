@@ -11,16 +11,15 @@
  *
  * Every constant here is fixed by the exported graph and the shipped operating
  * point, not chosen:
- *   input   "images"   float32 [1, 3, 256, 256]  RGB, /255, NCHW
- *   output  "output0"  float32 [1, 10, 1344]
- *   1344 anchors = 32*32 + 16*16 + 8*8   (strides 8, 16, 32 at 256 px)
- *   10 channels  = 4 box (cx, cy, w, h in input pixels) + 6 already-activated
+ *   input   "images"   float32 [1, 3, 320, 320]  RGB, /255, NCHW
+ *   output  "output0"  float32 [1, 14, 2100]
+ *   2100 anchors = 40*40 + 20*20 + 10*10  (strides 8, 16, 32 at 320 px)
+ *   14 channels  = 4 box (cx, cy, w, h in input pixels) + 10 already-activated
  *                  class scores (no sigmoid, the export bakes it in)
- *
- * Source of the layout: reports/export_summary.json -> verification.graph.
  */
 
-/** Class order is fixed by data/neu-det/data.yaml and by the trained head. */
+/** Class order is fixed by the trained head: six named defect types, then four
+ *  mill defect types that the public training data does not name. */
 export const CLASS_NAMES = [
   'crazing',
   'inclusion',
@@ -28,7 +27,26 @@ export const CLASS_NAMES = [
   'pitted_surface',
   'rolled-in_scale',
   'scratches',
+  'severstal_1',
+  'severstal_2',
+  'severstal_3',
+  'severstal_4',
 ];
+
+/** What a reader sees. The four unnamed mill types share one honest label. */
+export const DISPLAY_NAMES = {
+  crazing: 'Crazing',
+  inclusion: 'Inclusion',
+  patches: 'Patches',
+  pitted_surface: 'Pitted surface',
+  'rolled-in_scale': 'Rolled-in scale',
+  scratches: 'Scratches',
+  severstal_1: 'Unclassified defect',
+  severstal_2: 'Unclassified defect',
+  severstal_3: 'Unclassified defect',
+  severstal_4: 'Unclassified defect',
+};
+export const displayName = (name) => DISPLAY_NAMES[name] || name;
 
 /** src/inference.py -> CLASS_COLORS, verbatim, so demo and console agree on hue. */
 export const CLASS_COLORS = {
@@ -38,10 +56,14 @@ export const CLASS_COLORS = {
   pitted_surface: [170, 80, 220],
   'rolled-in_scale': [240, 190, 0],
   scratches: [0, 200, 160],
+  severstal_1: [150, 160, 175],
+  severstal_2: [150, 160, 175],
+  severstal_3: [150, 160, 175],
+  severstal_4: [150, 160, 175],
 };
 
-/** src/inference.py -> DEFAULT_IMGSZ. Chosen on val by src/model_study.py, not inherited. */
-export const IMGSZ = 256;
+/** Network input size, chosen on the validation split (scripts/build_demo_model.py). */
+export const IMGSZ = 320;
 
 /** reports/operating_point.json -> conf_threshold / iou_threshold. */
 export const SHIPPED_CONF = 0.15;
