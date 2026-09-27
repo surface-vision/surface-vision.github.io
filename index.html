@@ -37,7 +37,7 @@
           only at the end of the line. At 300 m/min no inspector can see the whole surface.
         </p>
         <p class="lede">
-          <strong>This page is the detector.</strong> Click a sample, or drop in your own photo of steel:
+          <strong>This page is the detector.</strong> Click a sample, or click the box to upload your own photo of steel:
           it finds each defect, names it, rates how serious it is and says what to do about it.
           Everything runs on your own machine. Nothing is uploaded.
         </p>
@@ -74,11 +74,11 @@
       <div class="panel demo-panel">
         <div class="hd">Live detector, running in this tab</div>
         <div class="bd">
-          <div id="drop">
+          <div id="drop" role="button" tabindex="0" aria-label="Upload a steel photo: click, or drag and drop a file here">
             <canvas id="view" style="display:none"></canvas>
             <div id="dropHint">
-              <b>Click a sample below</b><br>
-              or drop your own steel photo here
+              <b>Click to upload</b> or drop a steel photo here<br>
+              or pick a sample below
             </div>
           </div>
 

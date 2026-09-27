@@ -148,6 +148,9 @@ h3 { font-size: 1.02rem; font-weight: 640; margin: 30px 0 10px; }
   background: var(--panel-alt); min-height: 260px;
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
+#drop { cursor: pointer; }
+#drop:hover { border-color: var(--accent); }
+#drop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 #drop.over { border-color: var(--accent); background: #16191C; }
 #drop.has-image { border-style: solid; border-color: var(--border); background: #0B0E12; }
 #drop canvas { display: block; max-width: 100%; height: auto; image-rendering: crisp-edges; }

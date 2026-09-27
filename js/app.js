@@ -279,7 +279,7 @@ async function runOn(source, width, height, name) {
   refilter();
   // The verdict line above states the ANSWER; this line states how it was computed, so
   // the two do not say the same thing twice.
-  status(`Analysed ${name}.`);
+  status(`Analysed ${name}. Click the image or drop another photo to try again.`);
 }
 
 /**
@@ -696,8 +696,18 @@ function wireDrop() {
     const f = ev.dataTransfer?.files?.[0];
     if (f) useFile(f);
   });
-  $('file').addEventListener('change', (ev) => useFile(ev.target.files[0]));
-  $('pick').addEventListener('click', () => $('file').click());
+  // Clicking (or pressing Enter / Space on) the drop zone opens the file picker too.
+  const pickFile = () => $('file').click();
+  drop.addEventListener('click', pickFile);
+  drop.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pickFile(); }
+  });
+  $('file').addEventListener('change', (ev) => {
+    const f = ev.target.files[0];
+    ev.target.value = ''; // so choosing the same file again still triggers a run
+    if (f) useFile(f);
+  });
+  $('pick').addEventListener('click', pickFile);
   window.addEventListener('paste', (ev) => {
     const f = [...(ev.clipboardData?.files || [])][0];
     if (f) useFile(f);
