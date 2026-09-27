@@ -54,7 +54,7 @@
           <div class="fact">
             <div class="v good">4.7%</div>
             <div class="k">false alarms</div>
-            <div class="g">Only 14 of 300 clean mill images wrongly flagged. The previous version flagged 52%.</div>
+            <div class="g">Only 14 of 300 clean mill images wrongly flagged: fewer than 1 in 20.</div>
           </div>
           <div class="fact">
             <div class="v">178 / 180</div>
@@ -202,30 +202,35 @@
     </p>
 
     <div class="ba-bars">
-      <div class="ba-title" style="margin-bottom:8px">Clean mill strip wrongly flagged as defective</div>
-      <div class="ba-row before">
-        <div class="lab">First version<small>trained on lab images only</small></div>
-        <div class="ba-bar"><i style="width:51.7%"></i><b>52%</b></div>
+      <div class="ba-row after">
+        <div class="lab">Defects caught<small>real mill strip, 258 of 288</small></div>
+        <div class="ba-bar"><i style="width:89.6%"></i><b>90%</b></div>
       </div>
       <div class="ba-row after">
-        <div class="lab">This version<small>also trained on real clean strip</small></div>
+        <div class="lab">Right defect type<small>lab photographs, 178 of 180</small></div>
+        <div class="ba-bar"><i style="width:98.9%"></i><b>99%</b></div>
+      </div>
+      <div class="ba-row after">
+        <div class="lab">Clean strip flagged<small>lower is better, 14 of 300</small></div>
         <div class="ba-bar"><i style="width:4.7%"></i><b>4.7%</b></div>
       </div>
     </div>
     <p class="ba-cap">
-      A detector that raises an alarm on every other clean coil gets ignored. Teaching it what clean
-      steel looks like cut false alarms by a factor of ten, and it caught more real defects, not fewer.
+      It is trained on real clean strip as well as on defects, so an alarm means something: it finds
+      9 in 10 real defects while fewer than 1 in 20 clean images raise one.
     </p>
 
     <div class="tbl-wrap" style="margin-top:18px">
       <table class="data">
         <thead>
-          <tr><th>On images it never saw</th><th class="was">First version</th><th></th><th class="now">This version</th></tr>
+          <tr><th>On images it never saw</th><th class="now">Result</th><th>What it means</th></tr>
         </thead>
         <tbody>
-          <tr><td>Clean mill strip wrongly flagged</td><td class="num was">155 of 300</td><td class="arrow">&rarr;</td><td class="num now">14 of 300</td></tr>
-          <tr><td>Defects caught on real mill strip</td><td class="num was">133 of 288</td><td class="arrow">&rarr;</td><td class="num now">258 of 288</td></tr>
-          <tr><td>Right defect type named (lab images)</td><td class="num was">177 of 180</td><td class="arrow">&rarr;</td><td class="num now">178 of 180</td></tr>
+          <tr><td>Defects caught on real mill strip</td><td class="num now">258 of 288</td><td>9 in 10 defects found</td></tr>
+          <tr><td>Clean mill strip wrongly flagged</td><td class="num now">14 of 300</td><td>fewer than 1 in 20</td></tr>
+          <tr><td>Right defect type named (lab images)</td><td class="num now">178 of 180</td><td>99% named correctly</td></tr>
+          <tr><td>Confidence against reality</td><td class="num now">within ±3 points</td><td>a "70%" alarm is right about 70% of the time</td></tr>
+          <tr><td>Speed in a laptop browser</td><td class="num now">~55 ms per image</td><td>no GPU, nothing uploaded</td></tr>
         </tbody>
       </table>
     </div>
@@ -298,8 +303,8 @@
 <footer class="slim">
   <div class="wrap">
     <p>
-      Built for the Jindal Stainless &ldquo;Stainless Spark&rdquo; case competition by Prathmesh Walimbe
-      and Krishna Kanta Mondal, IIT Bombay. A demonstration, not a Jindal Stainless system.
+      Built by Team Futuristic for the Jindal Stainless &ldquo;Stainless Spark&rdquo; case competition: Krishna Kanta Mondal and Prathmesh Walimbe,
+      IIT Bombay. A demonstration, not a Jindal Stainless system.
       Trained and tested on public research datasets: NEU-DET (Northeastern University) and
       Severstal steel defects.
     </p>

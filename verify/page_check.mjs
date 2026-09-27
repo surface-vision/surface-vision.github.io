@@ -12,7 +12,7 @@ const errors = [];
 p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 p.on('pageerror', (e) => errors.push(String(e)));
 await p.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
-await p.goto('http://127.0.0.1:8777/', { waitUntil: 'networkidle0' });
+await p.goto(process.argv[3] || 'http://127.0.0.1:8777/', { waitUntil: 'networkidle0' });
 const run = async (label) => {
   await p.evaluate((l) => [...document.querySelectorAll('#chips .chip')].find((c) => c.textContent === l).click(), label);
   await p.waitForFunction((l) => { const v = document.getElementById('verdict'); return v && !/Nothing analysed/.test(v.textContent) && document.getElementById('status').textContent.indexOf('loading') < 0; }, { timeout: 60000 }, label);
